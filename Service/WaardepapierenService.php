@@ -112,8 +112,9 @@ class WaardepapierenService
         $proof['type'] = 'RsaSignature';
         // $proof['created'] = date('H:i:s d-m-Y', filectime("cert/{" . $certificate['organization'] . "}.pem"));
         $proof['proofPurpose'] = 'assertionMethode';
-        // $proof['verificationMethod'] = $this->requestStack->getCurrentRequest()->getSchemeAndHttpHost() . "/cert/{" . $certificate['organization'] . "}.pem";
-        // $proof['jws'] = $this->createJWS($certificate, $data['credentialSubject']);
+        // $proof['verificationMethod'] = $this->requestStack->getCurrentRequest()->getSchemeAndHttpHost() . "/cert/{" . $this->configuration['organization'] . "}.pem";
+        $proof['verificationMethod'] = 'http://localhost/cert/00000010.pem';
+        $proof['jws'] = $this->createJWS($certificate, $data['credentialSubject']);
 
         return $proof;
     }
@@ -131,9 +132,14 @@ class WaardepapierenService
         $algorithmManager = new AlgorithmManager([
             new RS512(),
         ]);
-        $jwk = JWKFactory::createFromKeyFile(
-            "../cert/{" . $certificate['organization'] . "}.pem"
+        // New
+        $jwk = JWKFactory::createFromKey(
+            $this->configuration['certificateKey']
         );
+        // Old
+        // $jwk = JWKFactory::createFromKeyFile(
+        //     "../cert/{" . $certificate['organization'] . "}.pem"
+        // );
         $jwsBuilder = new \Jose\Component\Signature\JWSBuilder($algorithmManager);
         $payload = json_encode([
             'iat'  => time(),
@@ -141,7 +147,7 @@ class WaardepapierenService
             'exp'  => time() + 3600,
             // 'crt'  => $this->commonGroundService->cleanUrl(['component' => 'frontend', 'type' => 'claims/public_keys', 'id' => $certificate['organization']]),
             'iss'  => $certificate['id'],
-            'aud'  => $certificate['personObject']['burgerservicenummer'] ?? $certificate['organizaiton'],
+            'aud'  => $certificate['personObject']['burgerservicenummer'] ?? $certificate['organization'],
             'data' => $data,
         ]);
         $jws = $jwsBuilder
@@ -211,9 +217,10 @@ class WaardepapierenService
         $algorithmManager = new AlgorithmManager([
             new RS512(),
         ]);
-        $jwk = JWKFactory::createFromKeyFile(
-            "../cert/{" . $certificate['organization'] . "}.pem"
-        );
+        $jwk = JWKFactory::createFromKey($this->configuration['certificateKey']);
+        // $jwk = JWKFactory::createFromKeyFile(
+        //     "../cert/{" . $certificate['organization'] . "}.pem"
+        // );
         $jwsBuilder = new \Jose\Component\Signature\JWSBuilder($algorithmManager);
         $jws = $jwsBuilder
             ->create()
@@ -229,12 +236,13 @@ class WaardepapierenService
      * This function creates the claim based on the type defined in the certificate object.
      *
      * @param array $certificate The certificate object
+     * @param string $key The certificate object
      *
      * @throws \Exception
      *
      * @return array The modified certificate object
      */
-    public function createClaim(array $certificate)
+    public function createClaim(array $certificate, string $key)
     {
         // Lets add data to this claim
         isset($certificate['claimData']) ? $claimData = $certificate['claimData'] : [];
@@ -273,7 +281,7 @@ class WaardepapierenService
         // Create token payload as a JSON string
         $certificate['irma'] = $certificate['discipl'];
 
-        // $certificate['jwt'] = $this->createJWT($certificate);;
+        $certificate['jwt'] = $this->createJWT($certificate);;
 
         return $certificate;
     }
@@ -294,6 +302,9 @@ class WaardepapierenService
         $pinkBRPGateway = $this->entityManager->find('App:Gateway', $configuration['source']);
         $templateGroup = $this->entityManager->find('App:ObjectEntity', $configuration['templateGroup']);
 
+        if (!isset($configuration['certificateKey'])) {
+            throw new \Exception('Certificate key not found, check WaardepapierenAction config');
+        }
         if (!$pinkBRPGateway instanceof Gateway) {
             throw new \Exception('PinkBRP gateway could not be found, check WaardepapierenAction config');
         }
@@ -327,7 +338,7 @@ class WaardepapierenService
         // 2. Vul data van certificate in
         $certificate['claimData']['persoon'] = $certificate['person'];
         $certificate['claimData']['type'] = $certificate['type'];
-        $certificate = $this->createClaim($certificate);
+        $certificate = $this->createClaim($certificate, $configuration['certificateKey']);
         // $certificate = $this->createImage($certificate);
         $certificate = $this->createDocument($certificate, $certTemplate);
 
