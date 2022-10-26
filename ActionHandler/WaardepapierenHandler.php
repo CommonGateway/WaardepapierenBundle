@@ -45,6 +45,6 @@ class WaardepapierenHandler
      */
     public function run(array $data, array $configuration): array
     {
-        return $this->waardepapierenService->test($data, $configuration);
+        return $this->waardepapierenService->waardepapierenHandler($data, $configuration);
     }
 }
