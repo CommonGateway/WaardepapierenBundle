@@ -298,13 +298,13 @@ class WaardepapierenService
      *
      * @return array The modified certificate object
      */
-    private function fetchPersoonsgegevens(Gateway $haalcentraalGateway): array
+    private function fetchPersoonsgegevens(Gateway $haalcentraalGateway, string $bsn): array
     {
         $haalcentraalEndpoint = '';
         try {
             $response = $this->callService->call(
                 $haalcentraalGateway,
-                $haalcentraalEndpoint,
+                '/ingeschrevenpersonen/' . $bsn,
                 'GET'
             );
         } catch (\Exception $exception) {
@@ -353,7 +353,7 @@ class WaardepapierenService
 
         // 1. Haal persoonsgegevens op bij pink haalcentraalGateway 
         // get persoonsgegevens with $haalcentraalGateway
-        $haalcentraalPersoon = $this->fetchPersoonsgegevens($haalcentraalGateway);
+        $haalcentraalPersoon = $this->fetchPersoonsgegevens($haalcentraalGateway, $certificate['person']);
 
         // Test object
         $certificate['person'] = 'http://localhost/api/ingeschrevenpersonen/1234567';
