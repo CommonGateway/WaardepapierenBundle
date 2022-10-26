@@ -5,8 +5,7 @@ namespace CommonGateway\WaardepapierenBundle\Service;
 use App\Entity\Entity;
 use App\Entity\ObjectEntity;
 use Doctrine\ORM\EntityManagerInterface;
-// use Endroid\QrCode\QrCode;
-// use Endroid\QrCodeBundle\Response\QrCodeResponse;
+use Endroid\QrCode\Factory\QrCodeFactoryInterface;
 use Dompdf\Dompdf;
 use Jose\Component\Core\AlgorithmManager;
 use Jose\Component\KeyManagement\JWKFactory;
@@ -24,7 +23,7 @@ class WaardepapierenService
     private array $configuration;
     private array $data;
     private Twig $twig;
-    // private QrCode $qrCode;
+    private QrCodeFactoryInterface $qrCode;
 
     /**
      * @param EntityManagerInterface $entityManager
@@ -32,42 +31,39 @@ class WaardepapierenService
     public function __construct(
         EntityManagerInterface $entityManager,
         ObjectEntityService $objectEntityService,
-        Twig $twig
-        // QrCode $qrCode
+        Twig $twig,
+        QrCodeFactoryInterface $qrCode
     ) {
         $this->entityManager = $entityManager;
         $this->objectEntityService = $objectEntityService;
         $this->twig = $twig;
-        // $this->qrCode = $qrCode;
+        $this->qrCode = $qrCode;
 
         $this->objectEntityRepo = $this->entityManager->getRepository(ObjectEntity::class);
         $this->entityRepo = $this->entityManager->getRepository(Entity::class);
     }
 
-    // /**
-    //  * This function creates a QR code for the given claim.
-    //  *
-    //  * @param array $certificate The certificate object
-    //  *
-    //  * @return array The modified certificate object
-    //  */
-    // public function createImage(array $certificate = [])
-    // {
-    //     // TODO testing, might not work
+    /**
+     * This function creates a QR code for the given claim.
+     *
+     * @param array $certificate The certificate object
+     *
+     * @return array The modified certificate object
+     */
+    public function createImage(array $certificate = [])
+    {
+        // Then we need to render the QR code
+        $qrCode = $this->qrCode->create($certificate['jwt'], [
+            'size'  => 1000,
+            'margin' => 1,
+            'writer' => 'png',
+        ]);
 
-    //     // Then we need to render the QR code
-    //     $qrCode = $this->qrCode->create($certificate['jwt'], [
-    //         'size'  => 1000,
-    //         'margin' => 1,
-    //         'writer' => 'png',
-    //     ]);
-    //     // $response = new QrCodeResponse($qrCode);
+        // And finnaly we need to set the result on the certificate resource
+        $certificate['image'] = 'data:image/png;base64,' . base64_encode($qrCode->writeString());
 
-    //     // And finnaly we need to set the result on the certificate resource
-    //     $certificate['image'] = 'data:image/png;base64,' . base64_encode($qrCode);
-
-    //     return $certificate;
-    // }
+        return $certificate;
+    }
 
     /**
      * This function generates a claim based on the w3c structure.
@@ -110,8 +106,10 @@ class WaardepapierenService
     {
         $proof = [];
         $proof['type'] = 'RsaSignature';
+        // @TODO when should created be set, we have no cert key file anymore ?
         // $proof['created'] = date('H:i:s d-m-Y', filectime("cert/{" . $certificate['organization'] . "}.pem"));
         $proof['proofPurpose'] = 'assertionMethode';
+        // @TODO what should the verifymethod be now, we have no cert key file anymore ?
         // $proof['verificationMethod'] = $this->requestStack->getCurrentRequest()->getSchemeAndHttpHost() . "/cert/{" . $this->configuration['organization'] . "}.pem";
         $proof['verificationMethod'] = 'http://localhost/cert/00000010.pem';
         $proof['jws'] = $this->createJWS($certificate, $data['credentialSubject']);
@@ -339,7 +337,7 @@ class WaardepapierenService
         $certificate['claimData']['persoon'] = $certificate['person'];
         $certificate['claimData']['type'] = $certificate['type'];
         $certificate = $this->createClaim($certificate, $configuration['certificateKey']);
-        // $certificate = $this->createImage($certificate);
+        $certificate = $this->createImage($certificate);
         $certificate = $this->createDocument($certificate, $certTemplate);
 
         $certificate['personObject'] = json_encode($certificate['personObject']);
