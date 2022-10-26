@@ -300,7 +300,6 @@ class WaardepapierenService
      */
     private function fetchPersoonsgegevens(Gateway $haalcentraalGateway, string $bsn): array
     {
-        $haalcentraalEndpoint = '';
         try {
             $response = $this->callService->call(
                 $haalcentraalGateway,
