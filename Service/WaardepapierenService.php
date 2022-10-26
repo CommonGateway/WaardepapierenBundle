@@ -23,7 +23,7 @@ class WaardepapierenService
     private ObjectEntityService $objectEntityService;
     private array $configuration;
     private array $data;
-    private $twig;
+    private Twig $twig;
     // private QrCode $qrCode;
 
     /**
@@ -158,6 +158,7 @@ class WaardepapierenService
      * This function creates the (pdf) document for a given certificate type.
      *
      * @param array $certificate The certificate object
+     * @param array $template The twig template
      *
      * @throws \Twig\Error\LoaderError
      * @throws \Twig\Error\RuntimeError
@@ -165,7 +166,7 @@ class WaardepapierenService
      *
      * @return array The modified certificate object
      */
-    public function createDocument(array $certificate)
+    public function createDocument(array $certificate, array $certTemplate)
     {
         $data = [
             'qr'     => $certificate['image'],
@@ -179,8 +180,10 @@ class WaardepapierenService
         // }
 
         // First we need the HTML  for the template
-        // $html = $this->twig->render('certificates/' . $certificate->getType() . '.html.twig', array_filter($data));
-        $html = json_encode($data);
+        $createdTemplate = $this->twig->createTemplate($certTemplate['content']);
+        $html = $this->twig->render($createdTemplate, array_filter($data));
+
+        // $html = json_encode($data);
 
         // Then we need to render the template
         $dompdf = new DOMPDF();
@@ -289,9 +292,24 @@ class WaardepapierenService
         $this->configuration = $configuration;
 
         $pinkBRPGateway = $this->entityManager->find('App:Gateway', $configuration['source']);
+        $templateGroup = $this->entityManager->find('App:ObjectEntity', $configuration['templateGroup']);
 
         if (!$pinkBRPGateway instanceof Gateway) {
-            throw new \Exception('PinkBRP gateway could not be found');
+            throw new \Exception('PinkBRP gateway could not be found, check WaardepapierenAction config');
+        }
+        if (!$templateGroup instanceof ObjectEntity) {
+            throw new \Exception('Template group could not be found, check WaardepapierenAction config');
+        }
+
+        $templates = $templateGroup->getValue('templates');
+        foreach ($templates as $template) {
+            if ($template->getValue('description') == $certificate['type']) {
+                $certTemplate = $template->toArray();
+                break;
+            }
+        }
+        if (!isset($certTemplate)) {
+            throw new \Exception('No template found for certificate type');
         }
 
         // 1. Haal persoonsgegevens op bij pink brp 
@@ -311,7 +329,7 @@ class WaardepapierenService
         $certificate['claimData']['type'] = $certificate['type'];
         $certificate = $this->createClaim($certificate);
         // $certificate = $this->createImage($certificate);
-        $certificate = $this->createDocument($certificate);
+        $certificate = $this->createDocument($certificate, $certTemplate);
 
         $certificate['personObject'] = json_encode($certificate['personObject']);
         $certificate['irma'] = json_encode($certificate['irma']);
