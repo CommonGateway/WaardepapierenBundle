@@ -10,6 +10,7 @@
             <argument key="$objectEntityService" type="service" id="App\Service\ObjectEntityService"/>
             <argument key="$twig" type="service" id="Twig\Environment"/>
             <argument key="$qrCode" type="service" id="Endroid\QrCode\Factory\QrCodeFactoryInterface"/>
+            <argument key="$callService" type="service" id="CommonGateway\CoreBundle\Service\CallService"/>
         </service>
         <service public="true" id="CommonGateway\WaardepapierenBundle\ActionHandler\WaardepapierenHandler" />
     </services>

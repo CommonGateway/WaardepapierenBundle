@@ -14,6 +14,8 @@ use Jose\Component\Signature\Serializer\CompactSerializer;
 use Twig\Environment as Twig;
 use App\Entity\Gateway;
 use App\Service\ObjectEntityService;
+use CommonGateway\CoreBundle\Service\CallService;
+use Exception;
 
 class WaardepapierenService
 {
@@ -24,6 +26,7 @@ class WaardepapierenService
     private array $data;
     private Twig $twig;
     private QrCodeFactoryInterface $qrCode;
+    private CallService $callService;
 
     /**
      * @param EntityManagerInterface $entityManager
@@ -32,12 +35,14 @@ class WaardepapierenService
         EntityManagerInterface $entityManager,
         ObjectEntityService $objectEntityService,
         Twig $twig,
-        QrCodeFactoryInterface $qrCode
+        QrCodeFactoryInterface $qrCode,
+        CallService $callService
     ) {
         $this->entityManager = $entityManager;
         $this->objectEntityService = $objectEntityService;
         $this->twig = $twig;
         $this->qrCode = $qrCode;
+        $this->callService = $callService;
 
         $this->objectEntityRepo = $this->entityManager->getRepository(ObjectEntity::class);
         $this->entityRepo = $this->entityManager->getRepository(Entity::class);
@@ -285,6 +290,31 @@ class WaardepapierenService
     }
 
     /**
+     * This function fetches a haalcentraal persoon with the callService.
+     *
+     * @param Gateway $haalcentraalGateway The haalcentraal gateway
+     *
+     * @throws \Exception
+     *
+     * @return array The modified certificate object
+     */
+    private function fetchPersoonsgegevens(Gateway $haalcentraalGateway): array
+    {
+        $haalcentraalEndpoint = '';
+        try {
+            $response = $this->callService->call(
+                $haalcentraalGateway,
+                $haalcentraalEndpoint,
+                'GET'
+            );
+        } catch (\Exception $exception) {
+            throw new Exception($exception->getMessage());
+        }
+
+        return $this->callService->decodeResponse($haalcentraalGateway, $response);
+    }
+
+    /**
      * Creates or updates a Certificate.
      *
      * @param array $data          Data from the handler where the xxllnc casetype is in.
@@ -297,13 +327,13 @@ class WaardepapierenService
         $certificate = $data['response'];
         $this->configuration = $configuration;
 
-        $pinkBRPGateway = $this->entityManager->find('App:Gateway', $configuration['source']);
+        $haalcentraalGateway = $this->entityManager->find('App:Gateway', $configuration['source']);
         $templateGroup = $this->entityManager->find('App:ObjectEntity', $configuration['templateGroup']);
 
         if (!isset($configuration['certificateKey'])) {
             throw new \Exception('Certificate key not found, check WaardepapierenAction config');
         }
-        if (!$pinkBRPGateway instanceof Gateway) {
+        if (!$haalcentraalGateway instanceof Gateway) {
             throw new \Exception('PinkBRP gateway could not be found, check WaardepapierenAction config');
         }
         if (!$templateGroup instanceof ObjectEntity) {
@@ -321,8 +351,9 @@ class WaardepapierenService
             throw new \Exception('No template found for certificate type');
         }
 
-        // 1. Haal persoonsgegevens op bij pink brp 
-        // get persoonsgegevens with $pinkBRPGateway
+        // 1. Haal persoonsgegevens op bij pink haalcentraalGateway 
+        // get persoonsgegevens with $haalcentraalGateway
+        $haalcentraalPersoon = $this->fetchPersoonsgegevens($haalcentraalGateway);
 
         // Test object
         $certificate['person'] = 'http://localhost/api/ingeschrevenpersonen/1234567';
