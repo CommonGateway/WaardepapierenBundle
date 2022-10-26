@@ -1,5 +1,5 @@
 {
-    "name": "common-gateway/pet-store-bundle",
+    "name": "common-gateway/waardepapieren-bundle",
     "description": "An example package for creating symfony flex bundles as plugins",
 	"type" : "symfony-bundle",
     "license": "EUPL-1.2",
@@ -12,7 +12,7 @@
 	},
 	"autoload" : {
 		"psr-4" : {
-			"CommonGateway\\PetStoreBundle\\" : ""
+			"CommonGateway\\WaardepapierenBundle\\" : ""
 		}
 	}
 }
