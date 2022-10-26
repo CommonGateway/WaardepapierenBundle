@@ -5,7 +5,11 @@
         https://symfony.com/schema/dic/services/services-1.0.xsd">
     <services>
         <defaults autowire="true" autoconfigure="true" />
-        <service public="true" id="CommonGateway\WaardepapierenBundle\Service\WaardepapierenService" />
+        <service public="true" id="CommonGateway\WaardepapierenBundle\Service\WaardepapierenService" >
+            <argument key="$entityManager" type="service" id="Doctrine\ORM\EntityManagerInterface"/>
+            <argument key="$objectEntityService" type="service" id="App\Service\ObjectEntityService"/>
+            <argument key="$twig" type="service" id="Twig\Environment"/>
+        </service>
         <service public="true" id="CommonGateway\WaardepapierenBundle\ActionHandler\WaardepapierenHandler" />
     </services>
 </container>
