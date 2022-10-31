@@ -312,6 +312,44 @@ class WaardepapierenService
 
         return $this->callService->decodeResponse($haalcentraalGateway, $response);
     }
+    /**
+     * Validates action config
+     * 
+     * @throws \Exception
+     * 
+     * @return array Template for certificate
+     */
+    public function validateConfig($certificate, $haalcentraalGateway, $templateGroup, $zaakType, $zaakEntity): ?array
+    {
+        if (!isset($this->configuration['certificateKey'])) {
+            throw new \Exception('Certificate key not found, check WaardepapierenAction config');
+        }
+        if (!$haalcentraalGateway instanceof Gateway) {
+            throw new \Exception('PinkBRP gateway could not be found, check WaardepapierenAction config');
+        }
+        if (!$templateGroup instanceof ObjectEntity) {
+            throw new \Exception('Template group could not be found, check WaardepapierenAction config');
+        }
+        if (!$zaakType instanceof ObjectEntity) {
+            throw new \Exception('ZaakType could not be found, check WaardepapierenAction config');
+        }
+        if (!$zaakEntity instanceof Entity) {
+            throw new \Exception('Zaak could not be found, check WaardepapierenAction config');
+        }
+
+        $templates = $templateGroup->getValue('templates');
+        foreach ($templates as $template) {
+            if ($template->getValue('description') == $certificate['type']) {
+                $certTemplate = $template->toArray();
+                break;
+            }
+        }
+        if (!isset($certTemplate)) {
+            throw new \Exception('No template found for certificate type');
+        }
+
+        return $certTemplate;
+    }
 
     /**
      * Creates or updates a Certificate.
@@ -328,31 +366,14 @@ class WaardepapierenService
 
         $haalcentraalGateway = $this->entityManager->find('App:Gateway', $configuration['source']);
         $templateGroup = $this->entityManager->find('App:ObjectEntity', $configuration['templateGroup']);
+        $zaakType = $this->entityManager->find('App:ObjectEntity', $configuration['zaakType']);
+        $zaakEntity = $this->entityManager->find('App:Entity', $configuration['entities']['Zaak']);
 
-        if (!isset($configuration['certificateKey'])) {
-            throw new \Exception('Certificate key not found, check WaardepapierenAction config');
-        }
-        if (!$haalcentraalGateway instanceof Gateway) {
-            throw new \Exception('PinkBRP gateway could not be found, check WaardepapierenAction config');
-        }
-        if (!$templateGroup instanceof ObjectEntity) {
-            throw new \Exception('Template group could not be found, check WaardepapierenAction config');
-        }
-
-        $templates = $templateGroup->getValue('templates');
-        foreach ($templates as $template) {
-            if ($template->getValue('description') == $certificate['type']) {
-                $certTemplate = $template->toArray();
-                break;
-            }
-        }
-        if (!isset($certTemplate)) {
-            throw new \Exception('No template found for certificate type');
-        }
+        $certTemplate = $this->validateConfig($certificate, $haalcentraalGateway, $templateGroup, $zaakType, $zaakEntity);
 
         // 1. Haal persoonsgegevens op bij pink haalcentraalGateway 
         // get persoonsgegevens with $haalcentraalGateway
-        $haalcentraalPersoon = $this->fetchPersoonsgegevens($haalcentraalGateway, $certificate['person']);
+        // $haalcentraalPersoon = $this->fetchPersoonsgegevens($haalcentraalGateway, $certificate['person']);
 
         // Test object
         $certificate['person'] = 'http://localhost/api/ingeschrevenpersonen/1234567';
@@ -376,7 +397,32 @@ class WaardepapierenService
 
         $certificateObjectEntity = $this->objectEntityRepo->find($certificate['id']);
         $certificateObjectEntity->hydrate($certificate);
+
         $this->entityManager->persist($certificateObjectEntity);
+
+        // 3. Create zaak
+        $zaakObject = new ObjectEntity($zaakEntity);
+        $zaakObject->setValue('zaaktype', $zaakType);
+
+        foreach ($zaakType->toArray()['eigenschappen'] as $eigenschap) {
+            if ($eigenschap['naam'] == 'bsn') {
+                $eigenschapBsn = $eigenschap;
+            } elseif ($eigenschap['naam'] == 'type certificaat') {
+                $eigenschapCert = $eigenschap;
+            }
+        }
+
+        $zaakObject->setValue('eigenschappen', [[
+            'omschrijving' => $eigenschapBsn['naam'],
+            // 'waarde' => $haalcentraalPersoon['bsn'],
+            'eigenschap' => $this->entityManager->find('App:ObjectEntity',  $eigenschapBsn['id'])
+        ], [
+            'omschrijving' => $eigenschapCert['naam'],
+            'waarde' => $certificate['type'],
+            'eigenschap' => $this->entityManager->find('App:ObjectEntity', $eigenschapCert['id'])
+        ]]);
+
+        $this->entityManager->persist($zaakObject);
         $this->entityManager->flush();
 
         $certificate = $certificateObjectEntity->toArray();
