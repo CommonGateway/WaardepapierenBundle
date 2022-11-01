@@ -15,6 +15,7 @@ use Twig\Environment as Twig;
 use App\Entity\Gateway;
 use App\Service\ObjectEntityService;
 use CommonGateway\CoreBundle\Service\CallService;
+use CommonGateway\CoreBundle\Service\FileService;
 use Exception;
 
 class WaardepapierenService
@@ -27,6 +28,7 @@ class WaardepapierenService
     private Twig $twig;
     private QrCodeFactoryInterface $qrCode;
     private CallService $callService;
+    private FileService $fileService;
 
     /**
      * @param EntityManagerInterface $entityManager
@@ -36,13 +38,15 @@ class WaardepapierenService
         ObjectEntityService $objectEntityService,
         Twig $twig,
         QrCodeFactoryInterface $qrCode,
-        CallService $callService
+        CallService $callService,
+        FileService $fileService
     ) {
         $this->entityManager = $entityManager;
         $this->objectEntityService = $objectEntityService;
         $this->twig = $twig;
         $this->qrCode = $qrCode;
         $this->callService = $callService;
+        $this->fileService = $fileService;
 
         $this->objectEntityRepo = $this->entityManager->getRepository(ObjectEntity::class);
         $this->entityRepo = $this->entityManager->getRepository(Entity::class);
@@ -298,17 +302,26 @@ class WaardepapierenService
      *
      * @return array The modified certificate object
      */
-    private function fetchPersoonsgegevens(Gateway $haalcentraalGateway, string $bsn): array
+    private function fetchPersoonsgegevens(Gateway $haalcentraalGateway, string $bsn, string $certFile, string $certKeyFile): array
     {
-        try {
-            $response = $this->callService->call(
-                $haalcentraalGateway,
-                '/ingeschrevenpersonen/' . $bsn,
-                'GET'
-            );
-        } catch (\Exception $exception) {
-            throw new Exception($exception->getMessage());
-        }
+        // try {
+        $response = $this->callService->call(
+            $haalcentraalGateway,
+            '/ingeschrevenpersonen/' . $bsn,
+            'GET',
+            [
+                'cert' => $certFile,
+                'ssl_key' => [$certKeyFile, $this->configuration['authorization']['password']],
+                'headers' => [
+                    'x-doelbinding' => $this->configuration['authorization']['x-doelbinding'],
+                    'x-origin-oin' => $this->configuration['authorization']['x-origin-oin']
+                ],
+                'verify' => false
+            ]
+        );
+        // } catch (\Exception $exception) {S
+        //     throw new Exception($exception->getMessage());
+        // }
 
         return $this->callService->decodeResponse($haalcentraalGateway, $response);
     }
@@ -323,6 +336,15 @@ class WaardepapierenService
     {
         if (!isset($this->configuration['certificateKey'])) {
             throw new \Exception('Certificate key not found, check WaardepapierenAction config');
+        }
+        if (!isset($this->configuration['authorization']['certificate'])) {
+            throw new \Exception('Auth certificate key not found, check WaardepapierenAction config');
+        }
+        if (!isset($this->configuration['authorization']['certificateKey'])) {
+            throw new \Exception('Auth certificate key not found, check WaardepapierenAction config');
+        }
+        if (!isset($this->configuration['authorization']['password'])) {
+            throw new \Exception('Auth certificate password not found, check WaardepapierenAction config');
         }
         if (!$haalcentraalGateway instanceof Gateway) {
             throw new \Exception('PinkBRP gateway could not be found, check WaardepapierenAction config');
@@ -364,16 +386,19 @@ class WaardepapierenService
         $certificate = $data['response'];
         $this->configuration = $configuration;
 
-        $haalcentraalGateway = $this->entityManager->find('App:Gateway', $configuration['source']);
-        $templateGroup = $this->entityManager->find('App:ObjectEntity', $configuration['templateGroup']);
-        $zaakType = $this->entityManager->find('App:ObjectEntity', $configuration['zaakType']);
-        $zaakEntity = $this->entityManager->find('App:Entity', $configuration['entities']['Zaak']);
+        $haalcentraalGateway = $this->entityManager->find('App:Gateway', $this->configuration['source']);
+        $templateGroup = $this->entityManager->find('App:ObjectEntity', $this->configuration['templateGroup']);
+        $zaakType = $this->entityManager->find('App:ObjectEntity', $this->configuration['zaakType']);
+        $zaakEntity = $this->entityManager->find('App:Entity', $this->configuration['entities']['Zaak']);
 
         $certTemplate = $this->validateConfig($certificate, $haalcentraalGateway, $templateGroup, $zaakType, $zaakEntity);
 
+        $brpCert = $this->fileService->writeFile('brp-cert', $this->configuration['authorization']['certificate']);
+        $brpCertKey = $this->fileService->writeFile('brp-cert-key', $this->configuration['authorization']['certificateKey']);
+
         // 1. Haal persoonsgegevens op bij pink haalcentraalGateway 
         // get persoonsgegevens with $haalcentraalGateway
-        // $haalcentraalPersoon = $this->fetchPersoonsgegevens($haalcentraalGateway, $certificate['person']);
+        $haalcentraalPersoon = $this->fetchPersoonsgegevens($haalcentraalGateway, $certificate['person'], $brpCert, $brpCertKey);
 
         // Test object
         $certificate['person'] = 'http://localhost/api/ingeschrevenpersonen/1234567';
@@ -400,29 +425,29 @@ class WaardepapierenService
 
         $this->entityManager->persist($certificateObjectEntity);
 
-        // 3. Create zaak
-        $zaakObject = new ObjectEntity($zaakEntity);
-        $zaakObject->setValue('zaaktype', $zaakType);
+        // // 3. Create zaak
+        // $zaakObject = new ObjectEntity($zaakEntity);
+        // $zaakObject->setValue('zaaktype', $zaakType);
 
-        foreach ($zaakType->toArray()['eigenschappen'] as $eigenschap) {
-            if ($eigenschap['naam'] == 'bsn') {
-                $eigenschapBsn = $eigenschap;
-            } elseif ($eigenschap['naam'] == 'type certificaat') {
-                $eigenschapCert = $eigenschap;
-            }
-        }
+        // foreach ($zaakType->toArray()['eigenschappen'] as $eigenschap) {
+        //     if ($eigenschap['naam'] == 'bsn') {
+        //         $eigenschapBsn = $eigenschap;
+        //     } elseif ($eigenschap['naam'] == 'type certificaat') {
+        //         $eigenschapCert = $eigenschap;
+        //     }
+        // }
 
-        $zaakObject->setValue('eigenschappen', [[
-            'omschrijving' => $eigenschapBsn['naam'],
-            // 'waarde' => $haalcentraalPersoon['bsn'],
-            'eigenschap' => $this->entityManager->find('App:ObjectEntity',  $eigenschapBsn['id'])
-        ], [
-            'omschrijving' => $eigenschapCert['naam'],
-            'waarde' => $certificate['type'],
-            'eigenschap' => $this->entityManager->find('App:ObjectEntity', $eigenschapCert['id'])
-        ]]);
+        // $zaakObject->setValue('eigenschappen', [[
+        //     'omschrijving' => $eigenschapBsn['naam'],
+        //     // 'waarde' => $haalcentraalPersoon['bsn'],
+        //     'eigenschap' => $this->entityManager->find('App:ObjectEntity',  $eigenschapBsn['id'])
+        // ], [
+        //     'omschrijving' => $eigenschapCert['naam'],
+        //     'waarde' => $certificate['type'],
+        //     'eigenschap' => $this->entityManager->find('App:ObjectEntity', $eigenschapCert['id'])
+        // ]]);
 
-        $this->entityManager->persist($zaakObject);
+        // $this->entityManager->persist($zaakObject);
         $this->entityManager->flush();
 
         $certificate = $certificateObjectEntity->toArray();

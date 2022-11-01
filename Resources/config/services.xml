@@ -11,6 +11,7 @@
             <argument key="$twig" type="service" id="Twig\Environment"/>
             <argument key="$qrCode" type="service" id="Endroid\QrCode\Factory\QrCodeFactoryInterface"/>
             <argument key="$callService" type="service" id="CommonGateway\CoreBundle\Service\CallService"/>
+            <argument key="$fileService" type="service" id="CommonGateway\CoreBundle\Service\FileService"/>
         </service>
         <service public="true" id="CommonGateway\WaardepapierenBundle\ActionHandler\WaardepapierenHandler" />
     </services>
