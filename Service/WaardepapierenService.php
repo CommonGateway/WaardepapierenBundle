@@ -193,8 +193,9 @@ class WaardepapierenService
         // }
 
         // First we need the HTML  for the template
-        $createdTemplate = $this->twig->createTemplate($certTemplate['content']);
-        $html = $this->twig->render($createdTemplate, array_filter($data));
+        // var_dump($certTemplate['content']);
+        $createdTemplate = $this->twig->createTemplate("<div style=\"float: left\">{{ \"Persoon: \"~person.burgerservicenummer }}</div>");
+        $html = $this->twig->render($createdTemplate, $data);
 
         // $html = json_encode($data);
 
@@ -302,26 +303,26 @@ class WaardepapierenService
      *
      * @return array The modified certificate object
      */
-    private function fetchPersoonsgegevens(Gateway $haalcentraalGateway, string $bsn, string $certFile, string $certKeyFile): array
+    private function fetchPersoonsgegevens(Gateway $haalcentraalGateway, string $bsn, string $certFile, string $certKeyFile)
     {
-        // try {
-        $response = $this->callService->call(
-            $haalcentraalGateway,
-            '/ingeschrevenpersonen/' . $bsn,
-            'GET',
-            [
-                'cert' => $certFile,
-                'ssl_key' => [$certKeyFile, $this->configuration['authorization']['password']],
-                'headers' => [
-                    'x-doelbinding' => $this->configuration['authorization']['x-doelbinding'],
-                    'x-origin-oin' => $this->configuration['authorization']['x-origin-oin']
-                ],
-                'verify' => false
-            ]
-        );
-        // } catch (\Exception $exception) {S
-        //     throw new Exception($exception->getMessage());
-        // }
+        try {
+            $response = $this->callService->call(
+                $haalcentraalGateway,
+                '/ingeschrevenpersonen/' . $bsn,
+                'GET',
+                [
+                    'cert' => $certFile,
+                    'ssl_key' => [$certKeyFile, $this->configuration['authorization']['password']],
+                    'headers' => [
+                        'x-doelbinding' => $this->configuration['authorization']['x-doelbinding'],
+                        'x-origin-oin' => $this->configuration['authorization']['x-origin-oin']
+                    ],
+                    'verify' => false
+                ]
+            );
+        } catch (\Exception $exception) {
+            throw new Exception($exception->getMessage());
+        }
 
         return $this->callService->decodeResponse($haalcentraalGateway, $response);
     }
@@ -393,21 +394,18 @@ class WaardepapierenService
 
         $certTemplate = $this->validateConfig($certificate, $haalcentraalGateway, $templateGroup, $zaakType, $zaakEntity);
 
-        $brpCert = $this->fileService->writeFile('brp-cert', $this->configuration['authorization']['certificate']);
-        $brpCertKey = $this->fileService->writeFile('brp-cert-key', $this->configuration['authorization']['certificateKey']);
+        $brpCert = $this->fileService->writeFile('brp-cert', $this->configuration['authorization']['certificate'], 'crt');
+        $brpCertKey = $this->fileService->writeFile('brp-cert-key', $this->configuration['authorization']['certificateKey'], 'key');
 
         // 1. Haal persoonsgegevens op bij pink haalcentraalGateway 
         // get persoonsgegevens with $haalcentraalGateway
-        $haalcentraalPersoon = $this->fetchPersoonsgegevens($haalcentraalGateway, $certificate['person'], $brpCert, $brpCertKey);
+        $brpPersoon = $this->fetchPersoonsgegevens($haalcentraalGateway, $certificate['person'], $brpCert, $brpCertKey);
 
+        // var_dump(json_encode($brpPersoon));
         // Test object
-        $certificate['person'] = 'http://localhost/api/ingeschrevenpersonen/1234567';
-        $certificate['personObject'] = [
-            'id'                     => '1234567',
-            '@id'                    => 'http://localhost/api/ingeschrevenpersonen/1234567',
-            'burgerservicenummer'    => '1234567',
-            'naam' => 'Barry Brands'
-        ];
+        $certificate['person'] = 'https://' .  $haalcentraalGateway->getLocation() . '/ingeschrevenpersonen/' . $brpPersoon['burgerservicenummer'];
+        unset($brpPersoon['_links']);
+        $certificate['personObject'] = $brpPersoon;
 
         // 2. Vul data van certificate in
         $certificate['claimData']['persoon'] = $certificate['person'];
@@ -424,30 +422,6 @@ class WaardepapierenService
         $certificateObjectEntity->hydrate($certificate);
 
         $this->entityManager->persist($certificateObjectEntity);
-
-        // // 3. Create zaak
-        // $zaakObject = new ObjectEntity($zaakEntity);
-        // $zaakObject->setValue('zaaktype', $zaakType);
-
-        // foreach ($zaakType->toArray()['eigenschappen'] as $eigenschap) {
-        //     if ($eigenschap['naam'] == 'bsn') {
-        //         $eigenschapBsn = $eigenschap;
-        //     } elseif ($eigenschap['naam'] == 'type certificaat') {
-        //         $eigenschapCert = $eigenschap;
-        //     }
-        // }
-
-        // $zaakObject->setValue('eigenschappen', [[
-        //     'omschrijving' => $eigenschapBsn['naam'],
-        //     // 'waarde' => $haalcentraalPersoon['bsn'],
-        //     'eigenschap' => $this->entityManager->find('App:ObjectEntity',  $eigenschapBsn['id'])
-        // ], [
-        //     'omschrijving' => $eigenschapCert['naam'],
-        //     'waarde' => $certificate['type'],
-        //     'eigenschap' => $this->entityManager->find('App:ObjectEntity', $eigenschapCert['id'])
-        // ]]);
-
-        // $this->entityManager->persist($zaakObject);
         $this->entityManager->flush();
 
         $certificate = $certificateObjectEntity->toArray();
