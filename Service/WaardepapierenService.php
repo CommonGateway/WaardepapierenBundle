@@ -193,8 +193,7 @@ class WaardepapierenService
         // }
 
         // First we need the HTML  for the template
-        // var_dump($certTemplate['content']);
-        $createdTemplate = $this->twig->createTemplate("<div style=\"float: left\">{{ \"Persoon: \"~person.burgerservicenummer }}</div>");
+        $createdTemplate = $this->twig->createTemplate($certTemplate['content']);
         $html = $this->twig->render($createdTemplate, $data);
 
         // $html = json_encode($data);
