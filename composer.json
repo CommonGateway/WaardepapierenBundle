@@ -1,7 +1,7 @@
 {
     "name": "common-gateway/waardepapieren-bundle",
     "description": "An example package for creating symfony flex bundles as plugins",
-	"type" : "symfony-bundle",
+     "type" : "common-gateway-plugin",
     "license": "EUPL-1.2",
     "minimum-stability" : "dev",
     "require": {
