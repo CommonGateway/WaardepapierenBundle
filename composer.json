@@ -27,9 +27,9 @@
 		}
 	},
     "scripts": {
-        "post-package-install": "bin/console common-gateway/pet-store-bundle",
-        "post-package-update": "bin/console common-gateway/pet-store-bundle",
-        "post-package-uninstall": "bin/console common-gateway/pet-store-bundle"
+        "post-package-install": "bin/console common-gateway/waardepapieren-bundle",
+        "post-package-update": "bin/console common-gateway/waardepapieren-bundle",
+        "post-package-uninstall": "bin/console common-gateway/waardepapieren-bundle"
     },
     "config": {
         "allow-plugins": {
