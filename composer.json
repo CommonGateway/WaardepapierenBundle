@@ -1,16 +1,17 @@
 {
     "name": "common-gateway/waardepapieren-bundle",
     "description": "An example package for creating symfony flex bundles as plugins",
-     "type" : "symfony-bundle",	
-	"keywords" : [
-		"commongateway",
-		"common",
-		"gateway",
-		"conduction",
-		"symfony",
-		"common-gateway-plugin"
-	],
-	"homepage" : "https://commongatway.nl",
+	"type" : "symfony-bundle",
+    "keywords": [
+        "commongateway",
+        "common",
+        "gateway",
+        "conduction",
+        "symfony",
+        "common-gateway-plugin",
+        "waardepapieren"
+    ],
+    "homepage": "https://waardepapieren.commongateway.nl",
     "license": "EUPL-1.2",
     "minimum-stability" : "dev",
     "require": {
@@ -25,6 +26,11 @@
 			"CommonGateway\\WaardepapierenBundle\\" : ""
 		}
 	},
+    "scripts": {
+        "post-package-install": "bin/console common-gateway/pet-store-bundle",
+        "post-package-update": "bin/console common-gateway/pet-store-bundle",
+        "post-package-uninstall": "bin/console common-gateway/pet-store-bundle"
+    },
     "config": {
         "allow-plugins": {
             "endroid/installer": true
