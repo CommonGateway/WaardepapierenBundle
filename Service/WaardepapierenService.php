@@ -55,49 +55,47 @@ class WaardepapierenService
     /**
      * This function creates a QR code for the given claim.
      *
-     * @param array $certificate The certificate object
+     * @param array $this->certificate The certificate object
      *
      * @return array The modified certificate object
      */
-    public function createImage(array $certificate = [])
+    public function createImage()
     {
         // Then we need to render the QR code
-        $qrCode = $this->qrCode->create($certificate['jwt'], [
+        $qrCode = $this->qrCode->create($this->certificate['jwt'], [
             'size'  => 1000,
             'margin' => 1,
             'writer' => 'png',
         ]);
 
         // And finnaly we need to set the result on the certificate resource
-        $certificate['image'] = 'data:image/png;base64,' . base64_encode($qrCode->writeString());
-
-        return $certificate;
+        $this->certificate['image'] = 'data:image/png;base64,' . base64_encode($qrCode->writeString());
     }
 
     /**
      * This function generates a claim based on the w3c structure.
      *
      * @param array       $data        The data used to create the claim
-     * @param array $certificate The certificate object
+     * @param array $this->certificate The certificate object
      *
      * @throws \Exception
      *
      * @return array The generated claim
      */
-    public function w3cClaim(array $data, array $certificate)
+    public function w3cClaim(array $data)
     {
         $now = new \DateTime('now', new \DateTimeZone('Europe/Amsterdam'));
         $array = [];
         $array['@context'] = ['https://www.w3.org/2018/credentials/v1', 'https://www.w3.org/2018/credentials/examples/v1'];
-        $array['id'] = $certificate['id'];
-        $array['type'] = ['VerifiableCredential', $certificate['type']];
-        $array['issuer'] = $certificate['organization'];
+        $array['id'] = $this->certificate['id'];
+        $array['type'] = ['VerifiableCredential', $this->certificate['type']];
+        $array['issuer'] = $this->certificate['organization'];
         $array['inssuanceDate'] = $now->format('H:i:s d-m-Y');
-        $array['credentialSubject']['id'] = $certificate['personObject']['burgerservicenummer'] ?? $certificate['organization'];
+        $array['credentialSubject']['id'] = $this->certificate['personObject']['burgerservicenummer'] ?? $this->certificate['organization'];
         foreach ($data as $key => $value) {
             $array['credentialSubject'][$key] = $value;
         }
-        $array['proof'] = $this->createProof($certificate, $array);
+        $array['proof'] = $this->createProof($array);
 
         return $array;
     }
@@ -106,22 +104,21 @@ class WaardepapierenService
     /**
      * This function creates a proof.
      *
-     * @param array $certificate the certificate object
      * @param array       $data        the data that gets stored in the jws token of the proof
      *
      * @return array proof
      */
-    public function createProof(array $certificate, array $data)
+    public function createProof(array $data)
     {
         $proof = [];
         $proof['type'] = 'RsaSignature';
         // @TODO when should created be set, we have no cert key file anymore ?
-        // $proof['created'] = date('H:i:s d-m-Y', filectime("cert/{" . $certificate['organization'] . "}.pem"));
+        // $proof['created'] = date('H:i:s d-m-Y', filectime("cert/{" . $this->certificate['organization'] . "}.pem"));
         $proof['proofPurpose'] = 'assertionMethode';
         // @TODO what should the verifymethod be now, we have no cert key file anymore ?
         // $proof['verificationMethod'] = $this->requestStack->getCurrentRequest()->getSchemeAndHttpHost() . "/cert/{" . $this->configuration['organization'] . "}.pem";
         $proof['verificationMethod'] = 'http://localhost/cert/00000010.pem';
-        $proof['jws'] = $this->createJWS($certificate, $data['credentialSubject']);
+        $proof['jws'] = $this->createJWS($this->certificate, $data['credentialSubject']);
 
         return $proof;
     }
@@ -129,32 +126,32 @@ class WaardepapierenService
     /**
      * This function generates a JWS token with the RS512 algorithm.
      *
-     * @param array $certificate the certificate object
+     * @param array $this->certificate the certificate object
      * @param array       $data        the data that gets stored in the jws token
      *
      * @return string Generated JWS token.
      */
-    public function createJWS(array $certificate, array $data)
+    public function createJWS(array $data)
     {
         $algorithmManager = new AlgorithmManager([
             new RS512(),
         ]);
+        // Old
+        // $jwk = JWKFactory::createFromKeyFile(
+        //     "../cert/{" . $this->certificate['organization'] . "}.pem"
+        // );
         // New
         $jwk = JWKFactory::createFromKey(
             $this->configuration['certificateKey']
         );
-        // Old
-        // $jwk = JWKFactory::createFromKeyFile(
-        //     "../cert/{" . $certificate['organization'] . "}.pem"
-        // );
         $jwsBuilder = new \Jose\Component\Signature\JWSBuilder($algorithmManager);
         $payload = json_encode([
             'iat'  => time(),
             'nbf'  => time(),
             'exp'  => time() + 3600,
-            // 'crt'  => $this->commonGroundService->cleanUrl(['component' => 'frontend', 'type' => 'claims/public_keys', 'id' => $certificate['organization']]),
-            'iss'  => $certificate['id'],
-            'aud'  => $certificate['personObject']['burgerservicenummer'] ?? $certificate['organization'],
+            // 'crt'  => $this->commonGroundService->cleanUrl(['component' => 'frontend', 'type' => 'claims/public_keys', 'id' => $this->certificate['organization']]),
+            'iss'  => $this->certificate['id'],
+            'aud'  => $this->certificate['personObject']['burgerservicenummer'] ?? $this->certificate['organization'],
             'data' => $data,
         ]);
         $jws = $jwsBuilder
@@ -170,30 +167,27 @@ class WaardepapierenService
     /**
      * This function creates the (pdf) document for a given certificate type.
      *
-     * @param array $certificate The certificate object
      * @param array $template The twig template
      *
      * @throws \Twig\Error\LoaderError
      * @throws \Twig\Error\RuntimeError
      * @throws \Twig\Error\SyntaxError
-     *
-     * @return array The modified certificate object
      */
-    public function createDocument(array $certificate, array $certTemplate)
+    public function createDocument()
     {
         $data = [
-            'qr'     => $certificate['image'],
-            'claim'  => $certificate['claim'],
-            'person' => $certificate['personObject'] ?? null,
-            'base'   => '/organizations/' . $certificate['organization'] . '.html.twig',
+            'qr'     => $this->certificate['image'],
+            'claim'  => $this->certificate['claim'],
+            'person' => $this->certificate['personObject'] ?? null,
+            'base'   => '/organizations/' . $this->certificate['organization'] . '.html.twig',
         ];
 
-        // if ($certificate['type'] == 'historisch_uittreksel_basis_registratie_personen') {
-        //     $data['verblijfplaatshistorie'] = $this->commonGroundService->getResourceList(['component' => 'brp', 'type' => 'ingeschrevenpersonen', 'id' => $certificate->getPersonObject()['burgerservicenummer'].'/verblijfplaatshistorie'])['_embedded']['verblijfplaatshistorie'];
+        // if ($this->certificate['type'] == 'historisch_uittreksel_basis_registratie_personen') {
+        //     $data['verblijfplaatshistorie'] = $this->commonGroundService->getResourceList(['component' => 'brp', 'type' => 'ingeschrevenpersonen', 'id' => $this->certificate->getPersonObject()['burgerservicenummer'].'/verblijfplaatshistorie'])['_embedded']['verblijfplaatshistorie'];
         // }
 
         // First we need the HTML  for the template
-        $createdTemplate = $this->twig->createTemplate($certTemplate['content']);
+        $createdTemplate = $this->twig->createTemplate($this->certTemplate['content']);
         $html = $this->twig->render($createdTemplate, $data);
 
         // $html = json_encode($data);
@@ -204,29 +198,27 @@ class WaardepapierenService
         $dompdf->render();
 
         // And finnaly we need to set the result on the certificate resource
-        $certificate['document'] = 'data:application/pdf;base64,' . base64_encode($dompdf->output());
-
-        return $certificate;
+        $this->certificate['document'] = 'data:application/pdf;base64,' . base64_encode($dompdf->output());
     }
 
     /**
      * This function generates a jwt token using the claim that's available from the certificate object.
      *
-     * @param array $certificate The certificate object
+     * @param array $this->certificate The certificate object
      *
      * @return string The generated jwt token
      */
-    public function createJWT(array $certificate)
+    public function createJWT()
     {
         // Create a payload
-        $payload = $certificate['claim'];
+        $payload = $this->certificate['claim'];
 
         $algorithmManager = new AlgorithmManager([
             new RS512(),
         ]);
         $jwk = JWKFactory::createFromKey($this->configuration['certificateKey']);
         // $jwk = JWKFactory::createFromKeyFile(
-        //     "../cert/{" . $certificate['organization'] . "}.pem"
+        //     "../cert/{" . $this->certificate['organization'] . "}.pem"
         // );
         $jwsBuilder = new \Jose\Component\Signature\JWSBuilder($algorithmManager);
         $jws = $jwsBuilder
@@ -242,72 +234,66 @@ class WaardepapierenService
     /**
      * This function creates the claim based on the type defined in the certificate object.
      *
-     * @param array $certificate The certificate object
-     * @param string $key The certificate object
-     *
      * @throws \Exception
-     *
-     * @return array The modified certificate object
      */
-    public function createClaim(array $certificate, string $key)
+    public function createClaim()
     {
         // Lets add data to this claim
-        isset($certificate['claimData']) ? $claimData = $certificate['claimData'] : [];
+        isset($this->certificate['claimData']) ? $claimData = $this->certificate['claimData'] : [];
 
-        isset($certificate['data']) && $claimData = $certificate['data'];
+        isset($this->certificate['data']) && $claimData = $this->certificate['data'];
 
-        // switch ($certificate['type']) {
+        // switch ($this->certificate['type']) {
         // }
 
-        $certificate['w3c'] = $this->w3cClaim($claimData, $certificate);
-        isset($certificate['person']) && $claimData['persoon'] = $certificate['personObject']['burgerservicenummer'];
+        $this->certificate['w3c'] = $this->w3cClaim($claimData, $this->certificate);
+        isset($this->certificate['person']) && $claimData['persoon'] = $this->certificate['personObject']['burgerservicenummer'];
 
-        $claimData['doel'] = $certificate['type'];
-        $certificate['claimData'] = $claimData;
+        $claimData['doel'] = $this->certificate['type'];
+        $this->certificate['claimData'] = $claimData;
 
         // Create token payload as a JSON string
-        $certificate['claim'] = [
-            'iss'                 => $certificate['id'],
-            'user_id'             => $certificate['personObject']['id'] ?? $certificate['organization'],
-            'user_representation' => $certificate['personObject']['@id'] ?? $certificate['organization'],
-            'claim_data'          => $certificate['claimData'],
-            // 'validation_uri'      => $this->commonGroundService->cleanUrl(['component' => 'frontend', 'type' => 'claims/public_keys', 'id' => $certificate->getOrganization()]),
+        $this->certificate['claim'] = [
+            'iss'                 => $this->certificate['id'],
+            'user_id'             => $this->certificate['personObject']['id'] ?? $this->certificate['organization'],
+            'user_representation' => $this->certificate['personObject']['@id'] ?? $this->certificate['organization'],
+            'claim_data'          => $this->certificate['claimData'],
+            // 'validation_uri'      => $this->commonGroundService->cleanUrl(['component' => 'frontend', 'type' => 'claims/public_keys', 'id' => $this->certificate->getOrganization()]),
             'iat'                 => time(),
         ];
 
         // Create token payload as a JSON string
-        $certificate['discipl'] = [
+        $this->certificate['discipl'] = [
             'claimData' => [
                 'did:discipl:ephemeral:crt:4c86faf535029c8cf4a371813cc44cb434875b18' => [
-                    'link:discipl:ephemeral:tEi6K3mPRmE6QRf4WvpxY1hQgGmIG7uDV85zQILQNSCnQjAZPg2mj4Fbok/BHL9C8mFJQ1tCswBHBtsu6NIESA45XnN13pE+nLD6IPOeHx2cUrObxtzsqLhAy4ZXN6eDpZDmqnb6ymELUfXu/D2n4rL/t9aD279vqjFRKgBVE5WsId9c6KEYA+76mBQUBoJr8sF7w+3oMjzKy88oW693I3Keu+cdl/9sRCyYAYIDzwmg3A6n8t9KUpsBDK1b6tNznA6qoiN9Zb4JZ7rpq6lnVpyU5pyJjD+p9DiWgIYsVauJy8WOcKfNWkeOomWez0of2o+gu9xf+VLzcX3MSiAfZA==' => $certificate['claimData'],
+                    'link:discipl:ephemeral:tEi6K3mPRmE6QRf4WvpxY1hQgGmIG7uDV85zQILQNSCnQjAZPg2mj4Fbok/BHL9C8mFJQ1tCswBHBtsu6NIESA45XnN13pE+nLD6IPOeHx2cUrObxtzsqLhAy4ZXN6eDpZDmqnb6ymELUfXu/D2n4rL/t9aD279vqjFRKgBVE5WsId9c6KEYA+76mBQUBoJr8sF7w+3oMjzKy88oW693I3Keu+cdl/9sRCyYAYIDzwmg3A6n8t9KUpsBDK1b6tNznA6qoiN9Zb4JZ7rpq6lnVpyU5pyJjD+p9DiWgIYsVauJy8WOcKfNWkeOomWez0of2o+gu9xf+VLzcX3MSiAfZA==' => $this->certificate['claimData'],
                 ],
             ],
             'metadata' => ['cert' => 'localhost:8080'],
         ];
 
         // Create token payload as a JSON string
-        $certificate['irma'] = $certificate['discipl'];
+        $this->certificate['irma'] = $this->certificate['discipl'];
 
-        $certificate['jwt'] = $this->createJWT($certificate);;
-
-        return $certificate;
+        $this->certificate['jwt'] = $this->createJWT($this->certificate);
     }
 
     /**
      * This function fetches a haalcentraal persoon with the callService.
      *
-     * @param Gateway $haalcentraalGateway The haalcentraal gateway
-     *
      * @throws \Exception
      *
      * @return array The modified certificate object
      */
-    private function fetchPersoonsgegevens(Gateway $haalcentraalGateway, string $bsn, string $certFile, string $certKeyFile)
+    private function fetchPersoonsgegevens()
     {
+        $certFile = $this->fileService->writeFile('brp-cert', $this->configuration['authorization']['certificate'], 'crt');
+        $certKeyFile = $this->fileService->writeFile('brp-cert-key', $this->configuration['authorization']['certificateKey'], 'key');
+
         try {
             $response = $this->callService->call(
-                $haalcentraalGateway,
-                '/ingeschrevenpersonen/' . $bsn,
+                $this->haalcentraalGateway,
+                '/ingeschrevenpersonen/' . $this->certificate['person'],
                 'GET',
                 [
                     'cert' => $certFile,
@@ -323,155 +309,138 @@ class WaardepapierenService
             throw new Exception($exception->getMessage());
         }
 
-        return $this->callService->decodeResponse($haalcentraalGateway, $response);
+        $brpPersoon = $this->callService->decodeResponse($this->haalcentraalGateway, $response);
+
+        $this->certificate['person'] = 'https://' .  $this->haalcentraalGateway->getLocation() . '/ingeschrevenpersonen/' . $brpPersoon['burgerservicenummer'];
+        unset($brpPersoon['_links']);
+        $this->certificate['personObject'] = $brpPersoon;
     }
+
+    public function createCertificate(): void
+    {
+        isset($this->certificate['person']) && $this->certificate['claimData']['persoon'] = $this->certificate['person'];
+        $this->certificate['claimData']['type'] = $this->certificate['type'];
+        $this->createClaim();
+        $this->createImage();
+        $this->createDocument();
+
+        $this->certificate['personObject'] = json_encode($this->certificate['personObject']);
+        $this->certificate['irma'] = json_encode($this->certificate['irma']);
+        $this->certificate['discipl'] = json_encode($this->certificate['discipl']);
+
+        $certificateObjectEntity = $this->objectEntityRepo->find($this->certificate['id']);
+        $certificateObjectEntity->hydrate($this->certificate);
+
+        $this->entityManager->persist($certificateObjectEntity);
+        $this->entityManager->flush();
+
+        $this->certificate = $certificateObjectEntity->toArray();
+    }
+
     /**
-     * Validates action config
+     * Validates action config and sets the values to $this
      * 
      * @throws \Exception
      * 
      * @return array Template for certificate
      */
-    public function validateConfig($certificate, $haalcentraalGateway = null, $templateGroup, $zaakType = null, $zaakEntity = null): ?array
+    public function validateConfigAndSetValues(array $whatToValidate): void
     {
-        if (!isset($this->configuration['certificateKey'])) {
+        if (array_key_exists('templateGroup', $whatToValidate) && !isset($this->configuration['templateGroup'])) {
+            throw new \Exception('TemplateGroup not set, check WaardepapierenAction config');
+        } elseif (array_key_exists('templateGroup', $whatToValidate)) {
+            $templateGroup = $this->entityManager->find('App:ObjectEntity', $this->configuration['templateGroup']);
+        }
+        if (array_key_exists('certificateKey', $whatToValidate) && !isset($this->configuration['certificateKey'])) {
             throw new \Exception('Certificate key not found, check WaardepapierenAction config');
         }
-        if (!isset($this->configuration['authorization']['certificate'])) {
-            throw new \Exception('Auth certificate key not found, check WaardepapierenAction config');
+        if (array_key_exists('authorization', $whatToValidate)) {
+            if (!isset($this->configuration['authorization']['certificate'])) {
+                throw new \Exception('Auth certificate key not found, check WaardepapierenAction config');
+            }
+            if (!isset($this->configuration['authorization']['certificateKey'])) {
+                throw new \Exception('Auth certificate key not found, check WaardepapierenAction config');
+            }
+            if (!isset($this->configuration['authorization']['password'])) {
+                throw new \Exception('Auth certificate password not found, check WaardepapierenAction config');
+            }
         }
-        if (!isset($this->configuration['authorization']['certificateKey'])) {
-            throw new \Exception('Auth certificate key not found, check WaardepapierenAction config');
+
+        if (array_key_exists('source', $whatToValidate) && !isset($this->configuration['source'])) {
+            throw new \Exception('Source not set, check WaardepapierenAction config');
+        } elseif (array_key_exists('source', $whatToValidate)) {
+            $this->haalcentraalGateway = $this->entityManager->find('App:Gateway', $this->configuration['source']);
         }
-        if (!isset($this->configuration['authorization']['password'])) {
-            throw new \Exception('Auth certificate password not found, check WaardepapierenAction config');
-        }
-        if (!$haalcentraalGateway instanceof Gateway) {
-            throw new \Exception('PinkBRP gateway could not be found, check WaardepapierenAction config');
-        }
-        if (!$templateGroup instanceof ObjectEntity) {
-            throw new \Exception('Template group could not be found, check WaardepapierenAction config');
+        if (array_key_exists('source', $whatToValidate) && !$this->haalcentraalGateway instanceof Gateway) {
+            throw new \Exception('Source could not found, check if source exists');
         }
 
         $templates = $templateGroup->getValue('templates');
-        foreach ($templates as $template) {
-            if ($template->getValue('description') == $certificate['type']) {
-                $certTemplate = $template->toArray();
-                break;
+        if (array_key_exists('templateType', $whatToValidate)) {
+            foreach ($templates as $template) {
+                if ($template->getValue('description') == $this->certificate['type']) {
+                    $this->certTemplate = $template->toArray();
+                    break;
+                }
             }
+        } else {
+            isset($templates[0]) && $this->certTemplate = $templates[0];
         }
-        if (!isset($certTemplate)) {
-            throw new \Exception('No template found for certificate type');
+        if (!isset($this->certTemplate)) {
+            throw new \Exception('No template found, check if template exists for type');
         }
-
-        return $certTemplate;
     }
 
     /**
-     * Creates or updates a Certificate.
+     * Creates or updates a dynamic Certificate.
      *
      * @param array $data          Data from the handler where the xxllnc casetype is in.
-     * @param array $configuration Configuration from the Action where the ZaakType entity id is stored in.
+     * @param array $configuration Configuration for the Action.
      *
-     * @return array $certificate Certificate which we updated with new data
+     * @return array $this->certificate Certificate which we updated with new data
      */
     public function waardepapierenDynamicHandler(array $data, array $configuration): array
     {
-        $certificate = $data['response'];
+        $this->certificate = $data['response'];
         $this->configuration = $configuration;
 
-        // $haalcentraalGateway = $this->entityManager->find('App:Gateway', $this->configuration['source']);
-        $templateGroup = $this->entityManager->find('App:ObjectEntity', $this->configuration['defaultTemplateGroup']);
+        // 1. Check Action configuration and set values
+        $this->validateConfigAndSetValues(['templateGroup' => true, 'certificateKey' => true]);
 
-        $certTemplate = $this->validateConfig($certificate, null, $templateGroup);
+        // 2. Fill certificate with given data 
+        $this->createCertificate();
 
-        // $brpCert = $this->fileService->writeFile('brp-cert', $this->configuration['authorization']['certificate'], 'crt');
-        // $brpCertKey = $this->fileService->writeFile('brp-cert-key', $this->configuration['authorization']['certificateKey'], 'key');
-
-        // // 1. Haal persoonsgegevens op bij pink haalcentraalGateway 
-        // // get persoonsgegevens with $haalcentraalGateway
-        // $brpPersoon = $this->fetchPersoonsgegevens($haalcentraalGateway, $certificate['person'], $brpCert, $brpCertKey);
-
-        // // var_dump(json_encode($brpPersoon));
-        // // Test object
-        // $certificate['person'] = 'https://' .  $haalcentraalGateway->getLocation() . '/ingeschrevenpersonen/' . $brpPersoon['burgerservicenummer'];
-        // unset($brpPersoon['_links']);
-        // $certificate['personObject'] = $brpPersoon;
-
-        // 2. Vul data van certificate in
-        $certificate['claimData']['persoon'] = $certificate['person'];
-        $certificate['claimData']['type'] = $certificate['type'];
-        $certificate = $this->createClaim($certificate, $configuration['certificateKey']);
-        $certificate = $this->createImage($certificate);
-        $certificate = $this->createDocument($certificate, $certTemplate);
-
-        $certificate['personObject'] = json_encode($certificate['personObject']);
-        $certificate['irma'] = json_encode($certificate['irma']);
-        $certificate['discipl'] = json_encode($certificate['discipl']);
-
-        $certificateObjectEntity = $this->objectEntityRepo->find($certificate['id']);
-        $certificateObjectEntity->hydrate($certificate);
-
-        $this->entityManager->persist($certificateObjectEntity);
-        $this->entityManager->flush();
-
-        $certificate = $certificateObjectEntity->toArray();
-
-        return ['response' => $certificate];
+        return ['response' => $this->certificate];
     }
 
     /**
      * Creates or updates a Certificate.
      *
      * @param array $data          Data from the handler where the xxllnc casetype is in.
-     * @param array $configuration Configuration from the Action where the ZaakType entity id is stored in.
+     * @param array $configuration Configuration for the Action.
      *
-     * @return array $certificate Certificate which we updated with new data
+     * @return array $this->certificate Certificate which we updated with new data
      */
     public function waardepapierenHandler(array $data, array $configuration): array
     {
-        $certificate = $data['response'];
+        $this->certificate = $data['response'];
         $this->configuration = $configuration;
 
-        $haalcentraalGateway = $this->entityManager->find('App:Gateway', $this->configuration['source']);
-        $templateGroup = $this->entityManager->find('App:ObjectEntity', $this->configuration['templateGroup']);
-        $zaakType = $this->entityManager->find('App:ObjectEntity', $this->configuration['zaakType']);
-        $zaakEntity = $this->entityManager->find('App:Entity', $this->configuration['entities']['Zaak']);
+        // 1. Check Action configuration and set values
+        $this->validateConfigAndSetValues([
+            'templateGroup'  => true,
+            'templateType'  => true,
+            'source'         => true,
+            'certificateKey' => true,
+            'authorization'  => true
+        ]);
 
-        $certTemplate = $this->validateConfig($certificate, $haalcentraalGateway, $templateGroup, $zaakType, $zaakEntity);
+        // 2. Get persons information from pink haalcentraalGateway 
+        $this->fetchPersoonsgegevens();
 
-        $brpCert = $this->fileService->writeFile('brp-cert', $this->configuration['authorization']['certificate'], 'crt');
-        $brpCertKey = $this->fileService->writeFile('brp-cert-key', $this->configuration['authorization']['certificateKey'], 'key');
+        // 3. Fill certificate with persons information
+        $this->createCertificate();
 
-        // 1. Haal persoonsgegevens op bij pink haalcentraalGateway 
-        // get persoonsgegevens with $haalcentraalGateway
-        $brpPersoon = $this->fetchPersoonsgegevens($haalcentraalGateway, $certificate['person'], $brpCert, $brpCertKey);
-
-        // var_dump(json_encode($brpPersoon));
-        // Test object
-        $certificate['person'] = 'https://' .  $haalcentraalGateway->getLocation() . '/ingeschrevenpersonen/' . $brpPersoon['burgerservicenummer'];
-        unset($brpPersoon['_links']);
-        $certificate['personObject'] = $brpPersoon;
-
-        // 2. Vul data van certificate in
-        $certificate['claimData']['persoon'] = $certificate['person'];
-        $certificate['claimData']['type'] = $certificate['type'];
-        $certificate = $this->createClaim($certificate, $configuration['certificateKey']);
-        $certificate = $this->createImage($certificate);
-        $certificate = $this->createDocument($certificate, $certTemplate);
-
-        $certificate['personObject'] = json_encode($certificate['personObject']);
-        $certificate['irma'] = json_encode($certificate['irma']);
-        $certificate['discipl'] = json_encode($certificate['discipl']);
-
-        $certificateObjectEntity = $this->objectEntityRepo->find($certificate['id']);
-        $certificateObjectEntity->hydrate($certificate);
-
-        $this->entityManager->persist($certificateObjectEntity);
-        $this->entityManager->flush();
-
-        $certificate = $certificateObjectEntity->toArray();
-
-        return ['response' => $certificate];
+        return ['response' => $this->certificate];
     }
 }
