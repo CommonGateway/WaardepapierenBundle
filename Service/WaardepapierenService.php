@@ -87,8 +87,8 @@ class WaardepapierenService
         $now = new \DateTime('now', new \DateTimeZone('Europe/Amsterdam'));
         $array = [];
         $array['@context'] = ['https://www.w3.org/2018/credentials/v1', 'https://www.w3.org/2018/credentials/examples/v1'];
-        $array['id'] = $this->certificate['id'];
-        $array['type'] = ['VerifiableCredential', $this->certificate['type']];
+        $array['id'] = $this->certificate['id'] ?? null;
+        $array['type'] = ['VerifiableCredential', $this->certificate['type'] ?? 'dynamic'];
         $array['issuer'] = $this->certificate['organization'];
         $array['inssuanceDate'] = $now->format('H:i:s d-m-Y');
         $array['credentialSubject']['id'] = $this->certificate['personObject']['burgerservicenummer'] ?? $this->certificate['organization'];
@@ -150,7 +150,7 @@ class WaardepapierenService
             'nbf'  => time(),
             'exp'  => time() + 3600,
             // 'crt'  => $this->commonGroundService->cleanUrl(['component' => 'frontend', 'type' => 'claims/public_keys', 'id' => $this->certificate['organization']]),
-            'iss'  => $this->certificate['id'],
+            'iss'  => $this->certificate['id'] ?? null,
             'aud'  => $this->certificate['personObject']['burgerservicenummer'] ?? $this->certificate['organization'],
             'data' => $data,
         ]);
@@ -172,6 +172,7 @@ class WaardepapierenService
      * @throws \Twig\Error\LoaderError
      * @throws \Twig\Error\RuntimeError
      * @throws \Twig\Error\SyntaxError
+     * @throws \Exception
      */
     public function createDocument()
     {
@@ -182,15 +183,24 @@ class WaardepapierenService
             'base'   => '/organizations/' . $this->certificate['organization'] . '.html.twig',
         ];
 
+        if (isset($this->userData)) {
+            $data['data'] = $this->userData;
+        }
+
         // if ($this->certificate['type'] == 'historisch_uittreksel_basis_registratie_personen') {
         //     $data['verblijfplaatshistorie'] = $this->commonGroundService->getResourceList(['component' => 'brp', 'type' => 'ingeschrevenpersonen', 'id' => $this->certificate->getPersonObject()['burgerservicenummer'].'/verblijfplaatshistorie'])['_embedded']['verblijfplaatshistorie'];
         // }
 
+        // try {
         // First we need the HTML  for the template
         $createdTemplate = $this->twig->createTemplate($this->certTemplate['content']);
         $html = $this->twig->render($createdTemplate, $data);
+        // } catch (Exception $e) {
+        // throw new Exception('Something went wrong while creating the template, the available data might not be compatible with the template.');
+        // }
 
         // $html = json_encode($data);
+        // var_dump($html);die;
 
         // Then we need to render the template
         $dompdf = new DOMPDF();
@@ -249,12 +259,12 @@ class WaardepapierenService
         $this->certificate['w3c'] = $this->w3cClaim($claimData, $this->certificate);
         isset($this->certificate['person']) && $claimData['persoon'] = $this->certificate['personObject']['burgerservicenummer'];
 
-        $claimData['doel'] = $this->certificate['type'];
+        $claimData['doel'] = $this->certificate['type'] ?? 'dynamic';
         $this->certificate['claimData'] = $claimData;
 
         // Create token payload as a JSON string
         $this->certificate['claim'] = [
-            'iss'                 => $this->certificate['id'],
+            'iss'                 => $this->certificate['id'] ?? null,
             'user_id'             => $this->certificate['personObject']['id'] ?? $this->certificate['organization'],
             'user_representation' => $this->certificate['personObject']['@id'] ?? $this->certificate['organization'],
             'claim_data'          => $this->certificate['claimData'],
@@ -290,6 +300,9 @@ class WaardepapierenService
         $certFile = $this->fileService->writeFile('brp-cert', $this->configuration['authorization']['certificate'], 'crt');
         $certKeyFile = $this->fileService->writeFile('brp-cert-key', $this->configuration['authorization']['certificateKey'], 'key');
 
+        // var_dump($certFile);
+        // var_dump($certKeyFile);
+
         try {
             $response = $this->callService->call(
                 $this->haalcentraalGateway,
@@ -298,12 +311,15 @@ class WaardepapierenService
                 [
                     'cert' => $certFile,
                     'ssl_key' => [$certKeyFile, $this->configuration['authorization']['password']],
+                    // 'ssl_key' => $certKeyFile,
                     'headers' => [
                         'x-doelbinding' => $this->configuration['authorization']['x-doelbinding'],
                         'x-origin-oin' => $this->configuration['authorization']['x-origin-oin']
                     ],
                     'verify' => false
-                ]
+                ],
+                false,
+                false
             );
         } catch (\Exception $exception) {
             throw new Exception($exception->getMessage());
@@ -316,19 +332,49 @@ class WaardepapierenService
         $this->certificate['personObject'] = $brpPersoon;
     }
 
+    /**
+     * Finds or creates Certificate object
+     * 
+     * @throws \Exception
+     * 
+     * @return ObjectEntity $certificateObjectEntity 
+     */
+    private function getCertificateObject()
+    {
+        // Find earlier created Certificate
+        if (isset($this->certificate['id'])) {
+            $id = is_string($this->certificate['id']) ? $this->certificate['id'] : $this->certificate['id']->toString();
+            $certificateObjectEntity = $this->objectEntityRepo->find($id);
+        }
+
+        // If not created earlier (for dynamic certificate) create new
+        if (!isset($certificateObjectEntity) || !$certificateObjectEntity instanceof ObjectEntity && isset($this->certificateEntity)) {
+            $certificateObjectEntity = new ObjectEntity($this->certificateEntity);
+        }
+
+        // If not found and could not be created throw error
+        if (!isset($certificateObjectEntity)) {
+            throw new Exception('Could not find or create new Certificate object due not having the Certificate entity, check WaardepapierenAction config');
+        }
+
+        return $certificateObjectEntity;
+    }
+
     public function createCertificate(): void
     {
         isset($this->certificate['person']) && $this->certificate['claimData']['persoon'] = $this->certificate['person'];
-        $this->certificate['claimData']['type'] = $this->certificate['type'];
+        $this->certificate['claimData']['type'] = $this->certificate['type'] ?? 'dynamic';
         $this->createClaim();
         $this->createImage();
         $this->createDocument();
 
-        $this->certificate['personObject'] = json_encode($this->certificate['personObject']);
+        isset($this->certificate['personObject']) && $this->certificate['personObject'] = json_encode($this->certificate['personObject']);
         $this->certificate['irma'] = json_encode($this->certificate['irma']);
         $this->certificate['discipl'] = json_encode($this->certificate['discipl']);
 
-        $certificateObjectEntity = $this->objectEntityRepo->find($this->certificate['id']);
+        $certificateObjectEntity = $this->getCertificateObject();
+
+
         $certificateObjectEntity->hydrate($this->certificate);
 
         $this->entityManager->persist($certificateObjectEntity);
@@ -351,8 +397,18 @@ class WaardepapierenService
         } elseif (array_key_exists('templateGroup', $whatToValidate)) {
             $templateGroup = $this->entityManager->find('App:ObjectEntity', $this->configuration['templateGroup']);
         }
+        if (array_key_exists('certificate', $whatToValidate) && !isset($this->configuration['entities']['Certificate'])) {
+            throw new \Exception('Certificate not set, check WaardepapierenAction config');
+        } elseif (array_key_exists('certificate', $whatToValidate)) {
+            $this->certificateEntity = $this->entityManager->find('App:Entity', $this->configuration['entities']['Certificate']);
+        }
         if (array_key_exists('certificateKey', $whatToValidate) && !isset($this->configuration['certificateKey'])) {
             throw new \Exception('Certificate key not found, check WaardepapierenAction config');
+        }
+        if (array_key_exists('organization', $whatToValidate) && !isset($this->configuration['organization']) && !isset($this->certificate['organization'])) {
+            throw new \Exception('Organization not set, check WaardepapierenAction config or give in body');
+        } elseif (array_key_exists('organization', $whatToValidate) && isset($this->configuration['organization'])) {
+            $this->certificate['organization'] = $this->configuration['organization'];
         }
         if (array_key_exists('authorization', $whatToValidate)) {
             if (!isset($this->configuration['authorization']['certificate'])) {
@@ -384,7 +440,7 @@ class WaardepapierenService
                 }
             }
         } else {
-            isset($templates[0]) && $this->certTemplate = $templates[0];
+            isset($templates[0]) && $this->certTemplate = $templates[0]->toArray();
         }
         if (!isset($this->certTemplate)) {
             throw new \Exception('No template found, check if template exists for type');
@@ -401,11 +457,17 @@ class WaardepapierenService
      */
     public function waardepapierenDynamicHandler(array $data, array $configuration): array
     {
-        $this->certificate = $data['response'];
+        $this->userData = $data['request'];
+        $this->certificate = $data['request'];
         $this->configuration = $configuration;
 
         // 1. Check Action configuration and set values
-        $this->validateConfigAndSetValues(['templateGroup' => true, 'certificateKey' => true]);
+        $this->validateConfigAndSetValues([
+            'templateGroup'  => true,
+            'certificateKey' => true,
+            'certificate'    => true,
+            'organization'   => true
+        ]);
 
         // 2. Fill certificate with given data 
         $this->createCertificate();
@@ -429,10 +491,11 @@ class WaardepapierenService
         // 1. Check Action configuration and set values
         $this->validateConfigAndSetValues([
             'templateGroup'  => true,
-            'templateType'  => true,
+            'templateType'   => true,
             'source'         => true,
             'certificateKey' => true,
-            'authorization'  => true
+            'authorization'  => true,
+            'organziation'   => true
         ]);
 
         // 2. Get persons information from pink haalcentraalGateway 
