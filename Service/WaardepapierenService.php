@@ -300,9 +300,6 @@ class WaardepapierenService
         $certFile = $this->fileService->writeFile('brp-cert', $this->configuration['authorization']['certificate'], 'crt');
         $certKeyFile = $this->fileService->writeFile('brp-cert-key', $this->configuration['authorization']['certificateKey'], 'key');
 
-        // var_dump($certFile);
-        // var_dump($certKeyFile);
-
         try {
             $response = $this->callService->call(
                 $this->haalcentraalGateway,
