@@ -2,6 +2,7 @@
 
 namespace CommonGateway\WaardepapierenBundle\Service;
 
+use DateTime;
 use App\Entity\Entity;
 use App\Entity\ObjectEntity;
 use Doctrine\ORM\EntityManagerInterface;
@@ -191,13 +192,13 @@ class WaardepapierenService
         //     $data['verblijfplaatshistorie'] = $this->commonGroundService->getResourceList(['component' => 'brp', 'type' => 'ingeschrevenpersonen', 'id' => $this->certificate->getPersonObject()['burgerservicenummer'].'/verblijfplaatshistorie'])['_embedded']['verblijfplaatshistorie'];
         // }
 
-        // try {
-        // First we need the HTML  for the template
-        $createdTemplate = $this->twig->createTemplate($this->certTemplate['content']);
-        $html = $this->twig->render($createdTemplate, $data);
-        // } catch (Exception $e) {
-        // throw new Exception('Something went wrong while creating the template, the available data might not be compatible with the template.');
-        // }
+        try {
+            // First we need the HTML  for the template
+            $createdTemplate = $this->twig->createTemplate($this->certTemplate['content']);
+            $html = $this->twig->render($createdTemplate, $data);
+        } catch (Exception $e) {
+            throw new Exception('Something went wrong while creating the template, the available data might not be compatible with the template.');
+        }
 
         // $html = json_encode($data);
         // var_dump($html);die;
@@ -380,6 +381,79 @@ class WaardepapierenService
         $this->certificate = $certificateObjectEntity->toArray();
     }
 
+    private function sendEnkelvoudigInformatieObject($enkelvoudigInformatieObject)
+    {
+        try {
+            $response = $this->callService->call(
+                $this->openZaakSource,
+                '/enkelvoudiginformatieobjecten',
+                'POST',
+                [
+                    'body' => $enkelvoudigInformatieObject
+                ]
+            );
+        } catch (\Exception $exception) {
+            throw new Exception($exception->getMessage());
+        }
+
+        return $this->callService->decodeResponse($this->openZaakSource, $response);
+    }
+
+    private function sendObjectInformatieObject($objectInformatieObject)
+    {
+        try {
+            $response = $this->callService->call(
+                $this->openZaakSource,
+                '/objectinformatieobjecten',
+                'POST',
+                [
+                    'body' => $objectInformatieObject
+                ]
+            );
+        } catch (\Exception $exception) {
+            throw new Exception($exception->getMessage());
+        }
+
+        return $this->callService->decodeResponse($this->openZaakSource, $response);
+    }
+
+    private function createInformatieObject()
+    {
+        $today = new DateTime();
+        $enkelvoudigInformatieObject = [
+            'bronorganisatie' => 'bsn buren',
+            'creatiedatum'    => $today->format('Y-m-d'),
+            'titel'           => 'Waardepapier' . $this->certificate['type'],
+            'vertrouwelijkheidsaanduiding' => 'vertrouwelijk',
+            'auteur'          => 'bsn buren',
+            'status'          => 'gearchiveerd',
+            'formaat'         => 'application/pdf',
+            'taal' => 'nld',
+            'versie' => 1,
+            'beginRegistratie' => $today->format('Y-m-d'),
+            'bestandsnaam' => 'todo',
+            'inhoud'       => $this->certificate['pdf'] ?? 'todo',
+            'beschrijving' => 'Waardepapier ' . $this->certificate['type'],
+            'ontvangstdatum' => $today->format('Y-m-d'),
+            'verzenddatum'  => $today->format('Y-m-d'),
+            'informatieobjecttype' => '?'
+        ];
+
+        $enkelvoudigInformatieObjectResult = $this->sendEnkelvoudigInformatieObject($enkelvoudigInformatieObject);
+
+        // Check is valid
+        if ($enkelvoudigInformatieObject) {
+        }
+
+        $objectInformatieObject = [
+            'informatieobject' => $enkelvoudigInformatieObjectResult['id or uri'],
+            'object' => $this->userData['zaakId or uri'],
+            'objectType' => 'zaak'
+        ];
+
+        $objectInformatieObjectResult = $this->sendObjectInformatieObject($objectInformatieObject);
+    }
+
     /**
      * Validates action config and sets the values to $this
      * 
@@ -442,6 +516,10 @@ class WaardepapierenService
         if (!isset($this->certTemplate)) {
             throw new \Exception('No template found, check if template exists for type');
         }
+
+        if (array_key_exists('zaakId', $whatToValidate) && !isset($userData['zaakId'])) {
+            throw new \Exception('No zaakid given, check body');
+        }
     }
 
     /**
@@ -454,7 +532,8 @@ class WaardepapierenService
      */
     public function waardepapierenOpenZaakHandler(array $data, array $configuration): array
     {
-        var_dump('OPENZAAK WAARDEPAPIERENSERVICE TRIGGERED');die;
+        var_dump('OPENZAAK WAARDEPAPIERENSERVICE TRIGGERED');
+        die;
         $this->userData = $data['request'];
         $this->certificate = $data['request'];
         $this->configuration = $configuration;
@@ -464,12 +543,25 @@ class WaardepapierenService
             'templateGroup'  => true,
             'certificateKey' => true,
             'certificate'    => true,
-            'organization'   => true
+            'organization'   => true,
+            'zaakId'         => true
         ]);
 
-        // 2. Fill certificate with given data 
+
+        // 2. Get persons information from pink haalcentraalGateway 
+        $this->fetchPersoonsgegevens();
+
+
+        // 3. Fill certificate with given data 
         $this->createCertificate();
 
+        if (!isset($this->certificate)) {
+            throw new Exception('Something wen\'t wrong creating the certificate so we couldnt create the informatieobject');
+        }
+        // 4. Create Informatieobject
+        $this->createInformatieObject();
+
+        // Return certificate (or zaak/informatieobject)
         return ['response' => $this->certificate];
     }
 
@@ -494,6 +586,7 @@ class WaardepapierenService
             'certificate'    => true,
             'organization'   => true
         ]);
+
 
         // 2. Fill certificate with given data 
         $this->createCertificate();
