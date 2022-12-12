@@ -4,7 +4,7 @@ namespace CommonGateway\WaardepapierenBundle\ActionHandler;
 
 use CommonGateway\WaardepapierenBundle\Service\WaardepapierenService;
 
-class WaardepapierenDynamicHandler implements ActionHandlerInterface
+class WaardepapierenOpenZaakHandler implements ActionHandlerInterface
 {
     private WaardepapierenService $waardepapierenService;
 
@@ -45,6 +45,6 @@ class WaardepapierenDynamicHandler implements ActionHandlerInterface
      */
     public function run(array $data, array $configuration): array
     {
-        return $this->waardepapierenService->waardepapierenDynamicHandler($data, $configuration);
+        return $this->waardepapierenService->waardepapierenOpenZaakHandler($data, $configuration);
     }
 }

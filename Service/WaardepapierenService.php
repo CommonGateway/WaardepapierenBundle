@@ -445,9 +445,38 @@ class WaardepapierenService
     }
 
     /**
+     * Creates a certificate and updates a zaak to send back to OpenZaak.
+     *
+     * @param array $data          Data from the handler where the zaak id is in.
+     * @param array $configuration Configuration for the Action.
+     *
+     * @return array $this->certificate Certificate which we updated with new data
+     */
+    public function waardepapierenOpenZaakHandler(array $data, array $configuration): array
+    {
+        var_dump('OPENZAAK WAARDEPAPIERENSERVICE TRIGGERED');die;
+        $this->userData = $data['request'];
+        $this->certificate = $data['request'];
+        $this->configuration = $configuration;
+
+        // 1. Check Action configuration and set values
+        $this->validateConfigAndSetValues([
+            'templateGroup'  => true,
+            'certificateKey' => true,
+            'certificate'    => true,
+            'organization'   => true
+        ]);
+
+        // 2. Fill certificate with given data 
+        $this->createCertificate();
+
+        return ['response' => $this->certificate];
+    }
+
+    /**
      * Creates or updates a dynamic Certificate.
      *
-     * @param array $data          Data from the handler where the xxllnc casetype is in.
+     * @param array $data          Data from the handler where the certificate info is in.
      * @param array $configuration Configuration for the Action.
      *
      * @return array $this->certificate Certificate which we updated with new data

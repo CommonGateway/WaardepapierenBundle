@@ -4,7 +4,7 @@ namespace CommonGateway\WaardepapierenBundle\ActionHandler;
 
 use CommonGateway\WaardepapierenBundle\Service\WaardepapierenService;
 
-class WaardepapierenHandler
+class WaardepapierenHandler implements ActionHandlerInterface
 {
     private WaardepapierenService $waardepapierenService;
 
