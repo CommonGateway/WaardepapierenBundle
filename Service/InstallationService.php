@@ -101,7 +101,7 @@ class InstallationService implements InstallerInterface
         isset($this->io) && $this->io->writeln('Endpoint: \'OpenZaak webhook\' created');
     }
 
-    private function createActions(string $certificateID)
+    private function createActions()
     {
         $schemaRepository = $this->entityManager->getRepository('App:Entity');
         $certificate = $schemaRepository->findOneBy(['name' => 'Certificate']);
@@ -124,6 +124,7 @@ class InstallationService implements InstallerInterface
         $action->setDescription('This is a action to update a zaak with certificate.');
         $action->setListens(['commongateway.openzaakwebhook.trigger']);
         $action->setConditions(['==' => [1, 1]]);
+        // $action->setConfiguration(); Must be set with postman
         $action->setClass('CommonGateway\WaardepapierenBundle\ActionHandler\WaardepapierenOpenZaakHandler');
         $action->setIsEnabled(true);
         $this->entityManager->persist($action);
@@ -152,8 +153,6 @@ class InstallationService implements InstallerInterface
         $gateway->setLocation('');
         $this->entityManager->persist($gateway);
         isset($this->io) && $this->io->writeln('Source: \'Haalcentraal BRP Pink API\' created');
-
-        return $gateway->getId()->toString();
     }
 
     public function checkDataConsistency()
@@ -204,7 +203,7 @@ class InstallationService implements InstallerInterface
         }
 
         // $this->createCollections(); BACKUP 
-        $haalcentraalBRP = $this->createSources();
+        $this->createSources();
         $this->createEndpoints();
         $this->createActions();
 
