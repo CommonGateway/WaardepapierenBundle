@@ -17,7 +17,8 @@
     "require": {
         "php": ">=7.4",
         "endroid/qr-code-bundle": "3.4",
-        "common-gateway/template-bundle": "^0.0.2"
+        "common-gateway/template-bundle": "^0.0.2",
+        "commongateway/corebundle": "dev-master"
     },
 	"require-dev" : {
 		"symfony/dependency-injection" : "~3.4|~4.1|~5.0"
