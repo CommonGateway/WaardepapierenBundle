@@ -77,12 +77,33 @@ class InstallationService implements InstallerInterface
 
     private function createEndpoints()
     {
+        $schemaRepository = $this->entityManager->getRepository('App:Entity');
+        $certificate = $schemaRepository->findOneBy(['name' => 'Certificate']);
         $endpointRepository = $this->entityManager->getRepository('App:Endpoint');
+
+        $endpoint = $endpointRepository->findOneBy(['name' => 'Certificate collection']) ?? new Endpoint();
+        $endpoint->setName('Certificate collection');
+        $endpoint->setPathRegex('^(waar/certificates)$');
+        $endpoint->setMethods(["POST", "GET"]);
+        $endpoint->setMethod("POST");
+        $endpoint->setEntity($certificate);
+        $endpoint->setOperationType('collection');
+        $this->entityManager->persist($endpoint);
+
+        $endpoint = $endpointRepository->findOneBy(['name' => 'Certificate item']) ?? new Endpoint();
+        $endpoint->setName('Certificate item');
+        $endpoint->setPathRegex('^(waar/certificates/[a-z0-9-]{36})$');
+        $endpoint->setMethods(["PUT", "GET"]);
+        $endpoint->setMethod("POST");
+        $endpoint->setEntity($certificate);
+        $endpoint->setOperationType('item');
+        $this->entityManager->persist($endpoint);
+
         $endpoint = $endpointRepository->findOneBy(['name' => 'Dynamic certificate']) ?? new Endpoint();
         $endpoint->setName('Dynamic certificate');
         $endpoint->setDescription('Endpoint for dynamic certificates that use the request body as data');
         $endpoint->setPathRegex('^(waar/dynamic_certificates)$');
-        $endpoint->setMethods(["POST"]);
+        $endpoint->setMethods(["POST", "GET"]);
         $endpoint->setMethod("POST");
         $endpoint->setOperationType('collection');
         $endpoint->setThrows(['commongateway.dynamiccertficate.trigger']);
@@ -158,43 +179,43 @@ class InstallationService implements InstallerInterface
     public function checkDataConsistency()
     {
 
-        // Lets create some genneric dashboard cards
-        $objectsThatShouldHaveCards = ['https://waardepapieren.commonground.nl/certificate.schema.json'];
+        // // Lets create some genneric dashboard cards
+        // $objectsThatShouldHaveCards = ['https://waardepapieren.commonground.nl/certificate.schema.json'];
 
-        foreach ($objectsThatShouldHaveCards as $object) {
-            (isset($this->io) ? $this->io->writeln('Looking for a dashboard card for: ' . $object) : '');
-            $entity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => $object]);
-            if (
-                $entity &&
-                !$dashboardCard = $this->entityManager->getRepository('App:DashboardCard')->findOneBy(['entityId' => $entity->getId()])
-            ) {
-                $dashboardCard = new DashboardCard($entity);
-                (isset($this->io) ? $this->io->writeln('Dashboard card created') : '');
-                continue;
-            }
-            (isset($this->io) ? $this->io->writeln('Dashboard card found') : '');
-        }
+        // foreach ($objectsThatShouldHaveCards as $object) {
+        //     (isset($this->io) ? $this->io->writeln('Looking for a dashboard card for: ' . $object) : '');
+        //     $entity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => $object]);
+        //     if (
+        //         $entity &&
+        //         !$dashboardCard = $this->entityManager->getRepository('App:DashboardCard')->findOneBy(['entityId' => $entity->getId()])
+        //     ) {
+        //         $dashboardCard = new DashboardCard($entity);
+        //         (isset($this->io) ? $this->io->writeln('Dashboard card created') : '');
+        //         continue;
+        //     }
+        //     (isset($this->io) ? $this->io->writeln('Dashboard card found') : '');
+        // }
 
         // Let create some endpoints
         $objectsThatShouldHaveEndpoints = ['https://waardepapieren.commonground.nl/certificate.schema.json'];
 
-        foreach ($objectsThatShouldHaveEndpoints as $object) {
-            (isset($this->io) ? $this->io->writeln('Looking for a endpoint for: ' . $object) : '');
-            $entity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => $object]);
+        // foreach ($objectsThatShouldHaveEndpoints as $object) {
+        //     (isset($this->io) ? $this->io->writeln('Looking for a endpoint for: ' . $object) : '');
+        //     $entity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => $object]);
 
-            if (
-                $entity &&
-                count($entity->getEndpoints()) == 0
-            ) {
-                $endpoint = new Endpoint($entity);
-                $endpoint->setPath(['waar', 'certificates']);
-                $endpoint->setPathRegex(['waar', 'certificates']);
-                $this->entityManager->persist($endpoint);
-                (isset($this->io) ? $this->io->writeln('Endpoint created') : '');
-                continue;
-            }
-            (isset($this->io) ? $this->io->writeln('Endpoint found') : '');
-        }
+        //     if (
+        //         $entity &&
+        //         count($entity->getEndpoints()) == 0
+        //     ) {
+        //         $endpoint = new Endpoint($entity);
+        //         $endpoint->setPath(['waar', 'certificates']);
+        //         $endpoint->setPathRegex('['waar', 'certificates']');
+        //         $this->entityManager->persist($endpoint);
+        //         (isset($this->io) ? $this->io->writeln('Endpoint created') : '');
+        //         continue;
+        //     }
+        //     (isset($this->io) ? $this->io->writeln('Endpoint found') : '');
+        // }
 
         // $this->createCollections(); BACKUP 
         $this->createSources();
