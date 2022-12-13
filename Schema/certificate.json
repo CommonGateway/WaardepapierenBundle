@@ -1,156 +1,158 @@
 {
+    "$id": "https://waardepapieren.commonground.nl/certificate.schema.json",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "version": "0.1",
     "title": "Certificate",
     "type": "object",
     "description": "An model representing an (verifiable) claim.",
-    "examples": [],
     "properties": {
-      "person": {
-        "type": "string",
-        "description": "The person for this certificate, this can be a bsn or 'haal centraal' uri."
-      },
-      "personObject": {
-        "type": "string"
-      },
-      "data": {
-        "type": "array",
-        "format": "email",
-        "description": "data array will be used for the claim.",
-        "items": {
-          "type": "string"
-        }
-      },
-      "type": {
-        "type": "string",
-        "enum": [
-          "akte_van_geboorte",
-          "akte_van_huwelijk",
-          "akte_van_overlijden",
-          "akte_van_registratie_van_een_partnerschap",
-          "akte_van_omzetting_van_een_huwelijk_in_een_registratie_van_een_partnerschap",
-          "akte_van_omzetting_van_een_registratie_van_een_partnerschap",
-          "haven",
-          "verklaring_diplomas",
-          "verklaring_inkomen",
-          "verklaring_studieschuld",
-          "verklaring_van_huwelijksbevoegdheid",
-          "verklaring_van_in_leven_zijn",
-          "verklaring_van_nederlandershap",
-          "uittreksel_basis_registratie_personen",
-          "uittreksel_registratie_niet_ingezetenen",
-          "historisch_uittreksel_basis_registratie_personen"
-        ],
-        "description": " The type of this certificate. This can be one of the following: {\"geboorte akte\", \"verblijfs geschiedenis\", \"uitreksel brp\"}."
-      },
-      "organization": {
-        "type": "string",
-        "description": "The organization that is requested to \"sign\" this claim"
-      },
-      "claim": {
-        "type": "object",
-        "description": "The claim of this certificate as an json object",
-        "properties": {
-          "iss": {
-            "type": "string"
-          },
-          "user_id": {
-            "type": "string"
-          },
-          "user_representation": {
-            "type": "string"
-          },
-          "claim_data": {
-            "type": "object",
-            "properties": {
-              "persoon": {
-                "type": "string"
-              },
-              "doel": {
-                "type": "string"
-              }
-            }
-          },
-          "iat": {
-            "type": "string"
-          }
+        "person": {
+            "type": "string",
+            "description": "The person for this certificate, this can be a bsn or 'haal centraal' uri."
         },
-        "readOnly": true
-      },
-      "discipl": {
-        "type": "string",
-        "description": "The discipl of this certificate as an json object"
-      },
-      "irma": {
-        "type": "string",
-        "description": "The claim of this certificate as an json object"
-      },
-      "claimData": {
-        "type": "object",
-        "description": "The data of the claim this certificate as an json object",
-        "properties": {
-          "persoon": {
+        "personObject": {
             "type": "string"
-          },
-          "doel": {
-            "type": "string"
-          }
-        }
-      },
-      "jwt": {
-        "type": "string",
-        "description": "The claim of this certificate as a jwt token."
-      },
-      "image": {
-        "type": "string",
-        "description": "The image of this certificate. This is a qr-code."
-      },
-      "w3c": {
-        "type": "object",
-        "description": "w3c version of the claim",
-        "properties": {
-          "@context": {
+        },
+        "data": {
             "type": "array",
+            "format": "email",
+            "description": "data array will be used for the claim.",
             "items": {
-              "type": "string"
-            }
-          },
-          "type": {
-            "type": "array",
-            "items": {}
-          },
-          "issuer": {
-            "type": "string"
-          },
-          "inssuanceDate": {
-            "type": "string"
-          },
-          "proof": {
-            "type": "object",
-            "properties": {
-              "proofPurpose": {
                 "type": "string"
-              },
-              "type": {
-                "type": "string"
-              }
             }
-          },
-          "credentialSubject": {
-            "type": "object",
-            "properties": {
-              "id": {
-                "type": "string"
-              }
-            }
-          }
         },
-        "readOnly": true
-      },
-      "imageLocation": {
-        "type": "string"
-      },
-      "document": {
-        "type": "string",
-        "description": "The document of this ceritificate. This is a pdf."
-      }
+        "type": {
+            "type": "string",
+            "enum": [
+                "akte_van_geboorte",
+                "akte_van_huwelijk",
+                "akte_van_overlijden",
+                "akte_van_registratie_van_een_partnerschap",
+                "akte_van_omzetting_van_een_huwelijk_in_een_registratie_van_een_partnerschap",
+                "akte_van_omzetting_van_een_registratie_van_een_partnerschap",
+                "haven",
+                "verklaring_diplomas",
+                "verklaring_inkomen",
+                "verklaring_studieschuld",
+                "verklaring_van_huwelijksbevoegdheid",
+                "verklaring_van_in_leven_zijn",
+                "verklaring_van_nederlandershap",
+                "uittreksel_basis_registratie_personen",
+                "uittreksel_registratie_niet_ingezetenen",
+                "historisch_uittreksel_basis_registratie_personen"
+            ],
+            "description": " The type of this certificate. This can be one of the following: {\"geboorte akte\", \"verblijfs geschiedenis\", \"uitreksel brp\"}."
+        },
+        "organization": {
+            "type": "string",
+            "description": "The organization that is requested to \"sign\" this claim"
+        },
+        "claim": {
+            "type": "object",
+            "description": "The claim of this certificate as an json object",
+            "properties": {
+                "iss": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "string"
+                },
+                "user_representation": {
+                    "type": "string"
+                },
+                "claim_data": {
+                    "type": "object",
+                    "properties": {
+                        "persoon": {
+                            "type": "string"
+                        },
+                        "doel": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "iat": {
+                    "type": "string"
+                }
+            },
+            "readOnly": true
+        },
+        "discipl": {
+            "type": "string",
+            "description": "The discipl of this certificate as an json object"
+        },
+        "irma": {
+            "type": "string",
+            "description": "The claim of this certificate as an json object"
+        },
+        "claimData": {
+            "type": "object",
+            "description": "The data of the claim this certificate as an json object",
+            "properties": {
+                "persoon": {
+                    "type": "string"
+                },
+                "doel": {
+                    "type": "string"
+                }
+            }
+        },
+        "jwt": {
+            "type": "string",
+            "description": "The claim of this certificate as a jwt token."
+        },
+        "image": {
+            "type": "string",
+            "description": "The image of this certificate. This is a qr-code."
+        },
+        "w3c": {
+            "type": "object",
+            "description": "w3c version of the claim",
+            "properties": {
+                "@context": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "type": {
+                    "type": "array",
+                    "items": {}
+                },
+                "issuer": {
+                    "type": "string"
+                },
+                "inssuanceDate": {
+                    "type": "string"
+                },
+                "proof": {
+                    "type": "object",
+                    "properties": {
+                        "proofPurpose": {
+                            "type": "string"
+                        },
+                        "type": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "credentialSubject": {
+                    "type": "object",
+                    "properties": {
+                        "id": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "readOnly": true
+        },
+        "imageLocation": {
+            "type": "string"
+        },
+        "document": {
+            "type": "string",
+            "description": "The document of this ceritificate. This is a pdf."
+        }
     }
-  }
+}
