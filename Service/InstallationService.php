@@ -52,115 +52,108 @@ class InstallationService implements InstallerInterface
 
     private function createCollections()
     {
-        if (!$collection = $this->entityManager->getRepository('App:CollectionEntity')->findOneBy(['name' => 'Waardepapieren'])) {
-            $collection = new CollectionEntity();
-            $collection->setName('Waardepapieren');
-            $collection->setAutoLoad(true);
-            $collection->setLoadTestData(true);
-            $collection->setSourceType('GitHub');
-            $collection->setPrefix('waar');
-            $collection->setLocationOAS('https://raw.githubusercontent.com/CommonGateway/WaardepapierenAPI/main/OAS.yaml');
-            $this->entityManager->persist($collection);
-            isset($this->io) && $this->io->writeln('Collection: \'Waardepapieren\' created');
-        }
-        if (!$collection = $this->entityManager->getRepository('App:CollectionEntity')->findOneBy(['name' => 'Template'])) {
-            $collection = new CollectionEntity();
-            $collection->setName('Template');
-            $collection->setAutoLoad(true);
-            $collection->setLoadTestData(true);
-            $collection->setSourceType('GitHub');
-            $collection->setPrefix('waar');
-            $collection->setLocationOAS('https://raw.githubusercontent.com/CommonGateway/TemplateAPI/main/OAS.yaml');
-            $collection->setTestDataLocation('https://raw.githubusercontent.com/CommonGateway/TemplateAPI/main/data/waardepapieren.json');
-            $this->entityManager->persist($collection);
-            isset($this->io) && $this->io->writeln('Collection: \'Template\' created');
-        }
+        $collectionRepository = $this->entityManager->getRepository('App:CollectionEntity');
+        $collection = $collectionRepository->findOneBy(['name' => 'Waardepapieren']) ?? new CollectionEntity();
+        $collection->setName('Waardepapieren');
+        $collection->setAutoLoad(true);
+        $collection->setLoadTestData(true);
+        $collection->setSourceType('GitHub');
+        $collection->setPrefix('waar');
+        $collection->setLocationOAS('https://raw.githubusercontent.com/CommonGateway/WaardepapierenAPI/main/OAS.yaml');
+        $this->entityManager->persist($collection);
+        isset($this->io) && $this->io->writeln('Collection: \'Waardepapieren\' created');
+
+        $collection = $collectionRepository->findOneBy(['name' => 'Template']) ?? new CollectionEntity();
+        $collection->setName('Template');
+        $collection->setAutoLoad(true);
+        $collection->setLoadTestData(true);
+        $collection->setSourceType('GitHub');
+        $collection->setPrefix('waar');
+        $collection->setLocationOAS('https://raw.githubusercontent.com/CommonGateway/TemplateAPI/main/OAS.yaml');
+        $collection->setTestDataLocation('https://raw.githubusercontent.com/CommonGateway/TemplateAPI/main/data/waardepapieren.json');
+        $this->entityManager->persist($collection);
+        isset($this->io) && $this->io->writeln('Collection: \'Template\' created');
     }
 
     private function createEndpoints()
     {
-        if (!$endpoint = $this->entityManager->getRepository('App:Endpoint')->findOneBy(['name' => 'Dynamic certificate'])) {
-            $endpoint = new Endpoint();
-            $endpoint->setName('Dynamic certificate');
-            $endpoint->setDescription('Endpoint for dynamic certificates that use the request body as data');
-            $endpoint->setPathRegex('^(waar/dynamic_certificates)$');
-            $endpoint->setMethods(["POST"]);
-            $endpoint->setMethod("POST");
-            $endpoint->setOperationType('collection');
-            $endpoint->setThrows(['commongateway.dynamiccertficate.trigger']);
-            $this->entityManager->persist($endpoint);
-            isset($this->io) && $this->io->writeln('Endpoint: \'Dynamic certificate\' created');
-        }
-        if (!$endpoint = $this->entityManager->getRepository('App:Endpoint')->findOneBy(['name' => 'OpenZaak webhook'])) {
-            $endpoint = new Endpoint();
-            $endpoint->setName('OpenZaak webhook');
-            $endpoint->setDescription('Endpoint for OpenZaak webhook that has a zaak id');
-            $endpoint->setPathRegex('^(waar/webhook)$');
-            $endpoint->setMethods(["POST"]);
-            $endpoint->setMethod("POST");
-            $endpoint->setOperationType('collection');
-            $endpoint->setThrows(['commongateway.openzaakwebhook.trigger']);
-            $this->entityManager->persist($endpoint);
-            isset($this->io) && $this->io->writeln('Endpoint: \'OpenZaak webhook\' created');
-        }
+        $endpointRepository = $this->entityManager->getRepository('App:Endpoint');
+        $endpoint = $endpointRepository->findOneBy(['name' => 'Dynamic certificate']) ?? new Endpoint();
+        $endpoint->setName('Dynamic certificate');
+        $endpoint->setDescription('Endpoint for dynamic certificates that use the request body as data');
+        $endpoint->setPathRegex('^(waar/dynamic_certificates)$');
+        $endpoint->setMethods(["POST"]);
+        $endpoint->setMethod("POST");
+        $endpoint->setOperationType('collection');
+        $endpoint->setThrows(['commongateway.dynamiccertficate.trigger']);
+        $this->entityManager->persist($endpoint);
+        isset($this->io) && $this->io->writeln('Endpoint: \'Dynamic certificate\' created');
+
+        $endpoint = $endpointRepository->findOneBy(['name' => 'OpenZaak webhook']) ?? new Endpoint();
+        $endpoint->setName('OpenZaak webhook');
+        $endpoint->setDescription('Endpoint for OpenZaak webhook that has a zaak id');
+        $endpoint->setPathRegex('^(waar/webhook)$');
+        $endpoint->setMethods(["POST"]);
+        $endpoint->setMethod("POST");
+        $endpoint->setOperationType('collection');
+        $endpoint->setThrows(['commongateway.openzaakwebhook.trigger']);
+        $this->entityManager->persist($endpoint);
+        isset($this->io) && $this->io->writeln('Endpoint: \'OpenZaak webhook\' created');
     }
 
-    private function createActions()
+    private function createActions(string $certificateID)
     {
-        if (!$action = $this->entityManager->getRepository('App:Action')->findOneBy(['name' => 'WaardepapierenAction'])) {
-            $action = new Action();
-            $action->setName('WaardepapierenAction');
-            $action->setDescription('This is a action to validate a certificate.');
-            $action->setListens(['commongateway.response.pre']);
-            $action->setConditions(['==' => [1, 1]]);
-            $action->setClass('CommonGateway\WaardepapierenBundle\ActionHandler\WaardepapierenHandler');
-            $action->setPriority(0);
-            $action->setAsync(false);
-            $action->setIsEnabled(true);
-            $this->entityManager->persist($action);
-            isset($this->io) && $this->io->writeln('Action: \'WaardepapierenAction\' created');
-        }
-        if (!$action = $this->entityManager->getRepository('App:Action')->findOneBy(['name' => 'WaardepapierenOpenZaakAction'])) {
-            $action = new Action();
-            $action->setName('WaardepapierenOpenZaakAction');
-            $action->setDescription('This is a action to update a zaak with certificate.');
-            $action->setListens(['commongateway.openzaakwebhook.trigger']);
-            $action->setConditions(['==' => [1, 1]]);
-            $action->setClass('CommonGateway\WaardepapierenBundle\ActionHandler\WaardepapierenOpenZaakHandler');
-            $action->setPriority(0);
-            $action->setAsync(false);
-            $action->setIsEnabled(true);
-            $this->entityManager->persist($action);
-            isset($this->io) && $this->io->writeln('Action: \'WaardepapierenOpenZaakAction\' created');
-        }
-        if (!$action = $this->entityManager->getRepository('App:Action')->findOneBy(['name' => 'WaardepapierenDynamicAction'])) {
-            $action = new Action();
-            $action->setName('WaardepapierenDynamicAction');
-            $action->setDescription('This is a action to create a dynamic certificate.');
-            $action->setListens(['commongateway.dynamiccertficate.trigger']);
-            $action->setConditions(['==' => [1, 1]]);
-            $action->setClass('CommonGateway\WaardepapierenBundle\ActionHandler\WaardepapierenDynamicHandler');
-            $action->setPriority(0);
-            $action->setAsync(false);
-            $action->setIsEnabled(true);
-            $this->entityManager->persist($action);
-            isset($this->io) && $this->io->writeln('Action: \'WaardepapierenDynamicAction\' created');
-        }
+        $schemaRepository = $this->entityManager->getRepository('App:Entity');
+        $certificate = $schemaRepository->findOneBy(['name' => 'Certificate']);
+        $certificateID = $certificate ? $certificate->getId()->toString() : '';
+
+        $actionRepository = $this->entityManager->getRepository('App:Action');
+        $action = $actionRepository->findOneBy(['name' => 'WaardepapierenAction']) ?? new Action();
+        $action->setName('WaardepapierenAction');
+        $action->setDescription('This is a action to validate a certificate.');
+        $action->setListens(['commongateway.response.pre']);
+        $action->setConditions(['==' => [['var' => 'entity'], $certificateID]]);
+        // $action->setConfiguration(); Must be set with postman
+        $action->setClass('CommonGateway\WaardepapierenBundle\ActionHandler\WaardepapierenHandler');
+        $action->setIsEnabled(true);
+        $this->entityManager->persist($action);
+        isset($this->io) && $this->io->writeln('Action: \'WaardepapierenAction\' created');
+
+        $action = $actionRepository->findOneBy(['name' => 'WaardepapierenOpenZaakAction']) ?? new Action();
+        $action->setName('WaardepapierenOpenZaakAction');
+        $action->setDescription('This is a action to update a zaak with certificate.');
+        $action->setListens(['commongateway.openzaakwebhook.trigger']);
+        $action->setConditions(['==' => [1, 1]]);
+        $action->setClass('CommonGateway\WaardepapierenBundle\ActionHandler\WaardepapierenOpenZaakHandler');
+        $action->setIsEnabled(true);
+        $this->entityManager->persist($action);
+        isset($this->io) && $this->io->writeln('Action: \'WaardepapierenOpenZaakAction\' created');
+
+        $action = $actionRepository->findOneBy(['name' => 'WaardepapierenDynamicAction']) ?? new Action();
+        $action = new Action();
+        $action->setName('WaardepapierenDynamicAction');
+        $action->setDescription('This is a action to create a dynamic certificate.');
+        $action->setListens(['commongateway.dynamiccertficate.trigger']);
+        $action->setConditions(['==' => [1, 1]]);
+        $action->setClass('CommonGateway\WaardepapierenBundle\ActionHandler\WaardepapierenDynamicHandler');
+        $action->setIsEnabled(true);
+        $this->entityManager->persist($action);
+        isset($this->io) && $this->io->writeln('Action: \'WaardepapierenDynamicAction\' created');
     }
 
     private function createSources()
     {
+        $sourceRepository = $this->entityManager->getRepository('App:Gateway');
+        $gateway = $sourceRepository->findOneBy(['name' => 'Haalcentraal BRP Pink API']) ?? new Gateway();
+        $gateway->setName('Haalcentraal BRP Pink API');
+        $gateway->setType('json');
+        $gateway->setAuth('none');
+        $gateway->setAccept('application/json');
+        $gateway->setLocation('');
+        $this->entityManager->persist($gateway);
+        isset($this->io) && $this->io->writeln('Source: \'Haalcentraal BRP Pink API\' created');
 
-        if (!$gateway = $this->entityManager->getRepository('App:Gateway')->findOneBy(['name' => 'Haalcentraal BRP Pink API'])) {
-            $gateway = new Gateway();
-            $gateway->setName('Haalcentraal BRP Pink API');
-            $gateway->setType('json');
-            $gateway->setAuth('none');
-            $gateway->setAccept('application/json');
-            $gateway->setLocation('');
-            $this->entityManager->persist($gateway);
-            isset($this->io) && $this->io->writeln('Source: \'Haalcentraal BRP Pink API\' created');
-        }
+        return $gateway->getId()->toString();
     }
 
     public function checkDataConsistency()
@@ -210,10 +203,10 @@ class InstallationService implements InstallerInterface
             (isset($this->io) ? $this->io->writeln('Endpoint found') : '');
         }
 
-        // $this->createCollections();
-        // $this->createSources();
-        // $this->createEndpoints();
-        // $this->createActions();
+        // $this->createCollections(); BACKUP 
+        $haalcentraalBRP = $this->createSources();
+        $this->createEndpoints();
+        $this->createActions();
 
         $this->entityManager->flush();
 
