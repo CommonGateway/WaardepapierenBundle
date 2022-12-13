@@ -152,7 +152,6 @@ class InstallationService implements InstallerInterface
         isset($this->io) && $this->io->writeln('Action: \'WaardepapierenOpenZaakAction\' created');
 
         $action = $actionRepository->findOneBy(['name' => 'WaardepapierenDynamicAction']) ?? new Action();
-        $action = new Action();
         $action->setName('WaardepapierenDynamicAction');
         $action->setDescription('This is a action to create a dynamic certificate.');
         $action->setListens(['commongateway.dynamiccertficate.trigger']);
