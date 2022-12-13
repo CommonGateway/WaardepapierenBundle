@@ -84,6 +84,7 @@ class InstallationService implements InstallerInterface
         $endpoint = $endpointRepository->findOneBy(['name' => 'Certificate collection']) ?? new Endpoint();
         $endpoint->setName('Certificate collection');
         $endpoint->setPathRegex('^(waar/certificates)$');
+        $endpoint->setPath(['waar', 'certificates']);
         $endpoint->setMethods(["POST", "GET"]);
         $endpoint->setMethod("POST");
         $endpoint->setEntity($certificate);
@@ -93,6 +94,7 @@ class InstallationService implements InstallerInterface
         $endpoint = $endpointRepository->findOneBy(['name' => 'Certificate item']) ?? new Endpoint();
         $endpoint->setName('Certificate item');
         $endpoint->setPathRegex('^(waar/certificates/[a-z0-9-]{36})$');
+        $endpoint->setPath(['waar', 'certificates', '[a-z0-9-]{36}']);
         $endpoint->setMethods(["PUT", "GET"]);
         $endpoint->setMethod("POST");
         $endpoint->setEntity($certificate);
@@ -103,6 +105,7 @@ class InstallationService implements InstallerInterface
         $endpoint->setName('Dynamic certificate');
         $endpoint->setDescription('Endpoint for dynamic certificates that use the request body as data');
         $endpoint->setPathRegex('^(waar/dynamic_certificates)$');
+        $endpoint->setPath(['waar', 'dynamic_certificates']);
         $endpoint->setMethods(["POST", "GET"]);
         $endpoint->setMethod("POST");
         $endpoint->setOperationType('collection');
