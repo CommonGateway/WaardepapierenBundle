@@ -187,6 +187,8 @@ class InstallationService implements InstallerInterface
                 count($entity->getEndpoints()) == 0
             ) {
                 $endpoint = new Endpoint($entity);
+                $endpoint->setPath(['waar', 'certificates']);
+                $endpoint->setPathRegex(['waar', 'certificates']);
                 $this->entityManager->persist($endpoint);
                 (isset($this->io) ? $this->io->writeln('Endpoint created') : '');
                 continue;
