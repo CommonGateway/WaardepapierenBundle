@@ -173,7 +173,7 @@ class InstallationService implements InstallerInterface
         $gateway->setType('json');
         $gateway->setAuth('none');
         $gateway->setAccept('application/json');
-        $gateway->setLocation('');
+        $gateway->setLocation('https://apitest.locgov.nl/iconnect/apihcbrp/mks/1.3.0');
         $this->entityManager->persist($gateway);
         isset($this->io) && $this->io->writeln('Source: \'Haalcentraal BRP Pink API\' created');
     }
