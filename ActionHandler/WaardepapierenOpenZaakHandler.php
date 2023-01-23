@@ -2,6 +2,7 @@
 
 namespace CommonGateway\WaardepapierenBundle\ActionHandler;
 
+use CommonGateway\CoreBundle\ActionHandler\ActionHandlerInterface;
 use CommonGateway\WaardepapierenBundle\Service\WaardepapierenService;
 
 class WaardepapierenOpenZaakHandler implements ActionHandlerInterface
