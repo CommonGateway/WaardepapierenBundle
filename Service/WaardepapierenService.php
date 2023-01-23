@@ -31,6 +31,12 @@ class WaardepapierenService
     private CallService $callService;
     private FileService $fileService;
 
+    private $objectEntityRepo;
+    private $entityRepo;
+
+    private $certificate;
+    private $certificateEntity;
+
     /**
      * @param EntityManagerInterface $entityManager
      */
@@ -51,6 +57,8 @@ class WaardepapierenService
 
         $this->objectEntityRepo = $this->entityManager->getRepository(ObjectEntity::class);
         $this->entityRepo = $this->entityManager->getRepository(Entity::class);
+
+        $this->certificate = [];
     }
 
     /**
@@ -547,6 +555,9 @@ class WaardepapierenService
             'zaakId'         => true
         ]);
 
+        // 2. Get zaak
+        // $this->fetchZaakFromOpenZaak();
+
 
         // 2. Get persons information from pink haalcentraalGateway 
         $this->fetchPersoonsgegevens();
@@ -560,6 +571,9 @@ class WaardepapierenService
         }
         // 4. Create Informatieobject
         $this->createInformatieObject();
+
+        // 5a. Send InformatieObject back to OpenZaak
+        // 5b. Send Zaak back to OpenZaak
 
         // Return certificate (or zaak/informatieobject)
         return ['response' => $this->certificate];
@@ -614,7 +628,8 @@ class WaardepapierenService
             'source'         => true,
             'certificateKey' => true,
             'authorization'  => true,
-            'organziation'   => true
+            'organziation'   => true,
+            'certificate'    => true   
         ]);
 
         // 2. Get persons information from pink haalcentraalGateway 
@@ -622,6 +637,8 @@ class WaardepapierenService
 
         // 3. Fill certificate with persons information
         $this->createCertificate();
+
+        // var_dump($this->certificate);
 
         return ['response' => $this->certificate];
     }
