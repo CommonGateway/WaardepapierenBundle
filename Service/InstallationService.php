@@ -135,7 +135,7 @@ class InstallationService implements InstallerInterface
         $action = $actionRepository->findOneBy(['name' => 'WaardepapierenAction']) ?? new Action();
         $action->setName('WaardepapierenAction');
         $action->setDescription('This is a action to validate a certificate.');
-        $action->setListens(['commongateway.response.pre']);
+        $action->setListens(['commongateway.object.created']);
         $action->setConditions(['==' => [['var' => 'entity'], $certificateID]]);
         // $action->setConfiguration(); Must be set with postman
         $action->setClass('CommonGateway\WaardepapierenBundle\ActionHandler\WaardepapierenHandler');
