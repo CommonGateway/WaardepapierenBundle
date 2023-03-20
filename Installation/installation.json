@@ -6,10 +6,10 @@
       ]
     },
     "endpoints": {
-        "schemas": {
+        "schemas": [{
             "reference": "https://waardepapieren.commonground.nl/certificate.schema.json",
             "path": "waar/certificates",
             "methods": ["GET", "POST"]
-        }
+        }]
     }
 }
