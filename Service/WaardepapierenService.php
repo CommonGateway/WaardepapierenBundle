@@ -19,6 +19,15 @@ use CommonGateway\CoreBundle\Service\CallService;
 use CommonGateway\CoreBundle\Service\FileService;
 use Exception;
 
+/**
+ * WaardepapierenService creates certificates
+ * WaardepapierenService creates certificates by template, given data, or created zgw zaak.
+ * 
+ * @author Barry Brands barry@conduction.nl 
+ * @package common-gateway/waardepapieren-bundle 
+ * @category Service
+ * @access public  
+ */
 class WaardepapierenService
 {
     private EntityManagerInterface $entityManager;
@@ -36,6 +45,7 @@ class WaardepapierenService
 
     private $certificate;
     private $certificateEntity;
+    private ?Gateway $haalcentraalGateway;
 
     /**
      * @param EntityManagerInterface $entityManager
@@ -642,4 +652,4 @@ class WaardepapierenService
 
         return ['response' => $this->certificate];
     }
-}
+}//end class
