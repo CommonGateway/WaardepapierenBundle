@@ -17,7 +17,7 @@
     "require": {
         "php": ">=7.4",
         "endroid/qr-code-bundle": "3.4",
-        "common-gateway/template-bundle": "^0.0.2",
+        "common-gateway/template-bundle": ">=0.0",
         "commongateway/corebundle": ">=1.0"
     },
 	"require-dev" : {
