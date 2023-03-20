@@ -22,7 +22,7 @@ class WaardepapierenHandler implements ActionHandlerInterface
     public function getConfiguration(): array
     {
         return [
-            '$id'         => 'https://example.com/person.schema.json',
+            '$id'         => 'https://waardepapieren.commonground.nl/person.schema.json',
             '$schema'     => 'https://json-schema.org/draft/2020-12/schema',
             'title'       => 'Waardepapieren Action',
             'description' => 'This handler returns a welcoming string',
