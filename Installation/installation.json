@@ -1,3 +1,15 @@
 {
-    "installationService": "CommonGateway\\WaardepapierenBundle\\Service\\InstallationService"
+    "installationService": "CommonGateway\\WaardepapierenBundle\\Service\\InstallationService",
+    "cards": {
+      "schemas": [
+        "https://waardepapieren.commonground.nl/certificate.schema.json"
+      ]
+    },
+    "endpoints": {
+        "schemas": {
+            "reference": "https://waardepapieren.commonground.nl/certificate.schema.json",
+            "path": "waar/certificates",
+            "methods": ["GET", "POST"]
+        }
+    }
 }

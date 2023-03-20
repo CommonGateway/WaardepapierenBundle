@@ -1,0 +1,13 @@
+{
+    "title": "OpenZaak webhook",
+    "$id": "https://waardepapieren.commonground.nl/EventEndpoint/waar.openZaakWebhook.endpoint.json",
+    "$schema": "https://docs.commongateway.nl/schemas/Endpoint.schema.json",
+    "version": "0.0.1",
+    "description": "Endpoint for OpenZaak webhook that has a zaak id",
+    "path": ["waar", "dynamic_certificates"],
+    "pathRegex": "^(waar/webhook)$",
+    "methods": ["POST"],
+    "throws": [
+        "commongateway.openzaakwebhook.trigger"
+    ]
+}

@@ -1,0 +1,9 @@
+{
+    "title": "BRP API Waardepapieren",
+    "$id": "https://waardepapieren.commonground.nl/source/waar.brp.endpoint.json",
+    "$schema": "https://docs.commongateway.nl/schemas/Gateway.schema.json",
+    "version": "0.0.1",
+    "description": "BRP API Waardepapieren",
+    "location": "!ChangMe!",
+    "isEnabled": false
+}

@@ -1,0 +1,18 @@
+{
+  "title": "WaardepapierenOpenZaakAction",
+  "$id": "https://waardepapieren.commonground.nl/action/waar.WaardepapierenOpenZaakAction.action.json",
+  "$schema": "https://docs.commongateway.nl/schemas/Action.schema.json",
+  "version": "0.0.1",
+  "listens": [
+    "commongateway.openzaakwebhook.trigger"
+  ],
+  "description": "This is a action to update a zaak with certificate.",
+  "throws": [],
+  "conditions": {
+    "==": [1, 1]
+  },
+  "class": "CommonGateway\\WaardepapierenBundle\\ActionHandler\\WaardepapierenOpenZaakHandler",
+  "configuration": {},
+  "isLockable": false,
+  "isEnabled": true
+}
