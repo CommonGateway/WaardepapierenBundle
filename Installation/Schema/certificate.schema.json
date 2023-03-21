@@ -1,8 +1,8 @@
 {
+    "title": "Certificate",
     "$id": "https://waardepapieren.commonground.nl/certificate.schema.json",
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "version": "0.1",
-    "title": "Certificate",
     "type": "object",
     "description": "An model representing an (verifiable) claim.",
     "properties": {
