@@ -1,7 +1,7 @@
 {
     "title": "Claim",
     "$id": "https://waardepapieren.commonground.nl/claim.schema.json",
-    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$schema": "https://docs.commongateway.nl/schemas/Entity.schema.json",
     "version": "0.1",
     "type": "object",
     "description": "An model representing an claim.claim.",
