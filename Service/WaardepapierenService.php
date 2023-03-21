@@ -30,46 +30,76 @@ use Exception;
  */
 class WaardepapierenService
 {
+
+    /**
+     * @var EntityManagerInterface
+     */
     private EntityManagerInterface $entityManager;
-    // private TranslationService $translationService;
-    private ObjectEntityService $objectEntityService;
-    private array $configuration;
-    private array $data;
+    
+    /**
+     * @var Twig
+     */
     private Twig $twig;
+
+    /**
+     * @var QrCodeFactoryInterface
+     */
     private QrCodeFactoryInterface $qrCode;
+    
+    /**
+     * @var CallService
+     */
     private CallService $callService;
+    
+    /**
+     * @var FileService
+     */
     private FileService $fileService;
 
-    private $objectEntityRepo;
-    private $entityRepo;
+    /**
+     * @var Entity|null $certificate schema we are creating a object with.
+     */
+    private ?Entity $certificateEntity;
 
-    private $certificate;
-    private $certificateEntity;
+    /**
+     * @var Gateway|null $haalcentraalGateway source to get brp info from.
+     */
     private ?Gateway $haalcentraalGateway;
+
+    /**
+     * @var array $configuration of the current action.
+     */
+    private array $configuration;
+
+    /**
+     * @var array $certificate that is being created in this service.
+     */
+    private ?array $certificate;
+
+    /**
+     * @var array $userData that is being used to create a certificate.
+     */
+    private ?array $userData;
 
     /**
      * @param EntityManagerInterface $entityManager
      */
     public function __construct(
         EntityManagerInterface $entityManager,
-        ObjectEntityService $objectEntityService,
         Twig $twig,
         QrCodeFactoryInterface $qrCode,
         CallService $callService,
         FileService $fileService
     ) {
         $this->entityManager = $entityManager;
-        $this->objectEntityService = $objectEntityService;
         $this->twig = $twig;
         $this->qrCode = $qrCode;
         $this->callService = $callService;
         $this->fileService = $fileService;
 
-        $this->objectEntityRepo = $this->entityManager->getRepository(ObjectEntity::class);
-        $this->entityRepo = $this->entityManager->getRepository(Entity::class);
-
         $this->certificate = [];
-    }
+
+    }//end construct()
 
     /**
      * This function creates a QR code for the given claim.
@@ -89,7 +119,8 @@ class WaardepapierenService
 
         // And finnaly we need to set the result on the certificate resource
         $this->certificate['image'] = 'data:image/png;base64,' . base64_encode($qrCode->writeString());
-    }
+    
+    }//end createImage()
 
     /**
      * This function generates a claim based on the w3c structure.
@@ -117,7 +148,8 @@ class WaardepapierenService
         $array['proof'] = $this->createProof($array);
 
         return $array;
-    }
+
+    }//end w3cClaim()
 
 
     /**
@@ -140,7 +172,8 @@ class WaardepapierenService
         $proof['jws'] = $this->createJWS($this->certificate, $data['credentialSubject']);
 
         return $proof;
-    }
+
+    }//end createProof()
 
     /**
      * This function generates a JWS token with the RS512 algorithm.
@@ -181,7 +214,8 @@ class WaardepapierenService
         $serializer = new CompactSerializer();
 
         return $serializer->serialize($jws, 0);
-    }
+
+    }//end createJWS()
 
     /**
      * This function creates the (pdf) document for a given certificate type.
@@ -228,7 +262,8 @@ class WaardepapierenService
 
         // And finnaly we need to set the result on the certificate resource
         $this->certificate['document'] = 'data:application/pdf;base64,' . base64_encode($dompdf->output());
-    }
+
+    }//end createDocument()
 
     /**
      * This function generates a jwt token using the claim that's available from the certificate object.
@@ -258,7 +293,8 @@ class WaardepapierenService
         $serializer = new CompactSerializer();
 
         return $serializer->serialize($jws, 0);
-    }
+
+    }//end createJWT()
 
     /**
      * This function creates the claim based on the type defined in the certificate object.
@@ -305,7 +341,8 @@ class WaardepapierenService
         $this->certificate['irma'] = $this->certificate['discipl'];
 
         $this->certificate['jwt'] = $this->createJWT($this->certificate);
-    }
+
+    }//end createClaim()
 
     /**
      * This function fetches a haalcentraal persoon with the callService.
@@ -346,7 +383,8 @@ class WaardepapierenService
         $this->certificate['person'] = 'https://' .  $this->haalcentraalGateway->getLocation() . '/ingeschrevenpersonen/' . $brpPersoon['burgerservicenummer'];
         unset($brpPersoon['_links']);
         $this->certificate['personObject'] = $brpPersoon;
-    }
+
+    }//end fetchPersoonsgegevens()
 
     /**
      * Finds or creates Certificate object
@@ -374,7 +412,8 @@ class WaardepapierenService
         }
 
         return $certificateObjectEntity;
-    }
+
+    }//end getCertificateObject()
 
     public function createCertificate(): void
     {
@@ -397,7 +436,8 @@ class WaardepapierenService
         $this->entityManager->flush();
 
         $this->certificate = $certificateObjectEntity->toArray();
-    }
+
+    }//end createCertificate()
 
     private function sendEnkelvoudigInformatieObject($enkelvoudigInformatieObject)
     {
@@ -415,7 +455,8 @@ class WaardepapierenService
         }
 
         return $this->callService->decodeResponse($this->openZaakSource, $response);
-    }
+
+    }//end sendEnkelvoudigInformatieObject()
 
     private function sendObjectInformatieObject($objectInformatieObject)
     {
@@ -433,7 +474,8 @@ class WaardepapierenService
         }
 
         return $this->callService->decodeResponse($this->openZaakSource, $response);
-    }
+
+    }//end sendObjectInformatieObject()
 
     private function createInformatieObject()
     {
@@ -469,8 +511,10 @@ class WaardepapierenService
             'objectType' => 'zaak'
         ];
 
-        $objectInformatieObjectResult = $this->sendObjectInformatieObject($objectInformatieObject);
-    }
+        $this->sendObjectInformatieObject($objectInformatieObject);
+
+    }//end createInformatieObject()
+
 
     /**
      * Validates action config and sets the values to $this
@@ -535,10 +579,11 @@ class WaardepapierenService
             throw new \Exception('No template found, check if template exists for type');
         }
 
-        if (array_key_exists('zaakId', $whatToValidate) && !isset($userData['zaakId'])) {
+        if (array_key_exists('zaakId', $whatToValidate) && !isset($this->userData['zaakId'])) {
             throw new \Exception('No zaakid given, check body');
         }
-    }
+
+    }//end validateConfigAndSetValues()
 
     /**
      * Creates a certificate and updates a zaak to send back to OpenZaak.
@@ -587,7 +632,8 @@ class WaardepapierenService
 
         // Return certificate (or zaak/informatieobject)
         return ['response' => $this->certificate];
-    }
+
+    }//end waardepapierenOpenZaakHandler()
 
     /**
      * Creates or updates a dynamic Certificate.
@@ -616,7 +662,8 @@ class WaardepapierenService
         $this->createCertificate();
 
         return ['response' => $this->certificate];
-    }
+
+    }//end waardepapierenDynamicHandler()
 
     /**
      * Creates or updates a Certificate.
@@ -651,5 +698,7 @@ class WaardepapierenService
         // var_dump($this->certificate);
 
         return ['response' => $this->certificate];
-    }
+
+    }//end waardepapierenHandler()
+    
 }//end class
