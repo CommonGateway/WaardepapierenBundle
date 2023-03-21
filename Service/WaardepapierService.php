@@ -14,21 +14,20 @@ use Jose\Component\Signature\Algorithm\RS512;
 use Jose\Component\Signature\Serializer\CompactSerializer;
 use Twig\Environment as Twig;
 use App\Entity\Gateway;
-use App\Service\ObjectEntityService;
 use CommonGateway\CoreBundle\Service\CallService;
 use CommonGateway\CoreBundle\Service\FileService;
 use Exception;
 
 /**
- * WaardepapierenService creates certificates
- * WaardepapierenService creates certificates by template, given data, or created zgw zaak.
+ * WaardepapierService creates certificates
+ * WaardepapierService creates certificates by template, given data, or created zgw zaak.
  * 
  * @author Barry Brands barry@conduction.nl 
  * @package common-gateway/waardepapieren-bundle 
  * @category Service
  * @access public  
  */
-class WaardepapierenService
+class WaardepapierService
 {
 
     /**
@@ -593,7 +592,7 @@ class WaardepapierenService
      *
      * @return array $this->certificate Certificate which we updated with new data
      */
-    public function waardepapierenOpenZaakHandler(array $data, array $configuration): array
+    public function waardepapierOpenZaakHandler(array $data, array $configuration): array
     {
         var_dump('OPENZAAK WAARDEPAPIERENSERVICE TRIGGERED');
         die;
@@ -673,7 +672,7 @@ class WaardepapierenService
      *
      * @return array $this->certificate Certificate which we updated with new data
      */
-    public function waardepapierenHandler(array $data, array $configuration): array
+    public function waardepapierHandler(array $data, array $configuration): array
     {
         $this->certificate = $data['response'];
         $this->configuration = $configuration;

@@ -3,7 +3,7 @@
 namespace CommonGateway\WaardepapierenBundle\ActionHandler;
 
 use CommonGateway\CoreBundle\ActionHandler\ActionHandlerInterface;
-use CommonGateway\WaardepapierenBundle\Service\WaardepapierenService;
+use CommonGateway\WaardepapierenBundle\Service\WaardepapierService;
 
 /**
  * WaardepapierenDynamicHandler
@@ -15,11 +15,11 @@ use CommonGateway\WaardepapierenBundle\Service\WaardepapierenService;
  */
 class WaardepapierenDynamicHandler implements ActionHandlerInterface
 {
-    private WaardepapierenService $waardepapierenService;
+    private WaardepapierService $waardepapierService;
 
-    public function __construct(WaardepapierenService $waardepapierenService)
+    public function __construct(WaardepapierService $waardepapierService)
     {
-        $this->waardepapierenService = $waardepapierenService;
+        $this->waardepapierService = $waardepapierService;
         
     }//end __construct()
 
@@ -56,7 +56,7 @@ class WaardepapierenDynamicHandler implements ActionHandlerInterface
      */
     public function run(array $data, array $configuration): array
     {
-        return $this->waardepapierenService->waardepapierenDynamicHandler($data, $configuration);
+        return $this->waardepapierService->waardepapierDynamicHandler($data, $configuration);
 
     }//end run()
 
