@@ -7,21 +7,24 @@ use CommonGateway\WaardepapierenBundle\Service\WaardepapierService;
 
 /**
  * WaardepapierenHandler
- * 
- * @author Barry Brands barry@conduction.nl 
- * @package common-gateway/waardepapieren-bundle 
+ *
+ * @author   Barry Brands barry@conduction.nl
+ * @package  common-gateway/waardepapieren-bundle
  * @category ActionHandler
- * @access public  
+ * @access   public
  */
 class WaardepapierenHandler implements ActionHandlerInterface
 {
+
     private WaardepapierService $waardepapierService;
+
 
     public function __construct(WaardepapierService $waardepapierService)
     {
         $this->waardepapierService = $waardepapierService;
 
     }//end __construct()
+
 
     /**
      *  This function returns the requered configuration as a [json-schema](https://json-schema.org/) array.
@@ -41,6 +44,7 @@ class WaardepapierenHandler implements ActionHandlerInterface
 
     }//end getConfiguration()
 
+
     /**
      * This function runs the service.
      *
@@ -57,6 +61,8 @@ class WaardepapierenHandler implements ActionHandlerInterface
     public function run(array $data, array $configuration): array
     {
         return $this->waardepapierService->waardepapierHandler($data, $configuration);
-    }
+
+    }//end run()
+
 
 }//end class

@@ -7,21 +7,24 @@ use CommonGateway\WaardepapierenBundle\Service\WPZaakService;
 
 /**
  * WPZaakHandler
- * 
- * @author Barry Brands barry@conduction.nl 
- * @package common-gateway/waardepapieren-bundle 
+ *
+ * @author   Barry Brands barry@conduction.nl
+ * @package  common-gateway/waardepapieren-bundle
  * @category ActionHandler
- * @access public  
+ * @access   public
  */
 class WPZaakHandler implements ActionHandlerInterface
 {
+
     private WPZaakService $wpZaakService;
+
 
     public function __construct(WPZaakService $wpZaakService)
     {
         $this->wpZaakService = $wpZaakService;
-        
+
     }//end __construct()
+
 
     /**
      *  This function returns the requered configuration as a [json-schema](https://json-schema.org/) array.
@@ -41,6 +44,7 @@ class WPZaakHandler implements ActionHandlerInterface
 
     }//end getConfiguration()
 
+
     /**
      * This function runs the service.
      *
@@ -59,5 +63,6 @@ class WPZaakHandler implements ActionHandlerInterface
         return $this->wpZaakService->wpZaakHandler($data, $configuration);
 
     }//end run()
+
 
 }//end class

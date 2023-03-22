@@ -9,20 +9,22 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 /**
  * WaardepapierenExtension
- * 
- * @author Barry Brands barry@conduction.nl 
- * @package common-gateway/waardepapieren-bundle 
+ *
+ * @author   Barry Brands barry@conduction.nl
+ * @package  common-gateway/waardepapieren-bundle
  * @category DependencyInjection
- * @access public  
+ * @access   public
  */
 class WaardepapierenExtension extends Extension
 {
-    
+
+
     public function load(array $configs, ContainerBuilder $container)
     {
-        $loader = new YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
+        $loader = new YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('services.yaml');
 
     }//end load()
+
 
 }//end class

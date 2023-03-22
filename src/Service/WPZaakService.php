@@ -6,11 +6,11 @@ use Doctrine\ORM\EntityManagerInterface;
 use CommonGateway\WaardepapierenBundle\Service\WaardepapierService;
 /**
  * WPZaakService makes a certificate with for a zaak
- * 
- * @author Barry Brands barry@conduction.nl 
- * @package common-gateway/waardepapieren-bundle 
+ *
+ * @author   Barry Brands barry@conduction.nl
+ * @package  common-gateway/waardepapieren-bundle
  * @category Service
- * @access public  
+ * @access   public
  */
 class WPZaakService
 {
@@ -39,7 +39,8 @@ class WPZaakService
      * @var array $userData that is being used to create a certificate.
      */
     private ?array $userData;
-    
+
+
     /**
      * __construct
      */
@@ -47,10 +48,11 @@ class WPZaakService
         EntityManagerInterface $entityManager,
         WaardepapierService $waardepapierService
     ) {
-        $this->entityManager = $entityManager;
+        $this->entityManager       = $entityManager;
         $this->waardepapierService = $waardepapierService;
 
-    }//end construct()
+    }//end __construct()
+
 
     /**
      * Creates a certificate for a ZGW Zaak.
@@ -67,21 +69,20 @@ class WPZaakService
 
         // @todo Get bsn from zaak
         // $bsn = $zaak['']
-
         // 1. Check Action configuration and set values
         $haalcentraalSource = $this->waardepapierService->getHaalcentraalSource();
-        $certificateEntity = $this->waardepapierService->getCertificateEntity();
+        $certificateEntity  = $this->waardepapierService->getCertificateEntity();
 
-        // 2. Get persons information from pink haalcentraalGateway 
+        // 2. Get persons information from pink haalcentraalGateway
         $brpPersoon = $this->waardepapierService->fetchPersoonsgegevens($haalcentraalSource, $bsn);
 
         // 3. Fill certificate with persons information
         $certificate = $this->waardepapierService->createCertificate([], 'zaak', $brpPersoon, $certificateEntity, $zaak);
 
         // var_dump($this->certificate);
-
         return ['response' => $certificate];
 
-    }//end waardepapierenHandler()
-    
+    }//end wpZaakHandler()
+
+
 }//end class
