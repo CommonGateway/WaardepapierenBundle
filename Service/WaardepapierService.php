@@ -61,14 +61,14 @@ class WaardepapierService
     private ?Entity $certificateEntity;
 
     /**
-     * @var Gateway|null $haalcentraalGateway source to get brp info from.
+     * @var Gateway|null $haalcentraalSource source to get brp info from.
      */
-    private ?Gateway $haalcentraalGateway;
+    public ?Gateway $haalcentraalSource;
 
     /**
      * @var array $configuration of the current action.
      */
-    private array $configuration;
+    public array $configuration;
 
     /**
      * @var array $userData that is being used to create a certificate.
@@ -76,9 +76,9 @@ class WaardepapierService
     private ?array $userData;
 
     /**
-     * @var ObjectEntity|null $certTemplate template to create certificate with.
+     * @var array|null $certTemplate template to create certificate with.
      */
-    private ?ObjectEntity $certTemplate;
+    public ?array $certTemplate;
 
 
     /**
@@ -97,8 +97,7 @@ class WaardepapierService
         $this->callService   = $callService;
         $this->fileService   = $fileService;
 
-        $this->certificate = [];
-
+        $this->haalcentraalSource = null;
     }//end __construct()
 
 
@@ -109,11 +108,12 @@ class WaardepapierService
      *
      * @return array The modified certificate object
      */
-    public function createImage()
+    public function createImage(array $certificate)
     {
         // Then we need to render the QR code
         $qrCode = $this->qrCode->create(
-            $this->certificate['jwt'],
+            // $certificate['jwt'], //@todo some ssl certs dont work
+            "basic", //@todo remove if above line works
             [
                 'size'   => 1000,
                 'margin' => 1,
@@ -122,7 +122,9 @@ class WaardepapierService
         );
 
         // And finnaly we need to set the result on the certificate resource
-        $this->certificate['image'] = 'data:image/png;base64,'.base64_encode($qrCode->writeString());
+        $certificate['image'] = 'data:image/png;base64,'.base64_encode($qrCode->writeString());
+
+        return $certificate;
 
     }//end createImage()
 
@@ -182,7 +184,7 @@ class WaardepapierService
         // @TODO what should the verifymethod be now, we have no cert key file anymore ?
         // $proof['verificationMethod'] = $this->requestStack->getCurrentRequest()->getSchemeAndHttpHost() . "/cert/{" . $this->configuration['organization'] . "}.pem";
         $proof['verificationMethod'] = 'http://localhost/cert/00000010.pem';
-        $proof['jws'] = $this->createJWS($certificate, $data['credentialSubject']);
+        // $proof['jws'] = $this->createJWS($certificate, $data['credentialSubject']);
 
         return $proof;
 
@@ -210,7 +212,7 @@ class WaardepapierService
         // );
         // New
         $jwk        = JWKFactory::createFromKey(
-            $this->configuration['certificateKey']
+            $this->haalcentraalSource->getConfiguration()['ssl_key'][0]
         );
         $jwsBuilder = new \Jose\Component\Signature\JWSBuilder($algorithmManager);
         $payload    = json_encode(
@@ -246,13 +248,13 @@ class WaardepapierService
      * @throws \Twig\Error\SyntaxError
      * @throws \Exception
      */
-    public function createDocument()
+    public function createDocument(array $certificate)
     {
         $data = [
-            'qr'     => $this->certificate['image'],
-            'claim'  => $this->certificate['claim'],
-            'person' => $this->certificate['personObject'] ?? null,
-            'base'   => '/organizations/'.$this->certificate['organization'].'.html.twig',
+            'qr'     => $certificate['image'],
+            'claim'  => $certificate['claim'],
+            'person' => $certificate['personObject'] ?? null,
+            'base'   => '/organizations/'.$certificate['organization'].'.html.twig',
         ];
 
         if (isset($this->userData)) {
@@ -278,7 +280,9 @@ class WaardepapierService
         $dompdf->render();
 
         // And finnaly we need to set the result on the certificate resource
-        $this->certificate['document'] = 'data:application/pdf;base64,'.base64_encode($dompdf->output());
+        $certificate['document'] = 'data:application/pdf;base64,'.base64_encode($dompdf->output());
+
+        return $certificate;
 
     }//end createDocument()
 
@@ -300,7 +304,7 @@ class WaardepapierService
                 new RS512(),
             ]
         );
-        $jwk = JWKFactory::createFromKey($this->configuration['certificateKey']);
+        $jwk = JWKFactory::createFromKey($this->haalcentraalSource->getConfiguration()['ssl_key'][0]);
         // $jwk = JWKFactory::createFromKeyFile(
         // "../cert/{" . $this->certificate['organization'] . "}.pem"
         // );
@@ -328,7 +332,7 @@ class WaardepapierService
         if (isset($certificate['claimData'])) {
             $claimData = ($certificate['claimData'] ?? []);
         } else if (isset($certificate['data'])) {
-            $claimData = $this->certificate['data'];
+            $claimData = $certificate['data'];
         }
 
         // switch ($this->certificate['type']) {
@@ -353,16 +357,16 @@ class WaardepapierService
         $certificate['discipl'] = [
             'claimData' => [
                 'did:discipl:ephemeral:crt:4c86faf535029c8cf4a371813cc44cb434875b18' => [
-                    'link:discipl:ephemeral:tEi6K3mPRmE6QRf4WvpxY1hQgGmIG7uDV85zQILQNSCnQjAZPg2mj4Fbok/BHL9C8mFJQ1tCswBHBtsu6NIESA45XnN13pE+nLD6IPOeHx2cUrObxtzsqLhAy4ZXN6eDpZDmqnb6ymELUfXu/D2n4rL/t9aD279vqjFRKgBVE5WsId9c6KEYA+76mBQUBoJr8sF7w+3oMjzKy88oW693I3Keu+cdl/9sRCyYAYIDzwmg3A6n8t9KUpsBDK1b6tNznA6qoiN9Zb4JZ7rpq6lnVpyU5pyJjD+p9DiWgIYsVauJy8WOcKfNWkeOomWez0of2o+gu9xf+VLzcX3MSiAfZA==' => $this->certificate['claimData'],
+                    'link:discipl:ephemeral:tEi6K3mPRmE6QRf4WvpxY1hQgGmIG7uDV85zQILQNSCnQjAZPg2mj4Fbok/BHL9C8mFJQ1tCswBHBtsu6NIESA45XnN13pE+nLD6IPOeHx2cUrObxtzsqLhAy4ZXN6eDpZDmqnb6ymELUfXu/D2n4rL/t9aD279vqjFRKgBVE5WsId9c6KEYA+76mBQUBoJr8sF7w+3oMjzKy88oW693I3Keu+cdl/9sRCyYAYIDzwmg3A6n8t9KUpsBDK1b6tNznA6qoiN9Zb4JZ7rpq6lnVpyU5pyJjD+p9DiWgIYsVauJy8WOcKfNWkeOomWez0of2o+gu9xf+VLzcX3MSiAfZA==' => $certificate['claimData'],
                 ],
             ],
             'metadata'  => ['cert' => 'localhost:8080'],
         ];
 
         // Create token payload as a JSON string
-        $certificate['irma'] = $this->certificate['discipl'];
+        $certificate['irma'] = $certificate['discipl'];
 
-        $certificate['jwt'] = $this->createJWT($certificate);
+        // $certificate['jwt'] = $this->createJWT($certificate);
 
         return $certificate;
 
@@ -376,37 +380,37 @@ class WaardepapierService
      *
      * @return array The modified certificate object
      */
-    public function fetchPersoonsgegevens(Gateway $haalcentraalGateway, string $bsn)
+    public function fetchPersoonsgegevens(string $bsn)
     {
-        $certFile    = $this->fileService->writeFile('brp-cert', $this->configuration['authorization']['certificate'], 'crt');
-        $certKeyFile = $this->fileService->writeFile('brp-cert-key', $this->configuration['authorization']['certificateKey'], 'key');
+        // $certFile    = $this->fileService->writeFile('brp-cert', $this->configuration['authorization']['certificate'], 'crt');
+        // $certKeyFile = $this->fileService->writeFile('brp-cert-key', $this->configuration['authorization']['certificateKey'], 'key');
+
+        $endpoint = $this->configuration['brpEndpoint'] ?? '/ingeschrevenpersonen';
 
         try {
             $response = $this->callService->call(
-                $haalcentraalGateway,
-                '/ingeschrevenpersonen/'.$bsn,
+                $this->haalcentraalSource,
+                $endpoint . '/' . $bsn,
                 'GET',
-                [
-                    'cert'    => $certFile,
-                    'ssl_key' => [
-                        $certKeyFile,
-                        $this->configuration['authorization']['password'],
-                    ],
-                    // 'ssl_key' => $certKeyFile,
-                    'headers' => [
-                        'x-doelbinding' => $this->configuration['authorization']['x-doelbinding'],
-                        'x-origin-oin'  => $this->configuration['authorization']['x-origin-oin'],
-                    ],
-                    'verify'  => false,
-                ],
-                false,
-                false
+                // [
+                //     'cert'    => $certFile,
+                //     'ssl_key' => [
+                //         $certKeyFile,
+                //         $this->configuration['authorization']['password'],
+                //     ],
+                //     // 'ssl_key' => $certKeyFile,
+                //     'headers' => [
+                //         'x-doelbinding' => $this->configuration['authorization']['x-doelbinding'],
+                //         'x-origin-oin'  => $this->configuration['authorization']['x-origin-oin'],
+                //     ],
+                //     'verify'  => false,
+                // ],
             );
         } catch (\Exception $exception) {
             throw new Exception($exception->getMessage());
         }//end try
 
-        $brpPersoon = $this->callService->decodeResponse($haalcentraalGateway, $response);
+        $brpPersoon = $this->callService->decodeResponse($this->haalcentraalSource, $response);
         unset($brpPersoon['_links']);
 
         return $brpPersoon;
@@ -621,16 +625,24 @@ class WaardepapierService
     }//end getTemplate()
 
 
-    public function getHaalcentraalSource()
+    public function getHaalcentraalSource(): ?Gateway
     {
-        if (!isset($this->configuration['source'])) {
-            throw new \Exception('Source not set, check WaardepapierenAction config');
+        if (isset($this->configuration['source']) === false) {
+            dump('no source config');
+            return null;
         }
 
         $haalcentraalSource = $this->entityManager->getRepository('App:Gateway')->findOneBy(['reference' => $this->configuration['source']]);
 
         if (!$haalcentraalSource instanceof Gateway) {
-            throw new \Exception('Source could not found, check if source exists');
+            dump('no source found');
+            return null;
+        }
+
+
+        if (isset($haalcentraalSource->getConfiguration()['ssl_key'][0]) === false) {
+            // ssl not set
+            return null;
         }
 
         return $haalcentraalSource;
@@ -638,12 +650,12 @@ class WaardepapierService
     }//end getHaalcentraalSource()
 
 
-    public function getCertificateEntity()
+    public function getCertificateEntity(): ?Entity
     {
         $certificateEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://waardepapieren.commonground.nl/certificate.schema.json']);
-
+        
         if (!$certificateEntity instanceof Entity) {
-            throw new \Exception('Entity could not found, check if https://waardepapieren.commonground.nl/certificate.schema.json exists');
+            return null;
         }
 
         return $certificateEntity;
@@ -693,7 +705,7 @@ class WaardepapierService
         $certificate         = $data['response'];
 
         // 1. Check Action configuration and set values
-        $haalcentraalSource = $this->getHaalcentraalSource();
+        $this->haalcentraalSource = $this->getHaalcentraalSource();
         $certificateEntity  = $this->getCertificateEntity();
 
         // @todo old
@@ -708,7 +720,7 @@ class WaardepapierService
         // 'certificate'    => true
         // ]);
         // 2. Get persons information from pink haalcentraalGateway
-        $brpPersoon = $this->fetchPersoonsgegevens($haalcentraalSource, $certificate['person']);
+        $brpPersoon = $this->fetchPersoonsgegevens($certificate['person']);
 
         // 3. Fill certificate with persons information
         $certificate = $this->createCertificate($certificate, $certificate['type'] ?? null, $brpPersoon, $certificateEntity);

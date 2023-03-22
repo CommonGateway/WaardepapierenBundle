@@ -11,8 +11,10 @@
   "conditions": {
     "==": [{"var": "entity"}, "https://vng.opencatalogi.nl/schemas/zrc.zaak.schema.json"]
   },
-  "class": "CommonGateway\\WaardepapierenBundle\\ActionHandler\\WaardepapierenOpenZaakHandler",
-  "configuration": {},
+  "class": "CommonGateway\\WaardepapierenBundle\\ActionHandler\\WPZaakHandler",
+  "configuration": {
+    "templateId": "!ChangeMe! (should be the zaak template id)"
+  },
   "isLockable": false,
   "isEnabled": false
 }
