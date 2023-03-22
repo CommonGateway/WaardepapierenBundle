@@ -85,6 +85,10 @@
         "document": {
             "type": "string",
             "description": "The document of this ceritificate. This is a pdf."
+        },
+        "zaak": {
+            "type": "string",
+            "description": "ID of a ZGW Zaak"
         }
     }
 }
