@@ -1,0 +1,26 @@
+{
+    "title": "Claim",
+    "$id": "https://waardepapieren.commonground.nl/claim.schema.json",
+    "$schema": "https://docs.commongateway.nl/schemas/Entity.schema.json",
+    "version": "0.1",
+    "type": "object",
+    "description": "An model representing an claim.claim.",
+    "properties": {
+        "iss": {
+            "type": "string"
+        },
+        "user_id": {
+            "type": "string"
+        },
+        "user_representation": {
+            "type": "string"
+        },
+        "claim_data": {
+            "type": "object",
+            "$ref": "https://waardepapieren.commonground.nl/claimData.schema.json"
+        },
+        "iat": {
+            "type": "string"
+        }
+    }
+}

@@ -1,0 +1,34 @@
+{
+    "title": "W3C",
+    "$id": "https://waardepapieren.commonground.nl/w3c.schema.json",
+    "$schema": "https://docs.commongateway.nl/schemas/Entity.schema.json",
+    "version": "0.1",
+    "type": "object",
+    "description": "An model representing an claim.w3c.",
+    "properties": {
+        "@context": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
+        "type": {
+            "type": "array",
+            "items": {}
+        },
+        "issuer": {
+            "type": "string"
+        },
+        "inssuanceDate": {
+            "type": "string"
+        },
+        "proof": {
+            "type": "object",
+            "$ref": "https://waardepapieren.commonground.nl/w3cProof.schema.json"
+        },
+        "credentialSubject": {
+            "type": "object",
+            "$ref": "https://waardepapieren.commonground.nl/w3cCredentialSubject.schema.json"
+        }
+    }
+}

@@ -1,8 +1,8 @@
 {
-    "$id": "https://waardepapieren.commonground.nl/certificate.schema.json",
-    "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "version": "0.1",
     "title": "Certificate",
+    "$id": "https://waardepapieren.commonground.nl/certificate.schema.json",
+    "$schema": "https://docs.commongateway.nl/schemas/Entity.schema.json",
+    "version": "0.1",
     "type": "object",
     "description": "An model representing an (verifiable) claim.",
     "properties": {
@@ -49,32 +49,7 @@
         },
         "claim": {
             "type": "object",
-            "description": "The claim of this certificate as an json object",
-            "properties": {
-                "iss": {
-                    "type": "string"
-                },
-                "user_id": {
-                    "type": "string"
-                },
-                "user_representation": {
-                    "type": "string"
-                },
-                "claim_data": {
-                    "type": "object",
-                    "properties": {
-                        "persoon": {
-                            "type": "string"
-                        },
-                        "doel": {
-                            "type": "string"
-                        }
-                    }
-                },
-                "iat": {
-                    "type": "string"
-                }
-            },
+            "$ref": "https://waardepapieren.commonground.nl/claim.schema.json",
             "readOnly": true
         },
         "discipl": {
@@ -88,14 +63,7 @@
         "claimData": {
             "type": "object",
             "description": "The data of the claim this certificate as an json object",
-            "properties": {
-                "persoon": {
-                    "type": "string"
-                },
-                "doel": {
-                    "type": "string"
-                }
-            }
+            "$ref": "https://waardepapieren.commonground.nl/claimData.schema.json"
         },
         "jwt": {
             "type": "string",
@@ -108,43 +76,7 @@
         "w3c": {
             "type": "object",
             "description": "w3c version of the claim",
-            "properties": {
-                "@context": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "type": {
-                    "type": "array",
-                    "items": {}
-                },
-                "issuer": {
-                    "type": "string"
-                },
-                "inssuanceDate": {
-                    "type": "string"
-                },
-                "proof": {
-                    "type": "object",
-                    "properties": {
-                        "proofPurpose": {
-                            "type": "string"
-                        },
-                        "type": {
-                            "type": "string"
-                        }
-                    }
-                },
-                "credentialSubject": {
-                    "type": "object",
-                    "properties": {
-                        "id": {
-                            "type": "string"
-                        }
-                    }
-                }
-            },
+            "$ref": "https://waardepapieren.commonground.nl/w3c.schema.json",
             "readOnly": true
         },
         "imageLocation": {
@@ -153,6 +85,10 @@
         "document": {
             "type": "string",
             "description": "The document of this ceritificate. This is a pdf."
+        },
+        "zaak": {
+            "type": "string",
+            "description": "ID of a ZGW Zaak"
         }
     }
 }

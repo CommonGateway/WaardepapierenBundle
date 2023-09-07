@@ -1,0 +1,16 @@
+{
+    "title": "W3CProof",
+    "$id": "https://waardepapieren.commonground.nl/w3cProof.schema.json",
+    "$schema": "https://docs.commongateway.nl/schemas/Entity.schema.json",
+    "version": "0.1",
+    "type": "object",
+    "description": "An model representing an claim.w3c.",
+    "properties": {
+        "proofPurpose": {
+            "type": "string"
+        },
+        "type": {
+            "type": "string"
+        }
+    }
+}

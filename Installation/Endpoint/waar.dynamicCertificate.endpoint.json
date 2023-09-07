@@ -1,0 +1,13 @@
+{
+    "title": "Dynamic certificate",
+    "$id": "https://waardepapieren.commonground.nl/EventEndpoint/waar.dynamicCertificate.endpoint.json",
+    "$schema": "https://docs.commongateway.nl/schemas/Endpoint.schema.json",
+    "version": "0.0.1",
+    "description": "Endpoint for dynamic certificates that creates certificates with given data",
+    "path": ["waar", "dynamic_certificates"],
+    "pathRegex": "^(waar/dynamic_certificates)$",
+    "methods": ["GET", "POST"],
+    "throws": [
+        "commongateway.dynamiccertficate.trigger"
+    ]
+}

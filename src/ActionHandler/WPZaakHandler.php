@@ -2,16 +2,29 @@
 
 namespace CommonGateway\WaardepapierenBundle\ActionHandler;
 
-use CommonGateway\WaardepapierenBundle\Service\WaardepapierenService;
+use CommonGateway\CoreBundle\ActionHandler\ActionHandlerInterface;
+use CommonGateway\WaardepapierenBundle\Service\WPZaakService;
 
-class WaardepapierenDynamicHandler implements ActionHandlerInterface
+/**
+ * WPZaakHandler
+ *
+ * @author   Barry Brands barry@conduction.nl
+ * @package  common-gateway/waardepapieren-bundle
+ * @category ActionHandler
+ * @access   public
+ */
+class WPZaakHandler implements ActionHandlerInterface
 {
-    private WaardepapierenService $waardepapierenService;
 
-    public function __construct(WaardepapierenService $waardepapierenService)
+    private WPZaakService $wpZaakService;
+
+
+    public function __construct(WPZaakService $wpZaakService)
     {
-        $this->waardepapierenService = $waardepapierenService;
-    }
+        $this->wpZaakService = $wpZaakService;
+
+    }//end __construct()
+
 
     /**
      *  This function returns the requered configuration as a [json-schema](https://json-schema.org/) array.
@@ -21,14 +34,16 @@ class WaardepapierenDynamicHandler implements ActionHandlerInterface
     public function getConfiguration(): array
     {
         return [
-            '$id'         => 'https://example.com/person.schema.json',
-            '$schema'     => 'https://json-schema.org/draft/2020-12/schema',
-            'title'       => 'Waardepapieren Action',
+            '$id'         => 'https://waardepapieren.commonground.nl/waardepapieren.zaak.ActionHandler.json',
+            '$schema'     => 'https://docs.commongateway.nl/schemas/ActionHandler.schema.json',
+            'title'       => 'WPZaak Action',
             'description' => 'This handler returns a welcoming string',
             'required'    => [],
             'properties'  => [],
         ];
-    }
+
+    }//end getConfiguration()
+
 
     /**
      * This function runs the service.
@@ -45,6 +60,9 @@ class WaardepapierenDynamicHandler implements ActionHandlerInterface
      */
     public function run(array $data, array $configuration): array
     {
-        return $this->waardepapierenService->waardepapierenDynamicHandler($data, $configuration);
-    }
-}
+        return $this->wpZaakService->wpZaakHandler($data, $configuration);
+
+    }//end run()
+
+
+}//end class

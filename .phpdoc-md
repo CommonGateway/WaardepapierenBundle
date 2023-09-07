@@ -1,0 +1,10 @@
+<?php
+return (object)[
+    'rootNamespace' => 'CommonGateway\WaardepapierenBundle',
+    'destDirectory' => 'docs/classes',
+    'format' => 'github',
+    'classes' => [
+        '\CommonGateway\WaardepapierenBundle\Service\WaardepapierService',
+        '\CommonGateway\WaardepapierenBundle\Service\WPZaakService'
+    ],
+];

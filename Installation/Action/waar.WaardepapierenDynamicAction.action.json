@@ -1,0 +1,18 @@
+{
+  "title": "WaardepapierenDynamicAction",
+  "$id": "https://waardepapieren.commonground.nl/action/waar.WaardepapierenDynamicAction.action.json",
+  "$schema": "https://docs.commongateway.nl/schemas/Action.schema.json",
+  "version": "0.0.1",
+  "listens": [
+    "commongateway.dynamiccertficate.trigger"
+  ],
+  "description": "This is a action to create a dynamic certificate.",
+  "throws": [],
+  "conditions": {
+    "==": [1, 1]
+  },
+  "class": "CommonGateway\\WaardepapierenBundle\\ActionHandler\\WaardepapierenDynamicHandler",
+  "configuration": {},
+  "isLockable": false,
+  "isEnabled": true
+}

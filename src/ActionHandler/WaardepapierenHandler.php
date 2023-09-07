@@ -2,16 +2,29 @@
 
 namespace CommonGateway\WaardepapierenBundle\ActionHandler;
 
-use CommonGateway\WaardepapierenBundle\Service\WaardepapierenService;
+use CommonGateway\CoreBundle\ActionHandler\ActionHandlerInterface;
+use CommonGateway\WaardepapierenBundle\Service\WaardepapierService;
 
+/**
+ * WaardepapierenHandler
+ *
+ * @author   Barry Brands barry@conduction.nl
+ * @package  common-gateway/waardepapieren-bundle
+ * @category ActionHandler
+ * @access   public
+ */
 class WaardepapierenHandler implements ActionHandlerInterface
 {
-    private WaardepapierenService $waardepapierenService;
 
-    public function __construct(WaardepapierenService $waardepapierenService)
+    private WaardepapierService $waardepapierService;
+
+
+    public function __construct(WaardepapierService $waardepapierService)
     {
-        $this->waardepapierenService = $waardepapierenService;
-    }
+        $this->waardepapierService = $waardepapierService;
+
+    }//end __construct()
+
 
     /**
      *  This function returns the requered configuration as a [json-schema](https://json-schema.org/) array.
@@ -21,14 +34,16 @@ class WaardepapierenHandler implements ActionHandlerInterface
     public function getConfiguration(): array
     {
         return [
-            '$id'         => 'https://example.com/person.schema.json',
-            '$schema'     => 'https://json-schema.org/draft/2020-12/schema',
+            '$id'         => 'https://waardepapieren.commonground.nl/waardepapieren.ActionHandler.json',
+            '$schema'     => 'https://docs.commongateway.nl/schemas/ActionHandler.schema.json',
             'title'       => 'Waardepapieren Action',
             'description' => 'This handler returns a welcoming string',
             'required'    => [],
             'properties'  => [],
         ];
-    }
+
+    }//end getConfiguration()
+
 
     /**
      * This function runs the service.
@@ -45,6 +60,9 @@ class WaardepapierenHandler implements ActionHandlerInterface
      */
     public function run(array $data, array $configuration): array
     {
-        return $this->waardepapierenService->waardepapierenHandler($data, $configuration);
-    }
-}
+        return $this->waardepapierService->waardepapierHandler($data, $configuration);
+
+    }//end run()
+
+
+}//end class
