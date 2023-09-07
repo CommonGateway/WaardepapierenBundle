@@ -33,11 +33,12 @@ class WPZaakCommand extends Command
      * @var EntityManagerInterface
      */
     private EntityManagerInterface $entityManager;
-    
+
     /**
      * @var WPZaakService
      */
     private WPZaakService $wpZaakService;
+
 
     /**
      * __construct
@@ -50,9 +51,10 @@ class WPZaakCommand extends Command
 
     }//end __construct()
 
+
     /**
      * Configures this command
-     * 
+     *
      * @return void
      */
     protected function configure(): void
@@ -64,17 +66,18 @@ class WPZaakCommand extends Command
 
     }//end configure()
 
+
     /**
      * Executes this command
-     * 
+     *
      * @param InputInterface  Handles input from cli
      * @param OutputInterface Handles output from cli
-     * 
+     *
      * @return int 0 for failure, 1 for success
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $style = new SymfonyStyle($input, $output);
+        $style  = new SymfonyStyle($input, $output);
         $zaakId = $input->getArgument('id');
 
         $style->info('Getting the WPZaakAction for config');
@@ -83,7 +86,7 @@ class WPZaakCommand extends Command
             $style->error('WPZaakAction not found');
             return Command::FAILURE;
         }
-        
+
         if (Uuid::isValid($zaakId) === false) {
             $style->error('Given zaak id not valid uuid');
             return Command::FAILURE;
@@ -97,13 +100,14 @@ class WPZaakCommand extends Command
 
         $style->info('Creating certificate with WPZaakService..');
         if (is_array($this->wpZaakService->wpZaakHandler(['response' => $zaakObject->toArray()], $wpZaakAction->getConfiguration())) === true) {
-            $style->success('Succesfully created certificate for zaak: ' . $zaakId);
+            $style->success('Succesfully created certificate for zaak: '.$zaakId);
             return Command::SUCCESS;
         }//end if
 
         $style->error('Creating certificate went wrong');
         return Command::FAILURE;
 
-    }// end execute()
+    }//end execute()
+
 
 }//end class

@@ -42,6 +42,7 @@ class WPZaakService
      */
     private ?array $userData;
 
+
     /**
      * __construct
      */
@@ -54,12 +55,13 @@ class WPZaakService
 
     }//end __construct()
 
+
     /**
      * Gets a Dutch BSN from a ZGW Zaak
-     * 
+     *
      * @param array $zaak ZGW Zaak
-     * 
-     * @return string|null Dutch BSN 
+     *
+     * @return string|null Dutch BSN
      */
     private function getBSN(array $zaak): ?string
     {
@@ -78,18 +80,18 @@ class WPZaakService
 
     }//end getBSN()
 
+
     /**
      * Gets a Dutch RSIN from a ZGW Zaak
-     * 
+     *
      * @param array $zaak ZGW Zaak
-     * 
-     * @return string|null Dutch RSIN 
+     *
+     * @return string|null Dutch RSIN
      */
     private function getRSIN(array $zaak): ?string
     {
         if (isset($zaak['verantwoordelijkeOrganisatie']) === false) {
             // $this->logger->error('No verantwoordelijkeOrganisatie found for Zaak, failed to create certificate')
-
             return null;
         }
 
@@ -97,9 +99,10 @@ class WPZaakService
 
     }//end getRSIN()
 
+
     /**
      * Gets the ZGW Zaak waardepapier template
-     * 
+     *
      * @return ObjectEntity|null ZGW Zaak waardepapier template
      */
     private function getZaakTemplate(): ?ObjectEntity
@@ -107,13 +110,13 @@ class WPZaakService
         // @todo Get bsn from zaak
         if (isset($this->configuration['templateId']) === false) {
             // $this->logger->error('No templateId found in Action config, failed to create certificate')
-
             return null;
         }
 
         return $this->entityManager->getRepository('App:ObjectEntity')->find($this->configuration['templateId']);
 
     }//end getZaakTemplate()
+
 
     /**
      * Creates a certificate for a ZGW Zaak.
@@ -138,7 +141,7 @@ class WPZaakService
         }
 
         // 2. Get RSIN organisatie from Zaak
-        $certificate['organization'] =  $this->getRSIN($zaak);
+        $certificate['organization'] = $this->getRSIN($zaak);
         if ($certificate['organization'] === null) {
             return $data;
         }
@@ -155,10 +158,10 @@ class WPZaakService
         $this->waardepapierService->haalcentraalSource = $this->waardepapierService->getHaalcentraalSource();
         if ($this->waardepapierService->haalcentraalSource === null) {
             return $data;
-
         }
+
         dump('get getCertificateEntity');
-        $certificateEntity  = $this->waardepapierService->getCertificateEntity();
+        $certificateEntity = $this->waardepapierService->getCertificateEntity();
         if ($certificateEntity === null) {
             return $data;
         }

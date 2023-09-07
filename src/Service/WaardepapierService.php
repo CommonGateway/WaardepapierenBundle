@@ -98,6 +98,7 @@ class WaardepapierService
         $this->fileService   = $fileService;
 
         $this->haalcentraalSource = null;
+
     }//end __construct()
 
 
@@ -113,7 +114,8 @@ class WaardepapierService
         // Then we need to render the QR code
         $qrCode = $this->qrCode->create(
             // $certificate['jwt'], //@todo some ssl certs dont work
-            "basic", //@todo remove if above line works
+            "basic",
+            // @todo remove if above line works
             [
                 'size'   => 1000,
                 'margin' => 1,
@@ -185,7 +187,6 @@ class WaardepapierService
         // $proof['verificationMethod'] = $this->requestStack->getCurrentRequest()->getSchemeAndHttpHost() . "/cert/{" . $this->configuration['organization'] . "}.pem";
         $proof['verificationMethod'] = 'http://localhost/cert/00000010.pem';
         // $proof['jws'] = $this->createJWS($certificate, $data['credentialSubject']);
-
         return $proof;
 
     }//end createProof()
@@ -367,7 +368,6 @@ class WaardepapierService
         $certificate['irma'] = $certificate['discipl'];
 
         // $certificate['jwt'] = $this->createJWT($certificate);
-
         return $certificate;
 
     }//end createClaim()
@@ -384,26 +384,25 @@ class WaardepapierService
     {
         // $certFile    = $this->fileService->writeFile('brp-cert', $this->configuration['authorization']['certificate'], 'crt');
         // $certKeyFile = $this->fileService->writeFile('brp-cert-key', $this->configuration['authorization']['certificateKey'], 'key');
-
-        $endpoint = $this->configuration['brpEndpoint'] ?? '/ingeschrevenpersonen';
+        $endpoint = ($this->configuration['brpEndpoint'] ?? '/ingeschrevenpersonen');
 
         try {
             $response = $this->callService->call(
                 $this->haalcentraalSource,
-                $endpoint . '/' . $bsn,
+                $endpoint.'/'.$bsn,
                 'GET',
                 // [
-                //     'cert'    => $certFile,
-                //     'ssl_key' => [
-                //         $certKeyFile,
-                //         $this->configuration['authorization']['password'],
-                //     ],
-                //     // 'ssl_key' => $certKeyFile,
-                //     'headers' => [
-                //         'x-doelbinding' => $this->configuration['authorization']['x-doelbinding'],
-                //         'x-origin-oin'  => $this->configuration['authorization']['x-origin-oin'],
-                //     ],
-                //     'verify'  => false,
+                // 'cert'    => $certFile,
+                // 'ssl_key' => [
+                // $certKeyFile,
+                // $this->configuration['authorization']['password'],
+                // ],
+                // 'ssl_key' => $certKeyFile,
+                // 'headers' => [
+                // 'x-doelbinding' => $this->configuration['authorization']['x-doelbinding'],
+                // 'x-origin-oin'  => $this->configuration['authorization']['x-origin-oin'],
+                // ],
+                // 'verify'  => false,
                 // ],
             );
         } catch (\Exception $exception) {
@@ -639,7 +638,6 @@ class WaardepapierService
             return null;
         }
 
-
         if (isset($haalcentraalSource->getConfiguration()['ssl_key'][0]) === false) {
             // ssl not set
             return null;
@@ -653,7 +651,7 @@ class WaardepapierService
     public function getCertificateEntity(): ?Entity
     {
         $certificateEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://waardepapieren.commonground.nl/certificate.schema.json']);
-        
+
         if (!$certificateEntity instanceof Entity) {
             return null;
         }
@@ -706,7 +704,7 @@ class WaardepapierService
 
         // 1. Check Action configuration and set values
         $this->haalcentraalSource = $this->getHaalcentraalSource();
-        $certificateEntity  = $this->getCertificateEntity();
+        $certificateEntity        = $this->getCertificateEntity();
 
         // @todo old
         // 1. Check Action configuration and set values
