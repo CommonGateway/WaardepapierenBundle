@@ -61,38 +61,38 @@ class WaardepapierService
      */
     private FileService $fileService;
 
-//    /**
-//     * @var Entity|null $certificate schema we are creating a object with.
-//     */
-//    private ?Entity $certificateEntity;
-//
-//    /**
-//     * @var Gateway|null $haalcentraalSource source to get brp info from.
-//     */
-//    public ?Gateway $haalcentraalSource;
+    // **
+    // * @var Entity|null $certificate schema we are creating a object with.
+    // */
+    // private ?Entity $certificateEntity;
+    //
+    // **
+    // * @var Gateway|null $haalcentraalSource source to get brp info from.
+    // */
+    // public ?Gateway $haalcentraalSource;
 
     /**
      * @var array $configuration of the current action.
      */
     public array $configuration;
 
-//    /**
-//     * @var array|null $userData that is being used to create a certificate.
-//     */
-//    private ?array $userData;
-//
-//    /**
-//     * @var array|null $certTemplate template to create certificate with.
-//     */
-//    public ?array $certTemplate;
+    // **
+    // * @var array|null $userData that is being used to create a certificate.
+    // */
+    // private ?array $userData;
+    //
+    // **
+    // * @var array|null $certTemplate template to create certificate with.
+    // */
+    // public ?array $certTemplate;
 
 
     /**
      * @param EntityManagerInterface $entityManager
-     * @param Twig $twig
+     * @param Twig                   $twig
      * @param QrCodeFactoryInterface $qrCode
-     * @param CallService $callService
-     * @param FileService $fileService
+     * @param CallService            $callService
+     * @param FileService            $fileService
      */
     public function __construct(
         EntityManagerInterface $entityManager,
@@ -106,6 +106,7 @@ class WaardepapierService
         $this->qrCode        = $qrCode;
         $this->callService   = $callService;
         $this->fileService   = $fileService;
+
     }//end __construct()
 
 
@@ -141,7 +142,7 @@ class WaardepapierService
     /**
      * This function generates a claim based on the w3c structure.
      *
-     * @param array $data The data used to create the claim
+     * @param array $data        The data used to create the claim
      * @param array $certificate The certificate object
      *
      * @throws Exception
@@ -713,8 +714,8 @@ class WaardepapierService
         $certificate         = $data['response'];
 
         // 1. Check Action configuration and set values
-        $certificateSchema  = $this->resourceService->getSchema('', 'common-gateway/waardepapieren-bundle');
-        $template =
+        $certificateSchema = $this->resourceService->getSchema('', 'common-gateway/waardepapieren-bundle');
+        $template          =
 
         // 2. Get persons information from pink haalcentraalGateway
         $brpPersoon = $this->fetchPersoonsgegevens($certificate['person']);
@@ -723,6 +724,7 @@ class WaardepapierService
         $certificate = $this->createCertificate($certificate, $certificate['type'] ?? null, $brpPersoon, $certificateSchema);
 
         return ['response' => $certificate];
+
     }//end waardepapierHandler()
 
 
