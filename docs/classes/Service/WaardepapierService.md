@@ -1,17 +1,13 @@
-# CommonGateway\WaardepapierenBundle\Service\WaardepapierService  
+# CommonGateway\WaardepapierenBundle\Service\WaardepapierService
 
 WaardepapierService creates certificates
 WaardepapierService creates certificates by template, given data, or created zgw zaak.
-
-
-
-
 
 ## Methods
 
 | Name | Description |
 |------|-------------|
-|[__construct](#waardepapierservice__construct)||
+|[\_\_construct](#waardepapierservice__construct)||
 |[createCertificate](#waardepapierservicecreatecertificate)||
 |[createClaim](#waardepapierservicecreateclaim)|This function creates the claim based on the type defined in the certificate object.|
 |[createDocument](#waardepapierservicecreatedocument)|This function creates the (pdf) document for a given certificate type.|
@@ -28,10 +24,7 @@ WaardepapierService creates certificates by template, given data, or created zgw
 |[waardepapierHandler](#waardepapierservicewaardepapierhandler)|Creates or updates a Certificate.|
 |[waardepapierenDynamicHandler](#waardepapierservicewaardepapierendynamichandler)|Creates or updates a dynamic Certificate.|
 
-
-
-
-### WaardepapierService::__construct  
+### WaardepapierService::\_\_construct
 
 **Description**
 
@@ -39,10 +32,6 @@ WaardepapierService creates certificates by template, given data, or created zgw
  __construct (void)
 ```
 
- 
-
- 
-
 **Parameters**
 
 `This function has no parameters.`
@@ -51,11 +40,9 @@ WaardepapierService creates certificates by template, given data, or created zgw
 
 `void`
 
-
 <hr />
 
-
-### WaardepapierService::createCertificate  
+### WaardepapierService::createCertificate
 
 **Description**
 
@@ -63,10 +50,6 @@ WaardepapierService creates certificates by template, given data, or created zgw
  createCertificate (void)
 ```
 
- 
-
- 
-
 **Parameters**
 
 `This function has no parameters.`
@@ -75,11 +58,9 @@ WaardepapierService creates certificates by template, given data, or created zgw
 
 `void`
 
-
 <hr />
 
-
-### WaardepapierService::createClaim  
+### WaardepapierService::createClaim
 
 **Description**
 
@@ -87,9 +68,7 @@ WaardepapierService creates certificates by template, given data, or created zgw
 public createClaim (void)
 ```
 
-This function creates the claim based on the type defined in the certificate object. 
-
- 
+This function creates the claim based on the type defined in the certificate object.
 
 **Parameters**
 
@@ -99,17 +78,13 @@ This function creates the claim based on the type defined in the certificate obj
 
 `void`
 
-
 **Throws Exceptions**
-
 
 `\Exception`
 
-
 <hr />
 
-
-### WaardepapierService::createDocument  
+### WaardepapierService::createDocument
 
 **Description**
 
@@ -117,39 +92,30 @@ This function creates the claim based on the type defined in the certificate obj
 public createDocument (array $template)
 ```
 
-This function creates the (pdf) document for a given certificate type. 
-
- 
+This function creates the (pdf) document for a given certificate type.
 
 **Parameters**
 
-* `(array) $template`
-: The twig template  
+*   `(array) $template`
+    : The twig template
 
 **Return Values**
 
 `void`
 
-
 **Throws Exceptions**
-
 
 `\Twig\Error\LoaderError`
 
-
 `\Twig\Error\RuntimeError`
-
 
 `\Twig\Error\SyntaxError`
 
-
 `\Exception`
-
 
 <hr />
 
-
-### WaardepapierService::createImage  
+### WaardepapierService::createImage
 
 **Description**
 
@@ -157,9 +123,7 @@ This function creates the (pdf) document for a given certificate type.
 public createImage (void)
 ```
 
-This function creates a QR code for the given claim. 
-
- 
+This function creates a QR code for the given claim.
 
 **Parameters**
 
@@ -171,11 +135,9 @@ This function creates a QR code for the given claim.
 
 > The modified certificate object
 
-
 <hr />
 
-
-### WaardepapierService::createJWS  
+### WaardepapierService::createJWS
 
 **Description**
 
@@ -183,16 +145,14 @@ This function creates a QR code for the given claim.
 public createJWS (array $data, array $certificate)
 ```
 
-This function generates a JWS token with the RS512 algorithm. 
-
- 
+This function generates a JWS token with the RS512 algorithm.
 
 **Parameters**
 
-* `(array) $data`
-: the data that gets stored in the jws token  
-* `(array) $certificate`
-: the certificate object  
+*   `(array) $data`
+    : the data that gets stored in the jws token
+*   `(array) $certificate`
+    : the certificate object
 
 **Return Values**
 
@@ -200,11 +160,9 @@ This function generates a JWS token with the RS512 algorithm.
 
 > Generated JWS token.
 
-
 <hr />
 
-
-### WaardepapierService::createJWT  
+### WaardepapierService::createJWT
 
 **Description**
 
@@ -212,9 +170,7 @@ This function generates a JWS token with the RS512 algorithm.
 public createJWT (void)
 ```
 
-This function generates a jwt token using the claim that's available from the certificate object. 
-
- 
+This function generates a jwt token using the claim that's available from the certificate object.
 
 **Parameters**
 
@@ -226,11 +182,9 @@ This function generates a jwt token using the claim that's available from the ce
 
 > The generated jwt token
 
-
 <hr />
 
-
-### WaardepapierService::createProof  
+### WaardepapierService::createProof
 
 **Description**
 
@@ -238,16 +192,14 @@ This function generates a jwt token using the claim that's available from the ce
 public createProof (array $data, array $certificate)
 ```
 
-This function creates a proof. 
-
- 
+This function creates a proof.
 
 **Parameters**
 
-* `(array) $data`
-: the data that gets stored in the jws token of the proof  
-* `(array) $certificate`
-: the certificate object  
+*   `(array) $data`
+    : the data that gets stored in the jws token of the proof
+*   `(array) $certificate`
+    : the certificate object
 
 **Return Values**
 
@@ -255,11 +207,9 @@ This function creates a proof.
 
 > proof
 
-
 <hr />
 
-
-### WaardepapierService::fetchPersoonsgegevens  
+### WaardepapierService::fetchPersoonsgegevens
 
 **Description**
 
@@ -267,9 +217,7 @@ This function creates a proof.
 public fetchPersoonsgegevens (void)
 ```
 
-This function fetches a haalcentraal persoon with the callService. 
-
- 
+This function fetches a haalcentraal persoon with the callService.
 
 **Parameters**
 
@@ -281,17 +229,13 @@ This function fetches a haalcentraal persoon with the callService.
 
 > The modified certificate object
 
-
 **Throws Exceptions**
-
 
 `\Exception`
 
-
 <hr />
 
-
-### WaardepapierService::getCertificateEntity  
+### WaardepapierService::getCertificateEntity
 
 **Description**
 
@@ -299,10 +243,6 @@ This function fetches a haalcentraal persoon with the callService.
  getCertificateEntity (void)
 ```
 
- 
-
- 
-
 **Parameters**
 
 `This function has no parameters.`
@@ -311,11 +251,9 @@ This function fetches a haalcentraal persoon with the callService.
 
 `void`
 
-
 <hr />
 
-
-### WaardepapierService::getHaalcentraalSource  
+### WaardepapierService::getHaalcentraalSource
 
 **Description**
 
@@ -323,10 +261,6 @@ This function fetches a haalcentraal persoon with the callService.
  getHaalcentraalSource (void)
 ```
 
- 
-
- 
-
 **Parameters**
 
 `This function has no parameters.`
@@ -335,11 +269,9 @@ This function fetches a haalcentraal persoon with the callService.
 
 `void`
 
-
 <hr />
 
-
-### WaardepapierService::getTemplate  
+### WaardepapierService::getTemplate
 
 **Description**
 
@@ -347,10 +279,6 @@ This function fetches a haalcentraal persoon with the callService.
  getTemplate (void)
 ```
 
- 
-
- 
-
 **Parameters**
 
 `This function has no parameters.`
@@ -359,11 +287,9 @@ This function fetches a haalcentraal persoon with the callService.
 
 `void`
 
-
 <hr />
 
-
-### WaardepapierService::validateConfigAndSetValues  
+### WaardepapierService::validateConfigAndSetValues
 
 **Description**
 
@@ -371,9 +297,7 @@ This function fetches a haalcentraal persoon with the callService.
 public validateConfigAndSetValues (void)
 ```
 
-Validates action config and sets the values to $this 
-
- 
+Validates action config and sets the values to $this
 
 **Parameters**
 
@@ -385,17 +309,13 @@ Validates action config and sets the values to $this
 
 > Template for certificate
 
-
 **Throws Exceptions**
-
 
 `\Exception`
 
-
 <hr />
 
-
-### WaardepapierService::w3cClaim  
+### WaardepapierService::w3cClaim
 
 **Description**
 
@@ -403,14 +323,12 @@ Validates action config and sets the values to $this
 public w3cClaim (array $data)
 ```
 
-This function generates a claim based on the w3c structure. 
-
- 
+This function generates a claim based on the w3c structure.
 
 **Parameters**
 
-* `(array) $data`
-: The data used to create the claim  
+*   `(array) $data`
+    : The data used to create the claim
 
 **Return Values**
 
@@ -418,17 +336,13 @@ This function generates a claim based on the w3c structure.
 
 > The generated claim
 
-
 **Throws Exceptions**
-
 
 `\Exception`
 
-
 <hr />
 
-
-### WaardepapierService::waardepapierHandler  
+### WaardepapierService::waardepapierHandler
 
 **Description**
 
@@ -436,16 +350,14 @@ This function generates a claim based on the w3c structure.
 public waardepapierHandler (array $data, array $configuration)
 ```
 
-Creates or updates a Certificate. 
-
- 
+Creates or updates a Certificate.
 
 **Parameters**
 
-* `(array) $data`
-: Data from the handler where the xxllnc casetype is in.  
-* `(array) $configuration`
-: Configuration for the Action.  
+*   `(array) $data`
+    : Data from the handler where the xxllnc casetype is in.
+*   `(array) $configuration`
+    : Configuration for the Action.
 
 **Return Values**
 
@@ -453,11 +365,9 @@ Creates or updates a Certificate.
 
 > $this->certificate Certificate which we updated with new data
 
-
 <hr />
 
-
-### WaardepapierService::waardepapierenDynamicHandler  
+### WaardepapierService::waardepapierenDynamicHandler
 
 **Description**
 
@@ -465,16 +375,14 @@ Creates or updates a Certificate.
 public waardepapierenDynamicHandler (array $data, array $configuration)
 ```
 
-Creates or updates a dynamic Certificate. 
-
- 
+Creates or updates a dynamic Certificate.
 
 **Parameters**
 
-* `(array) $data`
-: Data from the handler where the certificate info is in.  
-* `(array) $configuration`
-: Configuration for the Action.  
+*   `(array) $data`
+    : Data from the handler where the certificate info is in.
+*   `(array) $configuration`
+    : Configuration for the Action.
 
 **Return Values**
 
@@ -482,6 +390,4 @@ Creates or updates a dynamic Certificate.
 
 > $this->certificate Certificate which we updated with new data
 
-
 <hr />
-

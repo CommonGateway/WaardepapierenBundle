@@ -1,22 +1,15 @@
-# CommonGateway\WaardepapierenBundle\Service\WPZaakService  
+# CommonGateway\WaardepapierenBundle\Service\WPZaakService
 
 WPZaakService makes a certificate with for a zaak
-
-
-
-
 
 ## Methods
 
 | Name | Description |
 |------|-------------|
-|[__construct](#wpzaakservice__construct)|__construct|
+|[\_\_construct](#wpzaakservice__construct)|\_\_construct|
 |[wpZaakHandler](#wpzaakservicewpzaakhandler)|Creates a certificate for a ZGW Zaak.|
 
-
-
-
-### WPZaakService::__construct  
+### WPZaakService::\_\_construct
 
 **Description**
 
@@ -24,9 +17,7 @@ WPZaakService makes a certificate with for a zaak
 public __construct (void)
 ```
 
-__construct 
-
- 
+\_\_construct
 
 **Parameters**
 
@@ -36,11 +27,9 @@ __construct
 
 `void`
 
-
 <hr />
 
-
-### WPZaakService::wpZaakHandler  
+### WPZaakService::wpZaakHandler
 
 **Description**
 
@@ -48,16 +37,14 @@ __construct
 public wpZaakHandler (array $data, array $configuration)
 ```
 
-Creates a certificate for a ZGW Zaak. 
-
- 
+Creates a certificate for a ZGW Zaak.
 
 **Parameters**
 
-* `(array) $data`
-: Data from the handler where the xxllnc casetype is in.  
-* `(array) $configuration`
-: Configuration for the Action.  
+*   `(array) $data`
+    : Data from the handler where the xxllnc casetype is in.
+*   `(array) $configuration`
+    : Configuration for the Action.
 
 **Return Values**
 
@@ -65,6 +52,4 @@ Creates a certificate for a ZGW Zaak.
 
 > $this->certificate Certificate which we updated with new data
 
-
 <hr />
-
