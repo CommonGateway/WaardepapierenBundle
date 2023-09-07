@@ -2,9 +2,10 @@
 
 namespace CommonGateway\WaardepapierenBundle\Service;
 
+use App\Entity\ObjectEntity;
 use Doctrine\ORM\EntityManagerInterface;
 use CommonGateway\WaardepapierenBundle\Service\WaardepapierService;
-use App\Entity\ObjectEntity;
+
 /**
  * WPZaakService makes a certificate with for a zaak
  *

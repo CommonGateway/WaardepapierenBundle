@@ -3,25 +3,25 @@
 namespace CommonGateway\WaardepapierenBundle\ActionHandler;
 
 use CommonGateway\CoreBundle\ActionHandler\ActionHandlerInterface;
-use CommonGateway\WaardepapierenBundle\Service\WPZaakService;
+use CommonGateway\WaardepapierenBundle\Service\WaardepapierService;
 
 /**
- * WPZaakHandler
+ * WaardepapierenDynamicHandler
  *
  * @author   Barry Brands barry@conduction.nl
  * @package  common-gateway/waardepapieren-bundle
  * @category ActionHandler
  * @access   public
  */
-class WPZaakHandler implements ActionHandlerInterface
+class WaardepapierenDynamicHandler implements ActionHandlerInterface
 {
 
-    private WPZaakService $wpZaakService;
+    private WaardepapierService $waardepapierService;
 
 
-    public function __construct(WPZaakService $wpZaakService)
+    public function __construct(WaardepapierService $waardepapierService)
     {
-        $this->wpZaakService = $wpZaakService;
+        $this->waardepapierService = $waardepapierService;
 
     }//end __construct()
 
@@ -35,8 +35,8 @@ class WPZaakHandler implements ActionHandlerInterface
     {
         return [
             '$id'         => 'https://waardepapieren.commonground.nl/person.schema.json',
-            '$schema'     => 'https://json-schema.org/draft/2020-12/schema',
-            'title'       => 'WPZaak Action',
+            '$schema'     => 'https://docs.commongateway.nl/schemas/ActionHandler.schema.json',
+            'title'       => 'Waardepapieren Action',
             'description' => 'This handler returns a welcoming string',
             'required'    => [],
             'properties'  => [],
@@ -60,7 +60,7 @@ class WPZaakHandler implements ActionHandlerInterface
      */
     public function run(array $data, array $configuration): array
     {
-        return $this->wpZaakService->wpZaakHandler($data, $configuration);
+        return $this->waardepapierService->waardepapierDynamicHandler($data, $configuration);
 
     }//end run()
 

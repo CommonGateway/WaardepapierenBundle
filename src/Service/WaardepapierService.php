@@ -2,21 +2,21 @@
 
 namespace CommonGateway\WaardepapierenBundle\Service;
 
-use DateTime;
 use App\Entity\Entity;
-use App\Entity\ObjectEntity;
 use App\Entity\Gateway;
+use App\Entity\ObjectEntity;
+use CommonGateway\CoreBundle\Service\CallService;
+use CommonGateway\CoreBundle\Service\FileService;
+use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
-use Endroid\QrCode\Factory\QrCodeFactoryInterface;
 use Dompdf\Dompdf;
+use Endroid\QrCode\Factory\QrCodeFactoryInterface;
+use Exception;
 use Jose\Component\Core\AlgorithmManager;
 use Jose\Component\KeyManagement\JWKFactory;
 use Jose\Component\Signature\Algorithm\RS512;
 use Jose\Component\Signature\Serializer\CompactSerializer;
 use Twig\Environment as Twig;
-use CommonGateway\CoreBundle\Service\CallService;
-use CommonGateway\CoreBundle\Service\FileService;
-use Exception;
 
 /**
  * WaardepapierService creates certificates

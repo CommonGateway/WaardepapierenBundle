@@ -18,25 +18,26 @@
         "php": ">=7.4",
         "endroid/qr-code-bundle": "3.4",
         "common-gateway/template-bundle": ">=0.0",
-        "commongateway/corebundle": ">=1.0",
+          "commongateway/corebundle": "^1.1.0",
         "common-gateway/zgw-bundle": ">=0.1"
     },
 	"require-dev" : {
 		"symfony/dependency-injection" : "~3.4|~4.1|~5.0"
 	},
-	"autoload" : {
-		"psr-4" : {
-			"CommonGateway\\WaardepapierenBundle\\" : ""
-		}
-	},
-    "scripts": {
-        "post-package-install": "bin/console common-gateway/waardepapieren-bundle",
-        "post-package-update": "bin/console common-gateway/waardepapieren-bundle",
-        "post-package-uninstall": "bin/console common-gateway/waardepapieren-bundle"
-    },
     "config": {
-        "allow-plugins": {
-            "endroid/installer": true
-        }
+      "preferred-install": {
+        "*": "dist"
+      },
+      "sort-packages": true,
+      "allow-plugins": {
+        "symfony/flex": true,
+        "symfony/runtime": true,
+        "endroid/installer": true
+      }
+    },
+    "autoload" : {
+      "psr-4" : {
+        "CommonGateway\\WaardepapierenBundle\\" : "src/"
+      }
     }
 }

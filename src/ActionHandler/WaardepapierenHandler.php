@@ -6,14 +6,14 @@ use CommonGateway\CoreBundle\ActionHandler\ActionHandlerInterface;
 use CommonGateway\WaardepapierenBundle\Service\WaardepapierService;
 
 /**
- * WaardepapierenDynamicHandler
+ * WaardepapierenHandler
  *
  * @author   Barry Brands barry@conduction.nl
  * @package  common-gateway/waardepapieren-bundle
  * @category ActionHandler
  * @access   public
  */
-class WaardepapierenDynamicHandler implements ActionHandlerInterface
+class WaardepapierenHandler implements ActionHandlerInterface
 {
 
     private WaardepapierService $waardepapierService;
@@ -35,7 +35,7 @@ class WaardepapierenDynamicHandler implements ActionHandlerInterface
     {
         return [
             '$id'         => 'https://waardepapieren.commonground.nl/person.schema.json',
-            '$schema'     => 'https://json-schema.org/draft/2020-12/schema',
+            '$schema'     => 'https://docs.commongateway.nl/schemas/ActionHandler.schema.json',
             'title'       => 'Waardepapieren Action',
             'description' => 'This handler returns a welcoming string',
             'required'    => [],
@@ -60,7 +60,7 @@ class WaardepapierenDynamicHandler implements ActionHandlerInterface
      */
     public function run(array $data, array $configuration): array
     {
-        return $this->waardepapierService->waardepapierDynamicHandler($data, $configuration);
+        return $this->waardepapierService->waardepapierHandler($data, $configuration);
 
     }//end run()
 
