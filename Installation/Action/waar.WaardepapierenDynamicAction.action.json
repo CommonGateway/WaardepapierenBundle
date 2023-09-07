@@ -13,6 +13,5 @@
   },
   "class": "CommonGateway\\WaardepapierenBundle\\ActionHandler\\WaardepapierenDynamicHandler",
   "configuration": {},
-  "isLockable": false,
   "isEnabled": true
 }

@@ -15,6 +15,5 @@
   "configuration": {
     "templateId": "!ChangeMe! (should be the zaak template id)"
   },
-  "isLockable": false,
   "isEnabled": false
 }

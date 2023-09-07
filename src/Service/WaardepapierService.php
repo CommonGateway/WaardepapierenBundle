@@ -6,6 +6,7 @@ use App\Entity\Entity;
 use App\Entity\Gateway;
 use App\Entity\ObjectEntity;
 use CommonGateway\CoreBundle\Service\CallService;
+use CommonGateway\CoreBundle\Service\GatewayResourceService;
 use CommonGateway\CoreBundle\Service\FileService;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
@@ -51,38 +52,47 @@ class WaardepapierService
     private CallService $callService;
 
     /**
+     * @var GatewayResourceService
+     */
+    private GatewayResourceService $resourceService;
+
+    /**
      * @var FileService
      */
     private FileService $fileService;
 
-    /**
-     * @var Entity|null $certificate schema we are creating a object with.
-     */
-    private ?Entity $certificateEntity;
-
-    /**
-     * @var Gateway|null $haalcentraalSource source to get brp info from.
-     */
-    public ?Gateway $haalcentraalSource;
+//    /**
+//     * @var Entity|null $certificate schema we are creating a object with.
+//     */
+//    private ?Entity $certificateEntity;
+//
+//    /**
+//     * @var Gateway|null $haalcentraalSource source to get brp info from.
+//     */
+//    public ?Gateway $haalcentraalSource;
 
     /**
      * @var array $configuration of the current action.
      */
     public array $configuration;
 
-    /**
-     * @var array $userData that is being used to create a certificate.
-     */
-    private ?array $userData;
-
-    /**
-     * @var array|null $certTemplate template to create certificate with.
-     */
-    public ?array $certTemplate;
+//    /**
+//     * @var array|null $userData that is being used to create a certificate.
+//     */
+//    private ?array $userData;
+//
+//    /**
+//     * @var array|null $certTemplate template to create certificate with.
+//     */
+//    public ?array $certTemplate;
 
 
     /**
      * @param EntityManagerInterface $entityManager
+     * @param Twig $twig
+     * @param QrCodeFactoryInterface $qrCode
+     * @param CallService $callService
+     * @param FileService $fileService
      */
     public function __construct(
         EntityManagerInterface $entityManager,
@@ -96,16 +106,13 @@ class WaardepapierService
         $this->qrCode        = $qrCode;
         $this->callService   = $callService;
         $this->fileService   = $fileService;
-
-        $this->haalcentraalSource = null;
-
     }//end __construct()
 
 
     /**
      * This function creates a QR code for the given claim.
      *
-     * @param array $this->certificate The certificate object
+     * @param array $certificate The certificate object
      *
      * @return array The modified certificate object
      */
@@ -134,10 +141,10 @@ class WaardepapierService
     /**
      * This function generates a claim based on the w3c structure.
      *
-     * @param array $data              The data used to create the claim
-     * @param array $this->certificate The certificate object
+     * @param array $data The data used to create the claim
+     * @param array $certificate The certificate object
      *
-     * @throws \Exception
+     * @throws Exception
      *
      * @return array The generated claim
      */
@@ -180,7 +187,7 @@ class WaardepapierService
     {
         $proof         = [];
         $proof['type'] = 'RsaSignature';
-        // @TODO when should created be set, we have no cert key file anymore ?
+        // @TODO when should created be set, we have no cert kexv  y file anymore ?
         // $proof['created'] = date('H:i:s d-m-Y', filectime("cert/{" . $this->certificate['organization'] . "}.pem"));
         $proof['proofPurpose'] = 'assertionMethode';
         // @TODO what should the verifymethod be now, we have no cert key file anymore ?
@@ -242,12 +249,11 @@ class WaardepapierService
     /**
      * This function creates the (pdf) document for a given certificate type.
      *
-     * @param array $template The twig template
+     * @param array $certificate The certificate object
      *
-     * @throws \Twig\Error\LoaderError
-     * @throws \Twig\Error\RuntimeError
-     * @throws \Twig\Error\SyntaxError
-     * @throws \Exception
+     * @throws Exception
+     *
+     * @return array
      */
     public function createDocument(array $certificate)
     {
@@ -291,7 +297,7 @@ class WaardepapierService
     /**
      * This function generates a jwt token using the claim that's available from the certificate object.
      *
-     * @param array $this->certificate The certificate object
+     * @param array $certificate The certificate object
      *
      * @return string The generated jwt token
      */
@@ -325,7 +331,11 @@ class WaardepapierService
     /**
      * This function creates the claim based on the type defined in the certificate object.
      *
-     * @throws \Exception
+     * @param array $certificate The certificate object
+     *
+     * @throws Exception
+     *
+     * @return
      */
     public function createClaim(array $certificate)
     {
@@ -703,29 +713,16 @@ class WaardepapierService
         $certificate         = $data['response'];
 
         // 1. Check Action configuration and set values
-        $this->haalcentraalSource = $this->getHaalcentraalSource();
-        $certificateEntity        = $this->getCertificateEntity();
+        $certificateSchema  = $this->resourceService->getSchema('', 'common-gateway/waardepapieren-bundle');
+        $template =
 
-        // @todo old
-        // 1. Check Action configuration and set values
-        // $this->validateConfigAndSetValues([
-        // 'templateGroup'  => true,
-        // 'templateType'   => true,
-        // 'source'         => true,
-        // 'certificateKey' => true,
-        // 'authorization'  => true,
-        // 'organziation'   => true,
-        // 'certificate'    => true
-        // ]);
         // 2. Get persons information from pink haalcentraalGateway
         $brpPersoon = $this->fetchPersoonsgegevens($certificate['person']);
 
         // 3. Fill certificate with persons information
-        $certificate = $this->createCertificate($certificate, $certificate['type'] ?? null, $brpPersoon, $certificateEntity);
+        $certificate = $this->createCertificate($certificate, $certificate['type'] ?? null, $brpPersoon, $certificateSchema);
 
-        // var_dump($this->certificate);
         return ['response' => $certificate];
-
     }//end waardepapierHandler()
 
 

@@ -1,15 +1,29 @@
 {
     "installationService": "CommonGateway\\WaardepapierenBundle\\Service\\InstallationService",
     "cards": {
-      "schemas": [
-        "https://waardepapieren.commonground.nl/certificate.schema.json"
-      ]
+        "schemas": [
+          "https://waardepapieren.commonground.nl/certificate.schema.json"
+        ]
     },
+    "templates": [
+      {
+        "$id": "https://waardepapieren.commonground.nl/template/zaak.template.json",
+        "$version": "0.0.1",
+        "name": "Zaak Template",
+        "description": "The template for a case schema",
+        "supportesSchemas": ["https://vng.opencatalogi.nl/schemas/zrc.zaak.schema.json"]
+      }
+    ],
     "endpoints": {
-        "schemas": [{
-            "reference": "https://waardepapieren.commonground.nl/certificate.schema.json",
-            "path": "waar/certificates",
-            "methods": ["GET", "POST"]
-        }]
+        "schemas": [
+            {
+              "version": "0.0.1",
+              "name": "Waardepapieren certificates",
+              "reference": "https://waardepapieren.commonground.nl/certificate.schema.json",
+              "path": "waar/certificates",
+              "methods": ["GET", "POST"],
+              "throws": ["create.waardepapier"]
+            }
+        ]
     }
 }

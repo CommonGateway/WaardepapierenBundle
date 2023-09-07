@@ -60,7 +60,7 @@ class WaardepapierenDynamicHandler implements ActionHandlerInterface
      */
     public function run(array $data, array $configuration): array
     {
-        return $this->waardepapierService->waardepapierDynamicHandler($data, $configuration);
+        return $this->waardepapierService->waardepapierenDynamicHandler($data, $configuration);
 
     }//end run()
 

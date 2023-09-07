@@ -4,15 +4,17 @@
   "$schema": "https://docs.commongateway.nl/schemas/Action.schema.json",
   "version": "0.0.1",
   "listens": [
-    "commongateway.object.created"
+    "create.waardepapier"
   ],
   "description": "This is a action to validate a certificate.",
   "throws": [],
   "conditions": {
-    "==": [{"var": "entity"}, "https://waardepapieren.commonground.nl/certificate.schema.json"]
+    "==": [1, 1]
   },
   "class": "CommonGateway\\WaardepapierenBundle\\ActionHandler\\WaardepapierenHandler",
-  "configuration": {},
-  "isLockable": false,
-  "isEnabled": true
+  "configuration": {
+    "template": "",
+    "schema": "",
+    "source": ""
+  }
 }
