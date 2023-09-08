@@ -101,24 +101,6 @@ class WPZaakService
 
 
     /**
-     * Gets the ZGW Zaak waardepapier template
-     *
-     * @return ObjectEntity|null ZGW Zaak waardepapier template
-     */
-    private function getZaakTemplate(): ?ObjectEntity
-    {
-        // @todo Get bsn from zaak
-        if (isset($this->configuration['templateId']) === false) {
-            // $this->logger->error('No templateId found in Action config, failed to create certificate')
-            return null;
-        }
-
-        return $this->entityManager->getRepository('App:ObjectEntity')->find($this->configuration['templateId']);
-
-    }//end getZaakTemplate()
-
-
-    /**
      * Creates a certificate for a ZGW Zaak.
      *
      * @param array $data          Data from the handler where the xxllnc casetype is in.
@@ -128,53 +110,39 @@ class WPZaakService
      */
     public function wpZaakHandler(array $data, array $configuration): array
     {
-        $zaak = $data['response'];
         $this->configuration = $configuration;
-        $this->waardepapierService->configuration = $configuration;
-        $certificate = [];
-        dump('get bsn');
+        $this->data         = $data;
+
+
+        $responseContent = $this->data['response']->getContent();
+        $zaak = \Safe\json_decode($responseContent, true);
+
+        var_dump($zaak);
+        $zaakObject = $this->entityManager->getRepository("App:ObjectEntity")->find($zaak['id']);
+        if ($zaakObject instanceof ObjectEntity === false) {
+            return $this->data;
+        }
 
         // 1. Get BSN from Zaak.
         $bsn = $this->getBSN($zaak);
         if ($bsn === null) {
-            return $data;
+            return $this->data;
         }
+
+        var_dump($bsn);
 
         // 2. Get RSIN organisatie from Zaak
         $certificate['organization'] = $this->getRSIN($zaak);
         if ($certificate['organization'] === null) {
-            return $data;
+            return $this->data;
         }
 
-        // 2. Get zaak waardepapier template.
-        dump('get getZaakTemplate');
-        $template = $this->getZaakTemplate();
-        if ($template === null) {
-            return $data;
-        }
-
-        dump('get getHaalcentraalSource');
-        // 3. Check configuration and necessary gateway objects
-        $this->waardepapierService->haalcentraalSource = $this->waardepapierService->getHaalcentraalSource();
-        if ($this->waardepapierService->haalcentraalSource === null) {
-            return $data;
-        }
-
-        dump('get getCertificateEntity');
-        $certificateEntity = $this->waardepapierService->getCertificateEntity();
-        if ($certificateEntity === null) {
-            return $data;
-        }
-
-        dump('get fetchPersoonsgegevens');
-        // 4. Get persons information from pink haalcentraalGateway
+        // 3. Get persons information from pink haalcentraalGateway
         $brpPersoon = $this->waardepapierService->fetchPersoonsgegevens($bsn);
 
         // 5. Fill certificate with persons information and/or zaak
-        $this->waardepapierService->certTemplate = $template->toArray();
-        $certificate = $this->waardepapierService->createCertificate($certificate, 'zaak', $brpPersoon, $certificateEntity, $zaak);
+        $certificate = $this->waardepapierService->createCertificate($certificate, 'zaak', $brpPersoon, $zaak);
 
-        dump($certificate['document']);
         return ['response' => $certificate];
 
     }//end wpZaakHandler()

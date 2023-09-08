@@ -2,9 +2,10 @@
   "title": "WaardepapierenZaakAction",
   "$id": "https://waardepapieren.commonground.nl/action/waar.WaardepapierenZaakAction.action.json",
   "$schema": "https://docs.commongateway.nl/schemas/Action.schema.json",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "listens": [
-    "commongateway.object.created"
+    "commongateway.object.create",
+    "commongateway.object.update"
   ],
   "description": "This is a action to update a zaak with certificate.",
   "throws": [],
@@ -13,7 +14,10 @@
   },
   "class": "CommonGateway\\WaardepapierenBundle\\ActionHandler\\WPZaakHandler",
   "configuration": {
-    "templateId": "!ChangeMe! (should be the zaak template id)"
+    "schema": "https://waardepapieren.commonground.nl/certificate.schema.json",
+    "source": "https://waardepapieren.commonground.nl/source/waardepapieren.brp.source.json",
+    "mapping": "https://waardepapieren.commongateway.nl/mapping/waardepapieren.certificate.mapping.json",
+    "brpEndpoint": "ingeschrevenpersonen"
   },
   "isEnabled": false
 }
