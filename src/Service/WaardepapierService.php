@@ -74,13 +74,14 @@ class WaardepapierService
      */
     public array $data;
 
+
     /**
      * @param EntityManagerInterface $entityManager
      * @param QrCodeFactoryInterface $qrCode
      * @param CallService            $callService
      * @param GatewayResourceService $resourceService
-     * @param DownloadService $downloadService
-     * @param MappingService $mappingService
+     * @param DownloadService        $downloadService
+     * @param MappingService         $mappingService
      */
     public function __construct(
         EntityManagerInterface $entityManager,
@@ -90,88 +91,90 @@ class WaardepapierService
         DownloadService $downloadService,
         MappingService $mappingService
     ) {
-        $this->entityManager = $entityManager;
-        $this->qrCode        = $qrCode;
-        $this->callService   = $callService;
+        $this->entityManager   = $entityManager;
+        $this->qrCode          = $qrCode;
+        $this->callService     = $callService;
         $this->resourceService = $resourceService;
         $this->downloadService = $downloadService;
-        $this->mappingService = $mappingService;
+        $this->mappingService  = $mappingService;
 
     }//end __construct()
 
-//    private function sendEnkelvoudigInformatieObject($enkelvoudigInformatieObject)
-//    {
-//        try {
-//            $response = $this->callService->call(
-//                $this->openZaakSource,
-//                '/enkelvoudiginformatieobjecten',
-//                'POST',
-//                ['body' => $enkelvoudigInformatieObject]
-//            );
-//        } catch (\Exception $exception) {
-//            throw new Exception($exception->getMessage());
-//        }
-//
-//        return $this->callService->decodeResponse($this->openZaakSource, $response);
-//
-//    }//end sendEnkelvoudigInformatieObject()
-//
-//
-//    private function sendObjectInformatieObject($objectInformatieObject)
-//    {
-//        try {
-//            $response = $this->callService->call(
-//                $this->openZaakSource,
-//                '/objectinformatieobjecten',
-//                'POST',
-//                ['body' => $objectInformatieObject]
-//            );
-//        } catch (\Exception $exception) {
-//            throw new Exception($exception->getMessage());
-//        }
-//
-//        return $this->callService->decodeResponse($this->openZaakSource, $response);
-//
-//    }//end sendObjectInformatieObject()
-//
-//
-//    private function createInformatieObject()
-//    {
-//        $today = new DateTime();
-//        $enkelvoudigInformatieObject = [
-//            'bronorganisatie'              => 'bsn buren',
-//            'creatiedatum'                 => $today->format('Y-m-d'),
-//            'titel'                        => 'Waardepapier'.$this->certificate['type'],
-//            'vertrouwelijkheidsaanduiding' => 'vertrouwelijk',
-//            'auteur'                       => 'bsn buren',
-//            'status'                       => 'gearchiveerd',
-//            'formaat'                      => 'application/pdf',
-//            'taal'                         => 'nld',
-//            'versie'                       => 1,
-//            'beginRegistratie'             => $today->format('Y-m-d'),
-//            'bestandsnaam'                 => 'todo',
-//            'inhoud'                       => ($this->certificate['pdf'] ?? 'todo'),
-//            'beschrijving'                 => 'Waardepapier '.$this->certificate['type'],
-//            'ontvangstdatum'               => $today->format('Y-m-d'),
-//            'verzenddatum'                 => $today->format('Y-m-d'),
-//            'informatieobjecttype'         => '?',
-//        ];
-//
-//        $enkelvoudigInformatieObjectResult = $this->sendEnkelvoudigInformatieObject($enkelvoudigInformatieObject);
-//
-//        // Check is valid
-//        if ($enkelvoudigInformatieObject) {
-//        }
-//
-//        $objectInformatieObject = [
-//            'informatieobject' => $enkelvoudigInformatieObjectResult['id or uri'],
-//            'object'           => $this->userData['zaakId or uri'],
-//            'objectType'       => 'zaak',
-//        ];
-//
-//        $this->sendObjectInformatieObject($objectInformatieObject);
-//
-//    }//end createInformatieObject()
+
+    // private function sendEnkelvoudigInformatieObject($enkelvoudigInformatieObject)
+    // {
+    // try {
+    // $response = $this->callService->call(
+    // $this->openZaakSource,
+    // '/enkelvoudiginformatieobjecten',
+    // 'POST',
+    // ['body' => $enkelvoudigInformatieObject]
+    // );
+    // } catch (\Exception $exception) {
+    // throw new Exception($exception->getMessage());
+    // }
+    //
+    // return $this->callService->decodeResponse($this->openZaakSource, $response);
+    //
+    // }//end sendEnkelvoudigInformatieObject()
+    //
+    //
+    // private function sendObjectInformatieObject($objectInformatieObject)
+    // {
+    // try {
+    // $response = $this->callService->call(
+    // $this->openZaakSource,
+    // '/objectinformatieobjecten',
+    // 'POST',
+    // ['body' => $objectInformatieObject]
+    // );
+    // } catch (\Exception $exception) {
+    // throw new Exception($exception->getMessage());
+    // }
+    //
+    // return $this->callService->decodeResponse($this->openZaakSource, $response);
+    //
+    // }//end sendObjectInformatieObject()
+    //
+    //
+    // private function createInformatieObject()
+    // {
+    // $today = new DateTime();
+    // $enkelvoudigInformatieObject = [
+    // 'bronorganisatie'              => 'bsn buren',
+    // 'creatiedatum'                 => $today->format('Y-m-d'),
+    // 'titel'                        => 'Waardepapier'.$this->certificate['type'],
+    // 'vertrouwelijkheidsaanduiding' => 'vertrouwelijk',
+    // 'auteur'                       => 'bsn buren',
+    // 'status'                       => 'gearchiveerd',
+    // 'formaat'                      => 'application/pdf',
+    // 'taal'                         => 'nld',
+    // 'versie'                       => 1,
+    // 'beginRegistratie'             => $today->format('Y-m-d'),
+    // 'bestandsnaam'                 => 'todo',
+    // 'inhoud'                       => ($this->certificate['pdf'] ?? 'todo'),
+    // 'beschrijving'                 => 'Waardepapier '.$this->certificate['type'],
+    // 'ontvangstdatum'               => $today->format('Y-m-d'),
+    // 'verzenddatum'                 => $today->format('Y-m-d'),
+    // 'informatieobjecttype'         => '?',
+    // ];
+    //
+    // $enkelvoudigInformatieObjectResult = $this->sendEnkelvoudigInformatieObject($enkelvoudigInformatieObject);
+    //
+    // Check is valid
+    // if ($enkelvoudigInformatieObject) {
+    // }
+    //
+    // $objectInformatieObject = [
+    // 'informatieobject' => $enkelvoudigInformatieObjectResult['id or uri'],
+    // 'object'           => $this->userData['zaakId or uri'],
+    // 'objectType'       => 'zaak',
+    // ];
+    //
+    // $this->sendObjectInformatieObject($objectInformatieObject);
+    //
+    // }//end createInformatieObject()
+
 
     /**
      * Creates or updates a dynamic Certificate.
@@ -215,24 +218,24 @@ class WaardepapierService
 
         // And finnaly we need to set the result on the certificate resource
         return 'data:image/png;base64,'.base64_encode($qrCode->writeString());
+
     }//end createImage()
+
 
     /**
      * This function creates the (pdf) document for a given certificate type.
      *
      * @param string $schemaId
-     * @param array $certificate The certificate object
-     * @param array $brpPersoon
+     * @param array  $certificate The certificate object
+     * @param array  $brpPersoon
      *
      * @return string
      */
     public function createDocument(string $schemaId, array $certificate, array $brpPersoon): string
     {
         $data = [
-            '_self' => [
-                'schema' => [
-                    'id' => $schemaId
-                ]
+            '_self'  => [
+                'schema' => ['id' => $schemaId],
             ],
             'qr'     => $certificate['image'],
             'claim'  => $certificate['claim'],
@@ -294,11 +297,10 @@ class WaardepapierService
     {
         $source = $this->resourceService->getSource($this->configuration['source'], 'common-gateway/waardepapieren-bundle');
 
-//        if (key_exists('ssl_key', $source->getConfiguration()) === false) {
-//            // The ssl key is not set.
-//            return null;
-//        }
-
+        // if (key_exists('ssl_key', $source->getConfiguration()) === false) {
+        // The ssl key is not set.
+        // return null;
+        // }
         if (key_exists('brpEndpoint', $this->configuration) === true) {
             $endpoint = $this->configuration['brpEndpoint'];
         }
@@ -322,13 +324,14 @@ class WaardepapierService
         unset($brpPersoon['_links']);
 
         return $brpPersoon;
+
     }//end fetchPersoonsgegevens()
 
 
     /**
      * Creates or updates a Certificate.
      *
-     * @param array $data Data from the handler where the xxllnc casetype is in.
+     * @param array $data          Data from the handler where the xxllnc casetype is in.
      * @param array $configuration Configuration for the Action.
      *
      * @throws Exception
@@ -338,10 +341,10 @@ class WaardepapierService
     public function waardepapierHandler(array $data, array $configuration): array
     {
         $this->configuration = $configuration;
-        $this->data         = $data;
+        $this->data          = $data;
 
         $responseContent = $this->data['response']->getContent();
-        $certificate = \Safe\json_decode($responseContent, true);
+        $certificate     = \Safe\json_decode($responseContent, true);
 
         $certificateObject = $this->entityManager->getRepository("App:ObjectEntity")->find($certificate['id']);
         if ($certificateObject instanceof ObjectEntity === false) {
@@ -363,18 +366,18 @@ class WaardepapierService
 
         // 4. Make a data array to map from.
         $data = [
-            'brpPerson' => $brpPersoon,
+            'brpPerson'   => $brpPersoon,
             'certificate' => $certificate,
-            'image' => $image,
-            'zaak' => $zaakId
+            'image'       => $image,
+            'zaak'        => $zaakId,
         ];
 
         // 4. Get the mapping and map the certificate.
-        $mapping = $this->resourceService->getMapping($this->configuration['mapping'], 'common-gateway/waardepapieren-bundle');
+        $mapping          = $this->resourceService->getMapping($this->configuration['mapping'], 'common-gateway/waardepapieren-bundle');
         $certificateArray = $this->mappingService->mapping($mapping, $data);
 
         // 5. Create the JWT and Document for the certificate using the already mapped certificate.
-//        $data['jwt'] = $this->createJWT($certificateArray);
+        // $data['jwt'] = $this->createJWT($certificateArray);
         $data['document'] = $this->createDocument($certificate['_self']['schema']['id'], $certificateArray, $brpPersoon);
 
         // 6. Map the certificate again with the jwt and document

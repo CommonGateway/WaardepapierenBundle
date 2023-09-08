@@ -111,11 +111,10 @@ class WPZaakService
     public function wpZaakHandler(array $data, array $configuration): array
     {
         $this->configuration = $configuration;
-        $this->data         = $data;
-
+        $this->data          = $data;
 
         $responseContent = $this->data['response']->getContent();
-        $zaak = \Safe\json_decode($responseContent, true);
+        $zaak            = \Safe\json_decode($responseContent, true);
 
         var_dump($zaak);
         $zaakObject = $this->entityManager->getRepository("App:ObjectEntity")->find($zaak['id']);
