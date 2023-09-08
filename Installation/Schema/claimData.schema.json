@@ -2,7 +2,7 @@
     "title": "ClaimData",
     "$id": "https://waardepapieren.commonground.nl/claimData.schema.json",
     "$schema": "https://docs.commongateway.nl/schemas/Entity.schema.json",
-    "version": "0.1",
+    "version": "0.1.2",
     "type": "object",
     "description": "An model representing an (verifiable) claim.",
     "properties": {
@@ -11,6 +11,9 @@
         },
         "doel": {
             "type": "string"
+        },
+        "type": {
+          "type": "string"
         }
     }
 }

@@ -18,8 +18,8 @@
         "php": ">=7.4",
         "endroid/qr-code-bundle": "3.4",
         "common-gateway/template-bundle": ">=0.0",
-          "commongateway/corebundle": "^1.1.96",
-        "common-gateway/zgw-bundle": ">=1.0.48"
+          "commongateway/corebundle": "^1.1.98",
+        "common-gateway/zgw-bundle": "^1.0.49"
     },
 	"require-dev" : {
 		"symfony/dependency-injection" : "~3.4|~4.1|~5.0"

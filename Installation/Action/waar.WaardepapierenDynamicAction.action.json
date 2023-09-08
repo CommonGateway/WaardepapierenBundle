@@ -2,7 +2,7 @@
   "title": "WaardepapierenDynamicAction",
   "$id": "https://waardepapieren.commonground.nl/action/waar.WaardepapierenDynamicAction.action.json",
   "$schema": "https://docs.commongateway.nl/schemas/Action.schema.json",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "listens": [
     "commongateway.dynamiccertficate.trigger"
   ],
@@ -12,7 +12,9 @@
     "==": [1, 1]
   },
   "class": "CommonGateway\\WaardepapierenBundle\\ActionHandler\\WaardepapierenDynamicHandler",
-  "configuration": {},
-  "isLockable": false,
+  "configuration": {
+    "schema": "https://waardepapieren.commonground.nl/certificate.schema.json",
+    "source": "https://waardepapieren.commonground.nl/source/waardepapieren.brp.source.json"
+  },
   "isEnabled": true
 }
