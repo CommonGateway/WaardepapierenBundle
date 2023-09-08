@@ -34,7 +34,7 @@ class WPZaakHandler implements ActionHandlerInterface
     public function getConfiguration(): array
     {
         return [
-            '$id'         => 'https://waardepapieren.commonground.nl/person.schema.json',
+            '$id'         => 'https://waardepapieren.commonground.nl/waardepapieren.zaak.ActionHandler.json',
             '$schema'     => 'https://docs.commongateway.nl/schemas/ActionHandler.schema.json',
             'title'       => 'WPZaak Action',
             'description' => 'This handler returns a welcoming string',
