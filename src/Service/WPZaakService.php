@@ -119,6 +119,7 @@ class WPZaakService
 
     }//end getRSIN()
 
+
     public function saveWaardepapierInDRC(string $data, ObjectEntity $zaakObject): void
     {
         $now = new DateTime();
@@ -133,12 +134,12 @@ class WPZaakService
             'auteur'                       => 'Common Gateway',
             'taal'                         => 'NLD',
             'bestandsnaam'                 => 'waardepapier.pdf',
-            'versie'                       => null
+            'versie'                       => null,
         ];
 
         $informationObjectEntity = $this->resourceService->getSchema('https://vng.opencatalogi.nl/schemas/drc.enkelvoudigInformatieObject.schema.json', 'common-gateway/waardepapieren-bundle');
 
-        $informationObject     = new ObjectEntity($informationObjectEntity);
+        $informationObject = new ObjectEntity($informationObjectEntity);
 
         $informationObject->hydrate($informationArray);
         $this->entityManager->persist($informationObject);
@@ -148,10 +149,10 @@ class WPZaakService
 
         $caseInformationObjectEntity = $this->resourceService->getSchema('https://vng.opencatalogi.nl/schemas/zrc.zaakInformatieObject.schema.json', 'common-gateway/waardepapieren-bundle');
 
-        $caseInformationArray = [
+        $caseInformationArray  = [
             'zaak'                => $zaakObject,
             'informatieobject'    => $informationObject,
-            'aardRelatieWeergave' => 'Hoort bij, omgekeerd: kent'
+            'aardRelatieWeergave' => 'Hoort bij, omgekeerd: kent',
         ];
         $caseInformationObject = new ObjectEntity($caseInformationObjectEntity);
 
@@ -159,7 +160,7 @@ class WPZaakService
         $this->entityManager->persist($caseInformationObject);
         $this->entityManager->flush();
 
-    }
+    }//end saveWaardepapierInDRC()
 
 
     /**
@@ -179,8 +180,7 @@ class WPZaakService
 
         $this->DRCService->setDataAndConfiguration($data, $configuration);
 
-
-        if($this->data['response']['_self']['schema']['ref'] === "https://vng.opencatalogi.nl/schemas/zrc.zaak.schema.json") {
+        if ($this->data['response']['_self']['schema']['ref'] === "https://vng.opencatalogi.nl/schemas/zrc.zaak.schema.json") {
             $zaak = $this->data['response'];
         } else if ($this->data['response']['_self']['schema']['ref'] === "https://vng.opencatalogi.nl/schemas/zrc.rol.schema.json"
             && isset($this->data['response']['embedded']['zaak'])
@@ -210,8 +210,7 @@ class WPZaakService
         }
 
         // 3. Get persons information from pink haalcentraalGateway
-//        $brpPersoon = $this->waardepapierService->fetchPersoonsgegevens($bsn);
-
+        // $brpPersoon = $this->waardepapierService->fetchPersoonsgegevens($bsn);
         // 5. Fill certificate with persons information and/or zaak
         $certificate = $this->downloadService->downloadPdf($zaak);
 
