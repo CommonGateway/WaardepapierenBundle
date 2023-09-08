@@ -3,8 +3,12 @@
 namespace CommonGateway\WaardepapierenBundle\Service;
 
 use App\Entity\ObjectEntity;
-use Doctrine\ORM\EntityManagerInterface;
+use CommonGateway\CoreBundle\Service\DownloadService;
+use CommonGateway\CoreBundle\Service\GatewayResourceService;
 use CommonGateway\WaardepapierenBundle\Service\WaardepapierService;
+use CommonGateway\ZGWBundle\Service\DRCService;
+use Doctrine\ORM\EntityManagerInterface;
+use Safe\DateTime;
 
 /**
  * WPZaakService makes a certificate with for a zaak
@@ -28,6 +32,16 @@ class WPZaakService
     private WaardepapierService $waardepapierService;
 
     /**
+     * @var GatewayResourceService The gateway resource service.
+     */
+    private GatewayResourceService $resourceService;
+
+    /**
+     * @var DRCService The DRC service from the ZGW bundle.
+     */
+    private DRCService $DRCService;
+
+    /**
      * @var array $configuration of the current action.
      */
     private array $configuration;
@@ -48,10 +62,16 @@ class WPZaakService
      */
     public function __construct(
         EntityManagerInterface $entityManager,
-        WaardepapierService $waardepapierService
+        WaardepapierService $waardepapierService,
+        DownloadService $downloadService,
+        GatewayResourceService $resourceService,
+        DRCService $DRCService
     ) {
         $this->entityManager       = $entityManager;
         $this->waardepapierService = $waardepapierService;
+        $this->downloadService     = $downloadService;
+        $this->resourceService     = $resourceService;
+        $this->DRCService          = $DRCService;
 
     }//end __construct()
 
@@ -65,12 +85,12 @@ class WPZaakService
      */
     private function getBSN(array $zaak): ?string
     {
-        if (isset($zaak['rollen']) === false) {
+        if (isset($zaak['embedded']['rollen']) === false) {
             // $this->logger->error('No BSN found for Zaak, failed to create certificate')
             return null;
         }
 
-        foreach ($zaak['rollen'] as $rol) {
+        foreach ($zaak['embedded']['rollen'] as $rol) {
             if (isset($rol['betrokkeneIdentificatie']['inpBsn']) === true) {
                 return $rol['betrokkeneIdentificatie']['inpBsn'];
             }
@@ -99,6 +119,48 @@ class WPZaakService
 
     }//end getRSIN()
 
+    public function saveWaardepapierInDRC(string $data, ObjectEntity $zaakObject): void
+    {
+        $now = new DateTime();
+
+        $informationArray = [
+            'inhoud'                       => base64_encode($data),
+            'informatieobjecttype'         => '',
+            'bronorganisatie'              => '999990639',
+            'creatiedatum'                 => $now->format('Y-m-d'),
+            'titel'                        => 'Waardepapier',
+            'vertrouwelijkheidsaanduiding' => 'vertrouwelijk',
+            'auteur'                       => 'Common Gateway',
+            'taal'                         => 'NLD',
+            'bestandsnaam'                 => 'waardepapier.pdf',
+            'versie'                       => null
+        ];
+
+        $informationObjectEntity = $this->resourceService->getSchema('https://vng.opencatalogi.nl/schemas/drc.enkelvoudigInformatieObject.schema.json', 'common-gateway/waardepapieren-bundle');
+
+        $informationObject     = new ObjectEntity($informationObjectEntity);
+
+        $informationObject->hydrate($informationArray);
+        $this->entityManager->persist($informationObject);
+        $this->entityManager->flush();
+
+        $this->DRCService->createOrUpdateFile($informationObject, $informationArray, $this->entityManager->getRepository('App:Endpoint')->findOneBy(['reference' => 'https://vng.opencatalogi.nl/endpoints/drc.downloadEnkelvoudigInformatieObject.endpoint.json']));
+
+        $caseInformationObjectEntity = $this->resourceService->getSchema('https://vng.opencatalogi.nl/schemas/zrc.zaakInformatieObject.schema.json', 'common-gateway/waardepapieren-bundle');
+
+        $caseInformationArray = [
+            'zaak'                => $zaakObject,
+            'informatieobject'    => $informationObject,
+            'aardRelatieWeergave' => 'Hoort bij, omgekeerd: kent'
+        ];
+        $caseInformationObject = new ObjectEntity($caseInformationObjectEntity);
+
+        $caseInformationObject->hydrate($caseInformationArray);
+        $this->entityManager->persist($caseInformationObject);
+        $this->entityManager->flush();
+
+    }
+
 
     /**
      * Creates a certificate for a ZGW Zaak.
@@ -113,22 +175,33 @@ class WPZaakService
         $this->configuration = $configuration;
         $this->data          = $data;
 
-        $responseContent = $this->data['response']->getContent();
-        $zaak            = \Safe\json_decode($responseContent, true);
+        $data['method'] = 'PUT';
 
-        var_dump($zaak);
-        $zaakObject = $this->entityManager->getRepository("App:ObjectEntity")->find($zaak['id']);
+        $this->DRCService->setDataAndConfiguration($data, $configuration);
+
+
+        if($this->data['response']['_self']['schema']['ref'] === "https://vng.opencatalogi.nl/schemas/zrc.zaak.schema.json") {
+            $zaak = $this->data['response'];
+        } else if ($this->data['response']['_self']['schema']['ref'] === "https://vng.opencatalogi.nl/schemas/zrc.rol.schema.json"
+            && isset($this->data['response']['embedded']['zaak'])
+        ) {
+            $zaak = $this->data['response']['embedded']['zaak'];
+        } else {
+            return $this->data;
+        }
+
+        $zaakObject = $this->entityManager->getRepository("App:ObjectEntity")->find($zaak['_self']['id']);
         if ($zaakObject instanceof ObjectEntity === false) {
             return $this->data;
         }
+
+        $zaak = $zaakObject->toArray(['embedded' => true]);
 
         // 1. Get BSN from Zaak.
         $bsn = $this->getBSN($zaak);
         if ($bsn === null) {
             return $this->data;
         }
-
-        var_dump($bsn);
 
         // 2. Get RSIN organisatie from Zaak
         $certificate['organization'] = $this->getRSIN($zaak);
@@ -137,12 +210,15 @@ class WPZaakService
         }
 
         // 3. Get persons information from pink haalcentraalGateway
-        $brpPersoon = $this->waardepapierService->fetchPersoonsgegevens($bsn);
+//        $brpPersoon = $this->waardepapierService->fetchPersoonsgegevens($bsn);
 
         // 5. Fill certificate with persons information and/or zaak
-        $certificate = $this->waardepapierService->createCertificate($certificate, 'zaak', $brpPersoon, $zaak);
+        $certificate = $this->downloadService->downloadPdf($zaak);
 
-        return ['response' => $certificate];
+        // 6. Store certificate in DRC.
+        $this->saveWaardepapierInDRC($certificate, $zaakObject);
+
+        return $this->data;
 
     }//end wpZaakHandler()
 
