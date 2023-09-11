@@ -119,14 +119,15 @@ class WPZaakService
 
     }//end getRSIN()
 
+
     /**
      * Finds a informatieobjectttype id from a object url in the action configuration.
-     * 
+     *
      * @return string|null
      */
     private function getInformatieObjectTypeId()
     {
-        $informatieobjecttype = $this->configuration['informatieobjecttype'] ?? '';
+        $informatieobjecttype = ($this->configuration['informatieobjecttype'] ?? '');
         if (empty($informatieobjecttype) === false) {
             $uuidPattern = '/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/i';
             if (preg_match($uuidPattern, $informatieobjecttype, $matches)) {
@@ -134,8 +135,8 @@ class WPZaakService
                 $informatieobjecttype = $this->entityManager->find('App:ObjectEntity', $id);
                 if ($informatieobjecttype !== null) {
                     return $informatieobjecttype->getId()->toString();
-                } 
-                
+                }
+
                 // If no object is found try a synchronization and its object.
                 $synchronization = $this->entityManager->getRepository('App:Synchronizations')->findOneBy(['sourceId' => $id]);
                 if ($synchronization !== null) {
@@ -145,7 +146,8 @@ class WPZaakService
         }
 
         return null;
-    }//end getInformatieObjectType()
+
+    }//end getInformatieObjectTypeId()
 
 
     public function saveWaardepapierInDRC(string $data, ObjectEntity $zaakObject): void
