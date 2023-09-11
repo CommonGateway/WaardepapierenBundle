@@ -61,6 +61,7 @@ class WPZaakService
     private ?array $userData;
 
     private CallService $callService;
+
     private MappingService $mappingService;
 
 
@@ -130,6 +131,7 @@ class WPZaakService
 
     }//end getRSIN()
 
+
     /**
      * New setup for synchronizing upstream.
      * To be added in an adapted form into the core synchronizationService.
@@ -143,7 +145,7 @@ class WPZaakService
      */
     public function synchronizeUpstream(Synchronization $synchronization): bool
     {
-        if($synchronization->getLastSynced() === null) {
+        if ($synchronization->getLastSynced() === null) {
             $method = 'POST';
         } else {
             $method = 'PUT';
@@ -151,18 +153,20 @@ class WPZaakService
 
         $data = $this->mappingService->mapping($synchronization->getMapping(), $synchronization->getObject()->toArray());
 
-        $response = $this->callService->call($synchronization->getSource(), $synchronization->getEndpoint(), $method, ['body' => $data]);
+        $response     = $this->callService->call($synchronization->getSource(), $synchronization->getEndpoint(), $method, ['body' => $data]);
         $updateObject = $this->callService->decodeResponse($synchronization->getSource(), $response);
 
         $synchronization->getObject()->hydrate($updateObject);
         $synchronization->setLastSynced(new DateTime());
-        $synchronization->setSourceId($updateObject['url']); //hardcoded for openzaak, to determine dynamically
-
+        $synchronization->setSourceId($updateObject['url']);
+        // hardcoded for openzaak, to determine dynamically
         $this->entityManager->persist($synchronization);
         $this->entityManager->flush();
 
         return true;
-    }
+
+    }//end synchronizeUpstream()
+
 
     /**
      * Store information objects to an upstream source
@@ -175,14 +179,13 @@ class WPZaakService
      */
     public function storeWaardepapierInSourceDRC(ObjectEntity $informatieobject, ObjectEntity $zaakinformatieobject, ObjectEntity $zaak): bool
     {
-        if(count($zaak->getSynchronizations()) === 0) {
+        if (count($zaak->getSynchronizations()) === 0) {
             return true;
         }
 
         $zaakSync = $zaak->getSynchronizations()[0];
 
         $source = $zaakSync->getSource();
-
 
         $eioSync = new Synchronization();
         $eioSync->setSource($this->configuration['drcSource']);
@@ -192,7 +195,7 @@ class WPZaakService
 
         $result = $this->synchronizeUpstream($eioSync);
 
-        if($result === false) {
+        if ($result === false) {
             return false;
         }
 
@@ -206,7 +209,8 @@ class WPZaakService
 
         return $result;
 
-    }
+    }//end storeWaardepapierInSourceDRC()
+
 
     public function saveWaardepapierInDRC(string $data, ObjectEntity $zaakObject): void
     {
@@ -222,12 +226,12 @@ class WPZaakService
             'auteur'                       => 'Common Gateway',
             'taal'                         => 'NLD',
             'bestandsnaam'                 => 'waardepapier.pdf',
-            'versie'                       => null
+            'versie'                       => null,
         ];
 
         $informationObjectEntity = $this->resourceService->getSchema('https://vng.opencatalogi.nl/schemas/drc.enkelvoudigInformatieObject.schema.json', 'common-gateway/waardepapieren-bundle');
 
-        $informationObject     = new ObjectEntity($informationObjectEntity);
+        $informationObject = new ObjectEntity($informationObjectEntity);
 
         $informationObject->hydrate($informationArray);
         $this->entityManager->persist($informationObject);
@@ -237,10 +241,10 @@ class WPZaakService
 
         $caseInformationObjectEntity = $this->resourceService->getSchema('https://vng.opencatalogi.nl/schemas/zrc.zaakInformatieObject.schema.json', 'common-gateway/waardepapieren-bundle');
 
-        $caseInformationArray = [
+        $caseInformationArray  = [
             'zaak'                => $zaakObject,
             'informatieobject'    => $informationObject,
-            'aardRelatieWeergave' => 'Hoort bij, omgekeerd: kent'
+            'aardRelatieWeergave' => 'Hoort bij, omgekeerd: kent',
         ];
         $caseInformationObject = new ObjectEntity($caseInformationObjectEntity);
 
@@ -249,7 +253,8 @@ class WPZaakService
         $this->entityManager->flush();
 
         $this->storeWaardepapierInSourceDRC($informationObject, $caseInformationObject, $zaakObject);
-    }
+
+    }//end saveWaardepapierInDRC()
 
 
     /**
@@ -269,8 +274,7 @@ class WPZaakService
 
         $this->DRCService->setDataAndConfiguration($data, $configuration);
 
-
-        if($this->data['response']['_self']['schema']['ref'] === "https://vng.opencatalogi.nl/schemas/zrc.zaak.schema.json") {
+        if ($this->data['response']['_self']['schema']['ref'] === "https://vng.opencatalogi.nl/schemas/zrc.zaak.schema.json") {
             $zaak = $this->data['response'];
         } else if ($this->data['response']['_self']['schema']['ref'] === "https://vng.opencatalogi.nl/schemas/zrc.rol.schema.json"
             && isset($this->data['response']['embedded']['zaak'])
@@ -300,15 +304,14 @@ class WPZaakService
         }
 
         // 3. Get persons information from pink haalcentraalGateway
-        $brpPersoon = []; //$this->waardepapierService->fetchPersoonsgegevens($bsn);
-
+        $brpPersoon = [];
+        // $this->waardepapierService->fetchPersoonsgegevens($bsn);
         // 5. Fill certificate with persons information and/or zaak
         $certificate = $this->downloadService->downloadPdf($zaak);
 
         $this->saveWaardepapierInDRC($certificate, $zaakObject);
 
-//        $certificate = $this->waardepapierService->createCertificate($certificate, 'zaak', $brpPersoon, $zaak);
-
+        // $certificate = $this->waardepapierService->createCertificate($certificate, 'zaak', $brpPersoon, $zaak);
         return $this->data;
 
     }//end wpZaakHandler()
