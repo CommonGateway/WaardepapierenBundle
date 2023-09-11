@@ -34,7 +34,8 @@
     "schema": "https://waardepapieren.commonground.nl/certificate.schema.json",
     "source": "https://waardepapieren.commonground.nl/source/waardepapieren.brp.source.json",
     "mapping": "https://waardepapieren.commongateway.nl/mapping/waardepapieren.certificate.mapping.json",
-    "brpEndpoint": "ingeschrevenpersonen"
+    "brpEndpoint": "ingeschrevenpersonen",
+    "informatieobjecttype": ""
   },
   "isEnabled": false
 }
