@@ -159,7 +159,7 @@ class WPZaakService
 
         return null;
 
-    }//end getInformatieObjectTypeId()
+    }//end getInformatieObjectTypeUrl()
 
 
     /**
