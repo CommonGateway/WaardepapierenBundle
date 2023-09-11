@@ -133,11 +133,11 @@ class WPZaakService
 
 
     /**
-     * Finds a informatieobjectttype id from a object url in the action configuration.
+     * Finds a informatieobjectttype url from a object url in the action configuration.
      *
      * @return string|null
      */
-    private function getInformatieObjectTypeId()
+    private function getInformatieObjectTypeUrl()
     {
         $informatieobjecttype = ($this->configuration['informatieobjecttype'] ?? '');
         if (empty($informatieobjecttype) === false) {
@@ -146,13 +146,13 @@ class WPZaakService
                 $id = $matches[0];
                 $informatieobjecttype = $this->entityManager->find('App:ObjectEntity', $id);
                 if ($informatieobjecttype !== null) {
-                    return $informatieobjecttype->getId()->toString();
+                    return $informatieobjecttype->getValue('url');
                 }
 
                 // If no object is found try a synchronization and its object.
                 $synchronization = $this->entityManager->getRepository('App:Synchronizations')->findOneBy(['sourceId' => $id]);
                 if ($synchronization !== null) {
-                    return $synchronization->getObject()->getId()->toString();
+                    return $synchronization->getObject()->getValue('url');
                 }
             }
         }
@@ -248,7 +248,7 @@ class WPZaakService
 
         $informationArray = [
             'inhoud'                       => base64_encode($data),
-            'informatieobjecttype'         => $this->getInformatieObjectTypeId(),
+            'informatieobjecttype'         => $this->getInformatieObjectTypeUrl(),
             'bronorganisatie'              => $zaakObject->getValue('bronorganisatie'),
             'creatiedatum'                 => $now->format('Y-m-d'),
             'titel'                        => 'Waardepapier',
