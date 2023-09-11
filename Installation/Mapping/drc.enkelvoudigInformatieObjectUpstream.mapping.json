@@ -1,0 +1,10 @@
+{
+  "title": "Zaakinformatieobject",
+  "$id": "https://waardepapieren.commongateway.nl/mapping/drc.enkelvoudigInformatieObjectUpstream.mapping.json",
+  "$schema": "https://docs.commongateway.nl/schemas/Mapping.schema.json",
+  "version": "0.0.1",
+  "passTrough": false,
+  "mapping": {
+    "informatieobjecttype": "informatieobjecttype._self.synchronizations.0.sourceId"
+  }
+}

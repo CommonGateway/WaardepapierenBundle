@@ -3,8 +3,12 @@
 namespace CommonGateway\WaardepapierenBundle\Service;
 
 use App\Entity\ObjectEntity;
+use App\Entity\Synchronization;
+use Brick\Reflection\Tests\S;
+use CommonGateway\CoreBundle\Service\CallService;
 use CommonGateway\CoreBundle\Service\DownloadService;
 use CommonGateway\CoreBundle\Service\GatewayResourceService;
+use CommonGateway\CoreBundle\Service\MappingService;
 use CommonGateway\WaardepapierenBundle\Service\WaardepapierService;
 use CommonGateway\ZGWBundle\Service\DRCService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -56,6 +60,10 @@ class WPZaakService
      */
     private ?array $userData;
 
+    private CallService $callService;
+
+    private MappingService $mappingService;
+
 
     /**
      * __construct
@@ -65,13 +73,17 @@ class WPZaakService
         WaardepapierService $waardepapierService,
         DownloadService $downloadService,
         GatewayResourceService $resourceService,
-        DRCService $DRCService
+        DRCService $DRCService,
+        CallService $callService,
+        MappingService $mappingService
     ) {
         $this->entityManager       = $entityManager;
         $this->waardepapierService = $waardepapierService;
         $this->downloadService     = $downloadService;
         $this->resourceService     = $resourceService;
         $this->DRCService          = $DRCService;
+        $this->callService         = $callService;
+        $this->mappingService      = $mappingService;
 
     }//end __construct()
 
@@ -150,6 +162,86 @@ class WPZaakService
     }//end getInformatieObjectTypeId()
 
 
+    /**
+     * New setup for synchronizing upstream.
+     * To be added in an adapted form into the core synchronizationService.
+     *
+     * @param Synchronization $synchronization The synchronization to synchronize
+     *
+     * @return bool Whether or not the synchronization has passed.
+     *
+     * @throws \Twig\Error\LoaderError
+     * @throws \Twig\Error\SyntaxError
+     */
+    public function synchronizeUpstream(Synchronization $synchronization): bool
+    {
+        if ($synchronization->getLastSynced() === null) {
+            $method = 'POST';
+        } else {
+            $method = 'PUT';
+        }
+
+        $data = $this->mappingService->mapping($synchronization->getMapping(), $synchronization->getObject()->toArray());
+
+        $response     = $this->callService->call($synchronization->getSource(), $synchronization->getEndpoint(), $method, ['body' => $data]);
+        $updateObject = $this->callService->decodeResponse($synchronization->getSource(), $response);
+
+        $synchronization->getObject()->hydrate($updateObject);
+        $synchronization->setLastSynced(new DateTime());
+        $synchronization->setSourceId($updateObject['url']);
+        // hardcoded for openzaak, to determine dynamically
+        $this->entityManager->persist($synchronization);
+        $this->entityManager->flush();
+
+        return true;
+
+    }//end synchronizeUpstream()
+
+
+    /**
+     * Store information objects to an upstream source
+     *
+     * @param ObjectEntity $informatieobject     The information object to store
+     * @param ObjectEntity $zaakinformatieobject The case-information-object to store
+     * @param ObjectEntity $zaak                 The case the objects belong to
+     *
+     * @return bool Whether or not the synchronization has passed.
+     */
+    public function storeWaardepapierInSourceDRC(ObjectEntity $informatieobject, ObjectEntity $zaakinformatieobject, ObjectEntity $zaak): bool
+    {
+        if (count($zaak->getSynchronizations()) === 0) {
+            return true;
+        }
+
+        $zaakSync = $zaak->getSynchronizations()[0];
+
+        $source = $zaakSync->getSource();
+
+        $eioSync = new Synchronization();
+        $eioSync->setSource($this->configuration['drcSource']);
+        $eioSync->setMapping($this->resourceService->getMapping('https://waardepapieren.commongateway.nl/mapping/drc.enkelvoudigInformatieObjectUpstream.mapping.json'));
+        $eioSync->setEndpoint('/enkelvoudiginformatieobjecten');
+        $eioSync->setObject($informatieobject);
+
+        $result = $this->synchronizeUpstream($eioSync);
+
+        if ($result === false) {
+            return false;
+        }
+
+        $zioSync = new Synchronization();
+        $zioSync->setSource($source);
+        $zioSync->setMapping('https://waardepapieren.commongateway.nl/mapping/zrc.zaakInformatieObjectUpstream.mapping.json');
+        $zioSync->setEndpoint('/zaakinformatieobjecten');
+        $eioSync->setObject($informatieobject);
+
+        $result = $this->synchronizeUpstream($zioSync);
+
+        return $result;
+
+    }//end storeWaardepapierInSourceDRC()
+
+
     public function saveWaardepapierInDRC(string $data, ObjectEntity $zaakObject): void
     {
         $now = new DateTime();
@@ -157,7 +249,7 @@ class WPZaakService
         $informationArray = [
             'inhoud'                       => base64_encode($data),
             'informatieobjecttype'         => $this->getInformatieObjectTypeId(),
-            'bronorganisatie'              => '999990639',
+            'bronorganisatie'              => $zaakObject->getValue('bronorganisatie'),
             'creatiedatum'                 => $now->format('Y-m-d'),
             'titel'                        => 'Waardepapier',
             'vertrouwelijkheidsaanduiding' => 'vertrouwelijk',
@@ -189,6 +281,8 @@ class WPZaakService
         $caseInformationObject->hydrate($caseInformationArray);
         $this->entityManager->persist($caseInformationObject);
         $this->entityManager->flush();
+
+        $this->storeWaardepapierInSourceDRC($informationObject, $caseInformationObject, $zaakObject);
 
     }//end saveWaardepapierInDRC()
 
@@ -240,13 +334,14 @@ class WPZaakService
         }
 
         // 3. Get persons information from pink haalcentraalGateway
-        // $brpPersoon = $this->waardepapierService->fetchPersoonsgegevens($bsn);
+        $brpPersoon = [];
+        // $this->waardepapierService->fetchPersoonsgegevens($bsn);
         // 5. Fill certificate with persons information and/or zaak
         $certificate = $this->downloadService->downloadPdf($zaak);
 
-        // 6. Store certificate in DRC.
         $this->saveWaardepapierInDRC($certificate, $zaakObject);
 
+        // $certificate = $this->waardepapierService->createCertificate($certificate, 'zaak', $brpPersoon, $zaak);
         return $this->data;
 
     }//end wpZaakHandler()
