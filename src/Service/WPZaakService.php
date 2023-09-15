@@ -133,6 +133,36 @@ class WPZaakService
 
 
     /**
+     * Finds a informatieobjectttype url from a object url in the action configuration.
+     *
+     * @return string|null
+     */
+    private function getInformatieObjectTypeUrl()
+    {
+        $informatieobjecttype = ($this->configuration['informatieobjecttype'] ?? '');
+        if (empty($informatieobjecttype) === false) {
+            $uuidPattern = '/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/i';
+            if (preg_match($uuidPattern, $informatieobjecttype, $matches)) {
+                $id = $matches[0];
+                $informatieobjecttype = $this->entityManager->find('App:ObjectEntity', $id);
+                if ($informatieobjecttype !== null) {
+                    return $informatieobjecttype->getValue('url');
+                }
+
+                // If no object is found try a synchronization and its object.
+                $synchronization = $this->entityManager->getRepository('App:Synchronizations')->findOneBy(['sourceId' => $id]);
+                if ($synchronization !== null) {
+                    return $synchronization->getObject()->getValue('url');
+                }
+            }
+        }
+
+        return null;
+
+    }//end getInformatieObjectTypeUrl()
+
+
+    /**
      * New setup for synchronizing upstream.
      * To be added in an adapted form into the core synchronizationService.
      *
@@ -218,7 +248,7 @@ class WPZaakService
 
         $informationArray = [
             'inhoud'                       => base64_encode($data),
-            'informatieobjecttype'         => $this->resourceService->getObject($this->configuration['informatieobjecttype']),
+            'informatieobjecttype'         => $this->getInformatieObjectTypeUrl(),
             'bronorganisatie'              => $zaakObject->getValue('bronorganisatie'),
             'creatiedatum'                 => $now->format('Y-m-d'),
             'titel'                        => 'Waardepapier',
