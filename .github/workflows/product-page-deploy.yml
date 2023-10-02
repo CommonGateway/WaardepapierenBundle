@@ -23,7 +23,7 @@ env: # Change these to your preferences any image url can also be a base encoded
   # Jumbotron
   JUMBOTRON_TITLE: "Waardenpapieren"
   JUMBOTRON_SUBTITLE: "Het veilig, vertrouwd en snel verstrekken van digitale uittreksels en bewijsstukken"
-  JUMBOTRON_DESCRIPTION: ${{ github.event.repository.description }}
+  JUMBOTRON_DESCRIPTION: "Waardepapieren is onderdeel van commonground."
   JUMBOTRON_SVG: "https://www.conduction.nl/wp-content/uploads/2021/07/cropped-Conduction_HOME_0000_afb1-1.png"
 
   # NL-Design Theme
