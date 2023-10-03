@@ -41,10 +41,10 @@ Creates a certificate for a ZGW Zaak.
 
 **Parameters**
 
-*   `(array) $data`
-    : Data from the handler where the xxllnc casetype is in.
-*   `(array) $configuration`
-    : Configuration for the Action.
+* `(array) $data`
+  : Data from the handler where the xxllnc casetype is in.
+* `(array) $configuration`
+  : Configuration for the Action.
 
 **Return Values**
 

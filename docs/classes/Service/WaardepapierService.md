@@ -96,8 +96,8 @@ This function creates the (pdf) document for a given certificate type.
 
 **Parameters**
 
-*   `(array) $template`
-    : The twig template
+* `(array) $template`
+  : The twig template
 
 **Return Values**
 
@@ -149,10 +149,10 @@ This function generates a JWS token with the RS512 algorithm.
 
 **Parameters**
 
-*   `(array) $data`
-    : the data that gets stored in the jws token
-*   `(array) $certificate`
-    : the certificate object
+* `(array) $data`
+  : the data that gets stored in the jws token
+* `(array) $certificate`
+  : the certificate object
 
 **Return Values**
 
@@ -196,10 +196,10 @@ This function creates a proof.
 
 **Parameters**
 
-*   `(array) $data`
-    : the data that gets stored in the jws token of the proof
-*   `(array) $certificate`
-    : the certificate object
+* `(array) $data`
+  : the data that gets stored in the jws token of the proof
+* `(array) $certificate`
+  : the certificate object
 
 **Return Values**
 
@@ -327,8 +327,8 @@ This function generates a claim based on the w3c structure.
 
 **Parameters**
 
-*   `(array) $data`
-    : The data used to create the claim
+* `(array) $data`
+  : The data used to create the claim
 
 **Return Values**
 
@@ -354,10 +354,10 @@ Creates or updates a Certificate.
 
 **Parameters**
 
-*   `(array) $data`
-    : Data from the handler where the xxllnc casetype is in.
-*   `(array) $configuration`
-    : Configuration for the Action.
+* `(array) $data`
+  : Data from the handler where the xxllnc casetype is in.
+* `(array) $configuration`
+  : Configuration for the Action.
 
 **Return Values**
 
@@ -379,10 +379,10 @@ Creates or updates a dynamic Certificate.
 
 **Parameters**
 
-*   `(array) $data`
-    : Data from the handler where the certificate info is in.
-*   `(array) $configuration`
-    : Configuration for the Action.
+* `(array) $data`
+  : Data from the handler where the certificate info is in.
+* `(array) $configuration`
+  : Configuration for the Action.
 
 **Return Values**
 
