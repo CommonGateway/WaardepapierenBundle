@@ -12,7 +12,7 @@ Voor het generen van waardepapieren zijn een aantal zaken nodig:
 
 ## Plugin Installatie
 
-> 1. [Installeer de Common Gateway]([https://github.com/ConductionNL/commonground-gateway](https://commongateway.github.io/CoreBundle/))
+> 1. [Installeer de Common Gateway]([https://github.com/ConductionNL/commonground-gateway]\(https://commongateway.github.io/CoreBundle/\))
 > 2. ga naar Settings -> plugins
 > 3. Klik op `add plugin`
 > 4. Zoek op `Waardepapieren Service`
