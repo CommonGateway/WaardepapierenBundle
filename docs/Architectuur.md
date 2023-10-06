@@ -7,7 +7,8 @@ De Waardepapieren Service is in 2023 getransformeerd van een standalone applicat
 ![Microserviced Architecture](https://raw.githubusercontent.com/CommonGateway/WaardepapierenBundle/main/docs/microservice.svg)
 
 ### Referentie
-- [Microservices Architectuur](https://www.noraonline.nl/wiki/Microservices)
+
+* [Microservices Architectuur](https://www.noraonline.nl/wiki/Microservices)
 
 ## Varianten
 
@@ -20,7 +21,8 @@ Deze variant is specifiek ontworpen om te integreren met ZGW-gebaseerde zaaksyst
 ![ZGW  Architecture](https://raw.githubusercontent.com/CommonGateway/WaardepapierenBundle/main/docs/zgw_waardepapier_klein.svg)
 
 #### Referentie
-- [ZGW API's](https://www.vngrealisatie.nl/producten/api-standaarden-zaakgericht-werken)
+
+* [ZGW API's](https://www.vngrealisatie.nl/producten/api-standaarden-zaakgericht-werken)
 
 ### Mijn Omgeving
 
@@ -29,7 +31,8 @@ Deze variant is bedoeld voor integratie met persoonlijke omgevingen waar burgers
 ![Mijn Omgeving  Architecture](https://raw.githubusercontent.com/CommonGateway/WaardepapierenBundle/main/docs/zgw_waardepapier_mijn-zaken.svg)
 
 #### Referentie
-- [MijnOverheid](https://www.mijnoverheid.nl/)
+
+* [MijnOverheid](https://www.mijnoverheid.nl/)
 
 ### Notify
 
@@ -38,7 +41,8 @@ Deze variant maakt gebruik van notificaties om gebruikers en systemen op de hoog
 ![Notify  Architecture](https://raw.githubusercontent.com/CommonGateway/WaardepapierenBundle/main/docs/zgw_waardepapier_notify.svg)
 
 #### Referentie
-- [Notificatie API's](https://www.vngrealisatie.nl/producten/api-standaard-notificaties)
+
+* [Notificatie API's](https://www.vngrealisatie.nl/producten/api-standaard-notificaties)
 
 ### StuF (Standaard Uitwisselings Formaat)
 
@@ -47,7 +51,8 @@ Deze variant is ontworpen voor systemen die gebruik maken van het StuF-protocol 
 ![Stuf  Architecture](https://raw.githubusercontent.com/CommonGateway/WaardepapierenBundle/main/docs/stuf_waardepapier.svg)
 
 #### Referentie
-- [StuF](https://www.gemmaonline.nl/index.php/StUF-gegevenswoordenboeken)
+
+* [StuF](https://www.gemmaonline.nl/index.php/StUF-gegevenswoordenboeken)
 
 ### ZDS (Zaak- en Documentservices)
 
@@ -56,5 +61,5 @@ Deze variant is bedoeld voor organisaties die gebruik maken van de ZDS-standaard
 ![ZDS  Architecture](https://raw.githubusercontent.com/CommonGateway/WaardepapierenBundle/main/docs/zds_waardepapier.svg)
 
 #### Referentie
-- [ZDS](https://www.gemmaonline.nl/index.php/Zaak-_en_Documentservices)
 
+* [ZDS](https://www.gemmaonline.nl/index.php/Zaak-_en_Documentservices)

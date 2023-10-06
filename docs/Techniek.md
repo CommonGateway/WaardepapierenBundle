@@ -20,8 +20,8 @@ Waardepapieren zijn digitale documenten die claims bevatten. Deze claims kunnen 
 
 ### Referenties naar Europese en Nederlandse identiteitsprojecten
 
-- [IRMA (I Reveal My Attributes)](https://irma.app/)
-- [eIDAS](https://ec.europa.eu/info/law/law-topic/data-protection/eu-data-protection-rules/eidas-regulation_en)
+* [IRMA (I Reveal My Attributes)](https://irma.app/)
+* [eIDAS](https://ec.europa.eu/info/law/law-topic/data-protection/eu-data-protection-rules/eidas-regulation_en)
 
 ### Toepasbaarheid op verschillende gegevenssets
 
