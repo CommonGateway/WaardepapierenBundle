@@ -7,8 +7,7 @@ De waardepapieren plugin is gebaseerd op het [Common Gateway Framework]() een eu
 Voor het generen van waardepapieren zijn een aantal zaken nodig.
 
 1. Templates
-2. 
-
+2.
 
 ## Plugin Installatie
 
