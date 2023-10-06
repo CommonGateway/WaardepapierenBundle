@@ -1,0 +1,13 @@
+@startuml
+title: Waardepapier Direct bevragen
+footer: Common Gateway | Waardepapier Direct bevragen
+header: Common Gateway
+
+entity "Applicatie" as app
+entity "Waardepapieren Service" as WP
+
+app -> WP: POST waardepapier (inc gegeven)
+WP -> WP: Creërd waardepapier
+WP -> APP: JSON van waardepapier (inc claim en pdf)
+
+@enduml

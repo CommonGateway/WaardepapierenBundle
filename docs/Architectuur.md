@@ -16,11 +16,18 @@ Afhankelijk van de opzet van het zaaksysteem binnen de organisatie die waardepap
 
 Deze variant is specifiek ontworpen om te integreren met ZGW-gebaseerde zaaksystemen. Het maakt gebruik van de ZGW API's voor een naadloze interactie.
 
-![ZGW  Architecture](https://raw.githubusercontent.com/CommonGateway/WaardepapierenBundle/main/docs/zgw_waardepapier_klein.svg)
+![ZGW Architecture](https://raw.githubusercontent.com/CommonGateway/WaardepapierenBundle/main/docs/zgw_waardepapier_klein.svg)
 
 **Referenties**
 
 * [ZGW API's](https://www.vngrealisatie.nl/producten/api-standaarden-zaakgericht-werken)
+* 
+### Direct gebruik
+
+Naast de waardenpapieren service laten mee luisteren op een zaaksysteem is het ook mogenlijk om applicaties direct via de services een waardepapier te laten creëren (bijvoorbeeld omdat je een waardepapier nodig hebt los van een zaak). In dat geval kan de onderliggende applicatie een JSON bericht aan de waardepapiersn service sturen 
+
+![Direct Architecture](https://raw.githubusercontent.com/CommonGateway/WaardepapierenBundle/main/docs/direct_waardepapier.svg)
+
 
 ### Mijn Omgeving
 
@@ -36,7 +43,7 @@ Deze variant is bedoeld voor integratie met persoonlijke omgevingen waar burgers
 
 Deze variant maakt gebruik van notificaties om gebruikers en systemen op de hoogte te stellen van de status van waardepapieren.
 
-![Notify  Architecture](https://raw.githubusercontent.com/CommonGateway/WaardepapierenBundle/main/docs/zgw_waardepapier_notify.svg)
+![Notify Architecture](https://raw.githubusercontent.com/CommonGateway/WaardepapierenBundle/main/docs/zgw_waardepapier_notify.svg)
 
 **Referenties**
 
