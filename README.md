@@ -1,4 +1,4 @@
-# WaardepapierenBundle
+# Waardepapieren
 
 ## Over Waardepapieren
 
