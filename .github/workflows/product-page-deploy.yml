@@ -11,7 +11,7 @@ env: # Change these to your preferences any image url can also be a base encoded
 
   # Links
   SLACK_URL: "https://samenorganiseren.slack.com/archives/C023NV8P7DK"
-  # READ_THE_DOCS_URL: "https://waardepapieren.readthedocs.io/en/latest/"
+  READ_THE_DOCS_URL: "false"
 
   # Navbar
   NAVBAR_LOGO_URL: "https://www.dimpact.nl/sites/all/themes/custom/dimpact/logo.png"
