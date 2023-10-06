@@ -51,4 +51,4 @@ Deze variant maakt gebruik van notificaties om gebruikers en systemen op de hoog
 
 ### StuF-zaken en ZDS
 
-Het is ook mogenlijk om waardepapieren te draaien op StuF-Zaken of ZDS, zie daarvoor de pagina [StuF en ZDS](Stuf_en_ZDS).
+Het is ook mogelijk om waardepapieren te draaien op StuF-Zaken of ZDS, zie daarvoor de pagina [StuF en ZDS](Stuf_en_ZDS).
