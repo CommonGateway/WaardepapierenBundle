@@ -18,7 +18,7 @@ env: # Change these to your preferences any image url can also be a base encoded
 
   # Footer
   FOOTER_LOGO_URL: "https://www.dimpact.nl/sites/all/themes/custom/dimpact/logo.png"
-  FOOTER_LOGO_HREF: "https://dimapact.nl"
+  FOOTER_LOGO_HREF: "https://dimpact.nl"
 
   # Jumbotron
   JUMBOTRON_TITLE: "Waardepapieren"
