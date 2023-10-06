@@ -1,0 +1,22 @@
+@startuml
+title: ZGW Waardepapier
+footer: Common Gateway | ZGW Waardepapier
+header: Common Gateway
+
+actor Citizen
+database "Zaak registratie component" as ZRC
+database "Document registratie component" as DRC
+entity "Notificatie Component" as NC
+entity "Waardepapieren Service" as WP
+database "Haalcentraal BRP" as BRP
+entity "Notify" as Notify
+
+ZRC -> NC: Notificeerd
+NC -> WP: Notificeerd
+WP -> ZRC: Haalt Zaak op
+WP -> BRP: Haalt Persoonsgegevens op
+WP -> WP: Creerd waardepapier
+WP -> DRC: Plaats waardepapier
+WP -> ZRC: Zet status
+
+@enduml
