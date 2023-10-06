@@ -9,7 +9,6 @@ database "Document registratie component" as DRC
 entity "Notificatie Component" as NC
 entity "Waardepapieren Service" as WP
 database "Haalcentraal BRP" as BRP
-entity "Notify" as Notify
 
 Citizen -> ZRC : Maakt Zaak aan (e.g. via web formulier)
 ZRC -> NC: Notificeerd

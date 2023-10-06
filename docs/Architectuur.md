@@ -44,7 +44,7 @@ Deze variant maakt gebruik van notificaties om gebruikers en systemen op de hoog
 
 Deze variant is ontworpen voor systemen die gebruik maken van het StuF-protocol voor gegevensuitwisseling.
 
-![Stuf  Architecture](https://raw.githubusercontent.com/CommonGateway/WaardepapierenBundle/main/docs/Stuf_waardepapier.svg)
+![Stuf  Architecture](https://raw.githubusercontent.com/CommonGateway/WaardepapierenBundle/main/docs/stuf_waardepapier.svg)
 
 #### Referentie
 - [StuF](https://www.gemmaonline.nl/index.php/StUF-gegevenswoordenboeken)
