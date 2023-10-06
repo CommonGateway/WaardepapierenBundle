@@ -5,7 +5,8 @@ De Waardepapieren Service is in 2023 getransformeerd van een standalone applicat
 ![Microserviced Architecture](https://raw.githubusercontent.com/CommonGateway/WaardepapierenBundle/main/docs/microservice.svg)
 
 **Referenties**
-- [Microservices Architectuur](https://www.noraonline.nl/wiki/Microservices)
+
+* [Microservices Architectuur](https://www.noraonline.nl/wiki/Microservices)
 
 ## Varianten
 
@@ -18,7 +19,8 @@ Deze variant is specifiek ontworpen om te integreren met ZGW-gebaseerde zaaksyst
 ![ZGW  Architecture](https://raw.githubusercontent.com/CommonGateway/WaardepapierenBundle/main/docs/zgw_waardepapier_klein.svg)
 
 **Referenties**
-- [ZGW API's](https://www.vngrealisatie.nl/producten/api-standaarden-zaakgericht-werken)
+
+* [ZGW API's](https://www.vngrealisatie.nl/producten/api-standaarden-zaakgericht-werken)
 
 ### Mijn Omgeving
 
@@ -27,7 +29,8 @@ Deze variant is bedoeld voor integratie met persoonlijke omgevingen waar burgers
 ![Mijn Omgeving  Architecture](https://raw.githubusercontent.com/CommonGateway/WaardepapierenBundle/main/docs/zgw_waardepapier_mijn-zaken.svg)
 
 **Referenties**
-- [MijnOverheid](https://www.mijnoverheid.nl/)
+
+* [MijnOverheid](https://www.mijnoverheid.nl/)
 
 ### Notify
 
@@ -36,8 +39,9 @@ Deze variant maakt gebruik van notificaties om gebruikers en systemen op de hoog
 ![Notify  Architecture](https://raw.githubusercontent.com/CommonGateway/WaardepapierenBundle/main/docs/zgw_waardepapier_notify.svg)
 
 **Referenties**
-- [Notificatie API's](https://www.vngrealisatie.nl/producten/api-standaard-notificaties)
 
+* [Notificatie API's](https://www.vngrealisatie.nl/producten/api-standaard-notificaties)
 
 ### StuF-zaken en ZDS
+
 Het is ook mogenlijk om waardepapieren te draaien op StuF-Zaken of ZDS, zie daarvoor de pagina [StuF en ZDS](Stuf_en_ZDS).
