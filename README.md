@@ -2,10 +2,10 @@
 
 ## Over Waardepapieren
 
-Soms moet je aantonen dat je in een gemeente woont. Bijvoorbeeld als een woningcorporatie daarom vraagt. Je gaat dan naar de gemeente om een uittreksel aan te vragen. De gemeentemedewerker zoekt jouw gegevens op in het burgerzakensysteem. Print een uittreksel. En zet daar een stempel op. Een uittreksel kan vaak ook online aangevraagd worden. Het duurt dan een aantal dagen voordat je het uittreksel thuis hebt. In beide gevallen is het proces arbeidsintensief, en klantonvriendelijk. Ook zijn de kosten voor zowel de gemeente als inwoner hoog. NB: Deze website is in aanbouw.
+Soms moet je aantonen dat je in een gemeente woont. Bijvoorbeeld als een woningcorporatie daarom vraagt. Je gaat dan naar de gemeente om een uittreksel aan te vragen. De gemeentemedewerker zoekt jouw gegevens op in het burgerzakensysteem. Print een uittreksel. En zet daar een stempel op. Een uittreksel kan vaak ook online aangevraagd worden. Het duurt dan een aantal dagen voordat je het uittreksel thuis hebt. In beide gevallen is het proces arbeidsintensief, en klantonvriendelijk. Ook zijn de kosten voor zowel de gemeente als inwoner hoog. NB Deze website is in aanbouw.
 
 Over het innovatieproject Waardepapieren
-De dienstverlening aan inwoners en bedrijven moet verbeterd worden. Het liefst in combinatie met het bereiken van een efficientere bedrijfsvoering. Dit streven leidde bij de gemeente Haarlem tot de ontwikkeling van een Proof of Concept (PoC) voor het verstrekken van digitale waardepapieren. Een uittreksel uit de Basisregistratie Personen bijvoorbeeld. De klantreis voor uittreksels is in kaart gebracht om de behoefte aan deze oplossing bij zowel de gemeente als de inwoner te analyseren. Acht gemeenten hebben het prototype uitgewerkt tot een veilig product dat gemeenten nu zelf kunnen implementeren.
+De dienstverlening aan inwoners en bedrijven moet verbeterd worden. Het liefst in combinatie met het bereiken van een efficiëntere bedrijfsvoering. Dit streven leidde bij de gemeente Haarlem tot de ontwikkeling van een Proof of Concept (PoC) voor het verstrekken van digitale waardepapieren. Een uittreksel uit de Basisregistratie Personen bijvoorbeeld. De klantreis voor uittreksels is in kaart gebracht om de behoefte aan deze oplossing bij zowel de gemeente als de inwoner te analyseren. Acht gemeenten hebben het prototype uitgewerkt tot een veilig product dat gemeenten nu zelf kunnen implementeren.
 
 ## Over Waardepapieren
 
@@ -13,7 +13,7 @@ Soms moet je aantonen dat je in een gemeente woont. Bijvoorbeeld als een woningc
 
 ## Over het innovatieproject Waardepapieren
 
-De dienstverlening aan inwoners en bedrijven moet verbeterd worden. Het liefst in combinatie met het bereiken van een efficientere bedrijfsvoering. Dit streven leidde bij de gemeente Haarlem tot de ontwikkeling van een Proof of Concept (PoC) voor het verstrekken van digitale waardepapieren. Een uittreksel uit de Basisregistratie Personen bijvoorbeeld. De klantreis voor uittreksels is in kaart gebracht om de behoefte aan deze oplossing bij zowel de gemeente als de inwoner te analyseren. Acht gemeenten hebben het prototype uitgewerkt tot een veilig product dat gemeenten nu zelf kunnen implementeren.
+De dienstverlening aan inwoners en bedrijven moet verbeterd worden. Het liefst in combinatie met het bereiken van een efficiëntere bedrijfsvoering. Dit streven leidde bij de gemeente Haarlem tot de ontwikkeling van een Proof of Concept (PoC) voor het verstrekken van digitale waardepapieren. Een uittreksel uit de Basisregistratie Personen bijvoorbeeld. De klantreis voor uittreksels is in kaart gebracht om de behoefte aan deze oplossing bij zowel de gemeente als de inwoner te analyseren. Acht gemeenten hebben het prototype uitgewerkt tot een veilig product dat gemeenten nu zelf kunnen implementeren.
 
 ## Met wie we samenwerken
 
@@ -26,8 +26,10 @@ De betrokken gemeenten bij dit innovatieproject zijn:
 * Enschede
 * Harderwijk
 * Rotterdam
-* Hoorn en Schiedam
-  Regiebureau Dimpact is namens deze gemeenten opdrachtgever naar ICTU, die als opdrachtnemer optreedt. Binnen Dimpact delen gemeenten kennis en inspiratie. Dimpact is het platform voor het verbeteren én hergebruiken van praktische oplossingen. We delen onze kennis, netwerken en oplossingen met elkaar.
+* Hoorn
+* Schiedam
+
+Regiebureau Dimpact is namens deze gemeenten opdrachtgever naar ICTU, die als opdrachtnemer optreedt. Binnen Dimpact delen gemeenten kennis en inspiratie. Dimpact is het platform voor het verbeteren én hergebruiken van praktische oplossingen. We delen onze kennis, netwerken en oplossingen met elkaar.
 
 ## Wat we willen bereiken
 
