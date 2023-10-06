@@ -1,22 +1,18 @@
 @startuml
-title: ZGW Waardepapier
-footer: Common Gateway | ZGW Waardepapier
+title: ZDS Waardepapier
+footer: Common Gateway | ZDS Waardepapier
 header: Common Gateway
 
-actor Citizen
-database "Zaak registratie component" as ZRC
-database "Document registratie component" as DRC
-entity "Notificatie Component" as NC
+database "Zaak Systeem" as ZS
+entity "ZDS/ZGW Adapter" as Adapter
 entity "Waardepapieren Service" as WP
-database "Haalcentraal BRP" as BRP
-entity "Notify" as Notify
 
-ZRC -> NC: Notificeerd
-NC -> WP: Notificeerd
-WP -> ZRC: Haalt Zaak op
-WP -> BRP: Haalt Persoonsgegevens op
+ZS -> Adapter: ZDS Brug
+Adapter -> WP: ZGW
 WP -> WP: Creerd waardepapier
-WP -> DRC: Plaats waardepapier
-WP -> ZRC: Zet status
+WP -> Adapter: Plaats waardepapier
+Adapter -> ZS: Slaat ZGW om naar ZDS
+WP -> Adapter: Zet status
+Adapter -> ZS: Slaat ZGW om naar ZDS
 
 @enduml
