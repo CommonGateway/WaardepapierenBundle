@@ -15,6 +15,7 @@ use CommonGateway\CoreBundle\Service\MappingService;
 use CommonGateway\WaardepapierenBundle\Service\WaardepapierService;
 use CommonGateway\ZGWBundle\Service\DRCService;
 use Doctrine\ORM\EntityManagerInterface;
+use Exception;
 use Ramsey\Uuid\Uuid;
 use Safe\DateTime;
 use Symfony\Component\HttpFoundation\Response;
@@ -251,12 +252,13 @@ class WPZaakService
     /**
      * Gets the zaaktype from the given zaak
      *
-     * @param ObjectEntity $zaak      The zaak object.
-     * @param string       $objectUrl The url of the zaaktype.
-     * @param string       $schemaRef The reference of the schema
-     * @param string       $endpoint  The endpoint
+     * @param ObjectEntity $zaak The zaak object.
+     * @param string $objectUrl The url of the zaaktype.
+     * @param string $schemaRef The reference of the schema
+     * @param string $endpoint The endpoint
      *
      * @return ObjectEntity|null The zaaktype of the given source
+     * @throws Exception
      */
     public function getZaaktypeSubObjects(ObjectEntity $zaak, string $objectUrl, string $schemaRef, string $endpoint): ?ObjectEntity
     {
@@ -279,8 +281,8 @@ class WPZaakService
         if ($objectSync->getObject() === null) {
             try {
                 $response = $this->callService->call($source, $endpoint.'/'.$objectId);
-            } catch (\Exception $exception) {
-                // Throw error.
+            } catch (Exception $exception) {
+                throw new Exception($exception->getMessage());
             }
 
             $response   = $this->callService->decodeResponse($source, $response);
@@ -342,10 +344,11 @@ class WPZaakService
     /**
      * Gets the zaaktype from the given zaak
      *
-     * @param ObjectEntity $zaak        The zaak object.
-     * @param string       $zaaktypeUrl The url of the zaaktype.
+     * @param ObjectEntity $zaak The zaak object.
+     * @param string $zaaktypeUrl The url of the zaaktype.
      *
      * @return ObjectEntity|null The zaaktype of the given source
+     * @throws Exception
      */
     public function getZaaktypeFromSource(ObjectEntity $zaak, string $zaaktypeUrl): ?ObjectEntity
     {
@@ -367,8 +370,8 @@ class WPZaakService
         // if no object is present, a call must be made to retrieve the zaaktype.
         try {
             $response = $this->callService->call($source, '/zaaktypen/'.$zaaktypeId);
-        } catch (\Exception $exception) {
-            // Throw error.
+        } catch (Exception $exception) {
+            throw new Exception($exception->getMessage());
         }
 
         $response     = $this->callService->decodeResponse($source, $response);
@@ -511,6 +514,7 @@ class WPZaakService
      * @param ObjectEntity $zaak The zaak object.
      *
      * @return ObjectEntity|null The zaaktype of the given source
+     * @throws Exception
      */
     public function getZaakFromSource(ObjectEntity $zaak): ?ObjectEntity
     {
@@ -518,8 +522,8 @@ class WPZaakService
 
         try {
             $response = $this->callService->call($source, '/zaken');
-        } catch (\Exception $exception) {
-            // Throw error.
+        } catch (Exception $exception) {
+            throw new Exception($exception->getMessage());
         }
 
         if (isset($response) === true) {
