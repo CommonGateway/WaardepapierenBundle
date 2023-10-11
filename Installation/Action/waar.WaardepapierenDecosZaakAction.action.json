@@ -2,7 +2,7 @@
   "title": "WaardepapierenDecosZaakAction",
   "$id": "https://waardepapieren.commonground.nl/action/waar.WaardepapierenDecosZaakAction.action.json",
   "$schema": "https://docs.commongateway.nl/schemas/Action.schema.json",
-  "version": "0.0.10",
+  "version": "0.0.1",
   "listens": ["kiss.notification"],
   "description": "This is a action to update a zaak with certificate.",
   "throws": [],
