@@ -1,0 +1,17 @@
+{
+  "title": "Waardepapieren OpenZaak ZRC API",
+  "$id": "https://waardepapieren.nl/source/openzaak.zrc.source.json",
+  "$schema": "https://docs.commongateway.nl/schemas/Gateway.schema.json",
+  "version": "0.0.1",
+  "description": "Een API om een zaakregistratiecomponent (ZRC) te benaderen. De referentie van deze source moet toegevoegd worden aan de action configuratie.",
+  "location": "!ChangeMe!",
+  "isEnabled" : false,
+  "headers": {
+    "accept": "application/json",
+    "Accept-Crs": "EPSG:4326",
+    "Content-Crs": "EPSG:4326"
+  },
+  "auth": "jwt-HS256",
+  "secret": "!ChangeMe!",
+  "jwtId": "!ChangeMe!"
+}

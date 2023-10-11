@@ -1,0 +1,29 @@
+{
+    "title": "Waardepapieren Decos ZRC Source",
+    "$id": "https://waardepapieren.commonground.nl/source/waar.decos.zrc.source.json",
+    "$schema": "https://docs.commongateway.nl/schemas/Gateway.schema.json",
+    "version": "0.0.1",
+    "description": "Waardepapieren Decos ZRC Source. De referentie van deze source moet toegevoegd worden aan de action configuratie.",
+    "location": "!ChangeMe!",
+    "isEnabled": false,
+    "auth": "oauth",
+    "authenticationConfig": {
+      "additionalFields": {
+        "issuer": "!ChangeMe!",
+        "expiresInMinute": "1",
+        "claims": []
+      },
+      "tokenUrl": "!ChangeMe!",
+      "tokenField": "token"
+    },
+    "username": "!ChangeMe!",
+    "password": "!ChangeMe!",
+    "configuration": {
+      "headers": {
+        "accept": "application/json",
+        "accept-crs": "EPSG:4326",
+        "content-crs": "EPSG:4326",
+        "content-type": "application/json"
+      }
+    }
+}

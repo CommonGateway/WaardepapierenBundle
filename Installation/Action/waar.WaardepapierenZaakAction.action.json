@@ -2,40 +2,30 @@
   "title": "WaardepapierenZaakAction",
   "$id": "https://waardepapieren.commonground.nl/action/waar.WaardepapierenZaakAction.action.json",
   "$schema": "https://docs.commongateway.nl/schemas/Action.schema.json",
-  "version": "0.0.2",
-  "listens": [
-    "commongateway.object.create",
-    "commongateway.object.update"
-  ],
+  "version": "0.0.10",
+  "listens": ["kiss.notification"],
   "description": "This is a action to update a zaak with certificate.",
-  "throws": [],
+  "throws": ["send.bericht"],
   "conditions": {
-    "or": [
+    "==": [
       {
-        "==": [
-          {
-            "var": "entity"
-          },
-          "https://vng.opencatalogi.nl/schemas/zrc.zaak.schema.json"
-        ]
+        "var": "body.kenmerken.zaaktype"
       },
-      {
-        "==": [
-          {
-            "var": "entity"
-          },
-          "https://vng.opencatalogi.nl/schemas/zrc.rol.schema.json"
-        ]
-      }
+      "https://open-zaak.test.buren.opengem.nl/catalogi/api/v1/zaaktypen/f0e9be33-10ae-43f1-bc1d-9f1bb4579fd4"
     ]
   },
   "class": "CommonGateway\\WaardepapierenBundle\\ActionHandler\\WPZaakHandler",
   "configuration": {
-    "schema": "https://waardepapieren.commonground.nl/certificate.schema.json",
-    "source": "https://waardepapieren.commonground.nl/source/waardepapieren.brp.source.json",
-    "mapping": "https://waardepapieren.commongateway.nl/mapping/waardepapieren.certificate.mapping.json",
-    "brpEndpoint": "ingeschrevenpersonen",
-    "informatieobjecttype": ""
-  },
-  "isEnabled": false
+    "zrcSource": "https://buren.nl/source/buren.zrc.source.json",
+    "drcSource": "https://buren.nl/source/buren.drc.source.json",
+    "ztcSource": "https://buren.nl/source/buren.ztc.source.json",
+    "zaakSchema": "https://vng.opencatalogi.nl/schemas/zrc.zaak.schema.json",
+    "resultaatSchema": "https://vng.opencatalogi.nl/schemas/zrc.resultaat.schema.json",
+    "statusSchema": "https://vng.opencatalogi.nl/schemas/zrc.status.schema.json",
+    "zaaktypeSchema": "https://vng.opencatalogi.nl/schemas/ztc.zaakType.schema.json",
+    "enkelvoudigInfoMapping": "https://waardepapieren.commongateway.nl/mapping/drc.enkelvoudigInformatieObjectUpstream.mapping.json",
+    "zaakInfoMapping": "https://waardepapieren.commongateway.nl/mapping/zrc.zaakInformatieObjectUpstream.mapping.json",
+    "resultaatMapping": "https://waardepapieren.commongateway.nl/mapping/zrc.resultaatUpstream.mapping.json",
+    "statusMapping": "https://waardepapieren.commongateway.nl/mapping/zrc.statusUpstream.mapping.json"
+  }
 }
