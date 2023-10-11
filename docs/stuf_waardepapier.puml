@@ -1,0 +1,18 @@
+@startuml
+title: StuF Waardepapier
+footer: Common Gateway | StuF Waardepapier
+header: Common Gateway
+
+database "Zaak Systeem" as ZS
+entity "StuF/ZGW Adapter" as Adapter
+entity "Waardepapieren Service" as WP
+
+ZS -> Adapter: StuF Brug
+Adapter -> WP: ZGW
+WP -> WP: Creerd waardepapier
+WP -> Adapter: Plaats waardepapier
+Adapter -> ZS: Slaat ZGW om naar StuF
+WP -> Adapter: Zet status
+Adapter -> ZS: Slaat ZGW om naar StuF
+
+@enduml

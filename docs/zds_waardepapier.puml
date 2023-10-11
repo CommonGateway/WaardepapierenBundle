@@ -1,0 +1,18 @@
+@startuml
+title: ZDS Waardepapier
+footer: Common Gateway | ZDS Waardepapier
+header: Common Gateway
+
+database "Zaak Systeem" as ZS
+entity "ZDS/ZGW Adapter" as Adapter
+entity "Waardepapieren Service" as WP
+
+ZS -> Adapter: ZDS Brug
+Adapter -> WP: ZGW
+WP -> WP: Creerd waardepapier
+WP -> Adapter: Plaats waardepapier
+Adapter -> ZS: Slaat ZGW om naar ZDS
+WP -> Adapter: Zet status
+Adapter -> ZS: Slaat ZGW om naar ZDS
+
+@enduml

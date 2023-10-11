@@ -1,0 +1,18 @@
+@startuml
+title: Waardepapieren Microservice
+footer: Common Gateway | Waardepapier Microservice
+header: Common Gateway
+
+database "Zaak registratie component" as ZRC
+database "Document registratie component" as DRC
+entity "Notificatie Component" as NC
+entity "Waardepapieren Service" as WP
+
+ZRC -> NC: Notificeerd
+NC -> WP: Notificeerd
+WP -> ZRC: Haalt Zaak op
+WP -> WP: Creerd waardepapier
+WP -> DRC: Plaats waardepapier
+WP -> ZRC: Zet status
+
+@enduml
