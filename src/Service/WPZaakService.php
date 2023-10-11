@@ -92,6 +92,7 @@ class WPZaakService
         $this->callService         = $callService;
         $this->mappingService      = $mappingService;
         $this->syncService         = $syncService;
+
     }//end __construct()
 
 
@@ -193,9 +194,9 @@ class WPZaakService
     /**
      * Store information objects to an upstream source
      *
-     * @param string $data
-     * @param ObjectEntity $zaakObject The case as object.
-     * @param string $informatieobjecttypeUrl The url of the information object type that is related to the case type.
+     * @param string       $data
+     * @param ObjectEntity $zaakObject              The case as object.
+     * @param string       $informatieobjecttypeUrl The url of the information object type that is related to the case type.
      *
      * @return void Whether the synchronization has passed.
      */
@@ -233,8 +234,8 @@ class WPZaakService
         }
 
         $caseInformationArray  = [
-            'zaak'                => $zaakObject,
-            'informatieobject'    => $informationObject
+            'zaak'             => $zaakObject,
+            'informatieobject' => $informationObject,
         ];
         $caseInformationObject = new ObjectEntity($caseInformationObjectSchema);
 
@@ -246,13 +247,14 @@ class WPZaakService
 
     }//end saveWaardepapierInDRC()
 
+
     /**
      * Gets the zaaktype from the given zaak
      *
-     * @param ObjectEntity $zaak  The zaak object.
-     * @param string $objectUrl  The url of the zaaktype.
-     * @param string $schemaRef The reference of the schema
-     * @param string $endpoint The endpoint
+     * @param ObjectEntity $zaak      The zaak object.
+     * @param string       $objectUrl The url of the zaaktype.
+     * @param string       $schemaRef The reference of the schema
+     * @param string       $endpoint  The endpoint
      *
      * @return ObjectEntity|null The zaaktype of the given source
      */
@@ -275,14 +277,13 @@ class WPZaakService
 
         // if no object is present, a call must be made to retrieve the zaaktype.
         if ($objectSync->getObject() === null) {
-
             try {
                 $response = $this->callService->call($source, $endpoint.'/'.$objectId);
             } catch (\Exception $exception) {
                 // Throw error.
             }
 
-            $response = $this->callService->decodeResponse($source, $response);
+            $response   = $this->callService->decodeResponse($source, $response);
             $objectSync = $this->syncService->synchronize($objectSync, $response);
             $this->entityManager->flush();
 
@@ -294,13 +295,15 @@ class WPZaakService
         }
 
         return null;
-    }
+
+    }//end getZaaktypeSubObjects()
+
 
     /**
      * Gets the zaaktype from the given zaak
      *
-     * @param array $response  The response of the call
-     * @param ObjectEntity $zaak The zaak object
+     * @param array        $response The response of the call
+     * @param ObjectEntity $zaak     The zaak object
      *
      * @return array The zaaktype of the given source
      */
@@ -312,33 +315,35 @@ class WPZaakService
         }
 
         foreach ($response['eigenschappen'] as $eigenschap) {
-            $eigenschapObject = $this->getZaaktypeSubObjects($zaak, $eigenschap, 'https://vng.opencatalogi.nl/schemas/ztc.eigenschap.schema.json', '/eigenschappen');
+            $eigenschapObject            = $this->getZaaktypeSubObjects($zaak, $eigenschap, 'https://vng.opencatalogi.nl/schemas/ztc.eigenschap.schema.json', '/eigenschappen');
             $response['eigenschappen'][] = $eigenschapObject;
         }
 
         foreach ($response['roltypen'] as $roltype) {
-            $roltypeObject = $this->getZaaktypeSubObjects($zaak, $roltype, 'https://vng.opencatalogi.nl/schemas/ztc.rolType.schema.json', '/roltypen');
+            $roltypeObject          = $this->getZaaktypeSubObjects($zaak, $roltype, 'https://vng.opencatalogi.nl/schemas/ztc.rolType.schema.json', '/roltypen');
             $response['roltypen'][] = $roltypeObject;
         }
 
         foreach ($response['statustypen'] as $statustype) {
-            $statustypeObject = $this->getZaaktypeSubObjects($zaak, $statustype, 'https://vng.opencatalogi.nl/schemas/ztc.statusType.schema.json', '/statustypen');
+            $statustypeObject          = $this->getZaaktypeSubObjects($zaak, $statustype, 'https://vng.opencatalogi.nl/schemas/ztc.statusType.schema.json', '/statustypen');
             $response['statustypen'][] = $statustypeObject;
         }
 
         foreach ($response['resultaattypen'] as $resultaattype) {
-            $resultaattypeObject = $this->getZaaktypeSubObjects($zaak, $resultaattype, 'https://vng.opencatalogi.nl/schemas/ztc.resultaatType.schema.json', '/resultaattype');
+            $resultaattypeObject          = $this->getZaaktypeSubObjects($zaak, $resultaattype, 'https://vng.opencatalogi.nl/schemas/ztc.resultaatType.schema.json', '/resultaattype');
             $response['resultaattypen'][] = $resultaattypeObject;
         }
 
         return $response;
-    }
+
+    }//end getSubobjects()
+
 
     /**
      * Gets the zaaktype from the given zaak
      *
-     * @param ObjectEntity $zaak  The zaak object.
-     * @param string $zaaktypeUrl  The url of the zaaktype.
+     * @param ObjectEntity $zaak        The zaak object.
+     * @param string       $zaaktypeUrl The url of the zaaktype.
      *
      * @return ObjectEntity|null The zaaktype of the given source
      */
@@ -366,20 +371,22 @@ class WPZaakService
             // Throw error.
         }
 
-        $response = $this->callService->decodeResponse($source, $response);
-        $response = $this->getSubobjects($response, $zaak);
+        $response     = $this->callService->decodeResponse($source, $response);
+        $response     = $this->getSubobjects($response, $zaak);
         $zaaktypeSync = $this->syncService->synchronize($zaaktypeSync, $response);
         $this->entityManager->flush();
 
         return $zaaktypeSync->getObject();
-    }
+
+    }//end getZaaktypeFromSource()
+
 
     /**
      * Store information objects to an upstream source
      *
-     * @param ObjectEntity $resultaat  The resultaat to store
-     * @param ObjectEntity $status     The status object to store
-     * @param ObjectEntity $zaak       The case the objects belong to
+     * @param ObjectEntity $resultaat The resultaat to store
+     * @param ObjectEntity $status    The status object to store
+     * @param ObjectEntity $zaak      The case the objects belong to
      *
      * @return bool Whether the synchronization has passed.
      */
@@ -390,7 +397,7 @@ class WPZaakService
         }
 
         $zaakSync = $zaak->getSynchronizations()->first();
-        $source = $zaakSync->getSource();
+        $source   = $zaakSync->getSource();
 
         $resultaatSync = new Synchronization();
         $resultaatSync->setSource($source);
@@ -420,7 +427,7 @@ class WPZaakService
 
         return $result;
 
-    }//end storeWaardepapierInSourceDRC()
+    }//end storeInSourceZRC()
 
 
     /**
@@ -433,7 +440,7 @@ class WPZaakService
      */
     public function saveInZRC(ObjectEntity $zaakObject, ObjectEntity $zaaktype): void
     {
-        $zaaktypeArray = $zaaktype->toArray();
+        $zaaktypeArray  = $zaaktype->toArray();
         $resultaattypen = $zaaktypeArray['resultaattypen'];
 
         $resultaattype = null;
@@ -448,7 +455,7 @@ class WPZaakService
         }
 
         $resultaatArray = [
-            'zaak' => $zaakObject,
+            'zaak'          => $zaakObject,
             'resultaattype' => $resultaattype['url'],
         ];
 
@@ -481,11 +488,11 @@ class WPZaakService
             return;
         }
 
-        $datum = new DateTime('now');
+        $datum        = new DateTime('now');
         $statusArray  = [
-            'zaak' => $zaakObject,
-            'statustype' => $statustype['url'],
-            'datumStatusGezet' => $datum->format('c')
+            'zaak'             => $zaakObject,
+            'statustype'       => $statustype['url'],
+            'datumStatusGezet' => $datum->format('c'),
         ];
         $statusObject = new ObjectEntity($statusSchema);
 
@@ -495,12 +502,13 @@ class WPZaakService
 
         $this->storeInSourceZRC($resultaatObject, $statusObject, $zaakObject);
 
-    }//end saveWaardepapierInDRC()
+    }//end saveInZRC()
+
 
     /**
      * Gets the zaaktype from the given zaak
      *
-     * @param ObjectEntity $zaak  The zaak object.
+     * @param ObjectEntity $zaak The zaak object.
      *
      * @return ObjectEntity|null The zaaktype of the given source
      */
@@ -525,7 +533,8 @@ class WPZaakService
         }
 
         return null;
-    }
+
+    }//end getZaakFromSource()
 
 
     /**
@@ -544,7 +553,7 @@ class WPZaakService
 
         $source = $this->resourceService->getSource($this->configuration['zrcSource'], 'common-gateway/waardepapieren-bundle');
         $schema = $this->resourceService->getSchema($this->configuration['zaakSchema'], 'common-gateway/waardepapieren-bundle');
-        if ($source instanceof Source === false || $schema instanceof Schema === false){
+        if ($source instanceof Source === false || $schema instanceof Schema === false) {
             return $this->data;
         }
 
@@ -567,16 +576,16 @@ class WPZaakService
         $zaak = $zaakObject->toArray(['embedded' => true]);
 
         // Get the zaaktype from the source with the url from the zaak.
-        $zaaktype = $zaakObject->getValue('zaaktype');
+        $zaaktype     = $zaakObject->getValue('zaaktype');
         $zaaktypeSync = $zaaktype->getSynchronizations()->first();
-        $zaaktypeUrl = $zaaktypeSync->getSourceId();
+        $zaaktypeUrl  = $zaaktypeSync->getSourceId();
 
         $zaaktype = $this->getZaaktypeFromSource($zaakObject, $zaaktypeUrl);
 
         // Get the informatieobjecttypen of the zaaktype to set to the enkelvoudiginformatieobject.
-        $informatieobjecttypen = $zaaktype->getValue('informatieobjecttypen');
-        $informatieobjecttypeUrl = $informatieobjecttypen[0]->getValue('url'); // TODO: how do we know which we need to get?
-
+        $informatieobjecttypen   = $zaaktype->getValue('informatieobjecttypen');
+        $informatieobjecttypeUrl = $informatieobjecttypen[0]->getValue('url');
+        // TODO: how do we know which we need to get?
         // Fill certificate with persons information and/or zaak.
         $certificate = $this->downloadService->downloadPdf($zaak);
 
@@ -593,8 +602,7 @@ class WPZaakService
         $dataArray['response'] = new Response(json_encode($zaak), 200);
 
         // Create a certificate for the case.
-//        $this->waardepapierService->waardepapierHandler($dataArray, $this->configuration);
-
+        // $this->waardepapierService->waardepapierHandler($dataArray, $this->configuration);
         return $this->data;
 
     }//end wpZaakHandler()
