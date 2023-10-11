@@ -252,10 +252,10 @@ class WPZaakService
     /**
      * Gets the zaaktype from the given zaak
      *
-     * @param ObjectEntity $zaak The zaak object.
-     * @param string $objectUrl The url of the zaaktype.
-     * @param string $schemaRef The reference of the schema
-     * @param string $endpoint The endpoint
+     * @param ObjectEntity $zaak      The zaak object.
+     * @param string       $objectUrl The url of the zaaktype.
+     * @param string       $schemaRef The reference of the schema
+     * @param string       $endpoint  The endpoint
      *
      * @return ObjectEntity|null The zaaktype of the given source
      * @throws Exception
@@ -344,8 +344,8 @@ class WPZaakService
     /**
      * Gets the zaaktype from the given zaak
      *
-     * @param ObjectEntity $zaak The zaak object.
-     * @param string $zaaktypeUrl The url of the zaaktype.
+     * @param ObjectEntity $zaak        The zaak object.
+     * @param string       $zaaktypeUrl The url of the zaaktype.
      *
      * @return ObjectEntity|null The zaaktype of the given source
      * @throws Exception
