@@ -112,7 +112,7 @@ class WPZaakService
         $data = $this->mappingService->mapping($synchronization->getMapping(), $synchronization->getObject()->toArray());
 
         try {
-            $response     = $this->callService->call($synchronization->getSource(), $synchronization->getEndpoint(), 'POST', ['json' => $data]);
+            $response = $this->callService->call($synchronization->getSource(), $synchronization->getEndpoint(), 'POST', ['json' => $data]);
         } catch (Exception $exception) {
             throw new Exception($exception->getMessage());
         }
@@ -147,9 +147,9 @@ class WPZaakService
     /**
      * Store information objects to an upstream source
      *
-     * @param ObjectEntity $informatieobject The information object to store
+     * @param ObjectEntity $informatieobject     The information object to store
      * @param ObjectEntity $zaakinformatieobject The case-information-object to store
-     * @param ObjectEntity $zaak The case the objects belong to
+     * @param ObjectEntity $zaak                 The case the objects belong to
      *
      * @return bool Whether the synchronization has passed.
      * @throws Exception
@@ -192,7 +192,6 @@ class WPZaakService
 
         $result = $this->synchronizeUpstream($gebruiksrechtSync);
 
-
         if ($result === false) {
             return false;
         }
@@ -216,9 +215,9 @@ class WPZaakService
     /**
      * Store information objects to an upstream source
      *
-     * @param string $data
-     * @param ObjectEntity $zaakObject The case as object.
-     * @param string $informatieobjecttypeUrl The url of the information object type that is related to the case type.
+     * @param string       $data
+     * @param ObjectEntity $zaakObject              The case as object.
+     * @param string       $informatieobjecttypeUrl The url of the information object type that is related to the case type.
      *
      * @return void Whether the synchronization has passed.
      * @throws Exception
@@ -237,7 +236,7 @@ class WPZaakService
             'auteur'                       => 'Common Gateway',
             'taal'                         => 'NLD',
             'bestandsnaam'                 => 'waardepapier.pdf',
-            'versie'                       => null
+            'versie'                       => null,
         ];
 
         $informationObjectSchema = $this->resourceService->getSchema('https://vng.opencatalogi.nl/schemas/drc.enkelvoudigInformatieObject.schema.json', 'common-gateway/waardepapieren-bundle');
@@ -251,15 +250,14 @@ class WPZaakService
         $this->entityManager->persist($informationObject);
         $this->entityManager->flush();
 
-
         $gebruiksrechtSchema = $this->resourceService->getSchema('https://vng.opencatalogi.nl/schemas/drc.gebruiksrecht.schema.json', 'common-gateway/waardepapieren-bundle');
         if ($gebruiksrechtSchema === null) {
             return;
         }
 
         $gebruiksrechtArray = [
-            'informatieobject'   => $informationObject,
-            'startdatum'         => $now->format('c'),
+            'informatieobject'        => $informationObject,
+            'startdatum'              => $now->format('c'),
             'omschrijvingVoorwaarden' => 'Voorwaarden',
         ];
 
@@ -292,9 +290,9 @@ class WPZaakService
     /**
      * Gets the zaaktype from the given zaak
      *
-     * @param string       $objectUrl The url of the zaaktype.
-     * @param string       $schemaRef The reference of the schema
-     * @param string       $endpoint  The endpoint
+     * @param string $objectUrl The url of the zaaktype.
+     * @param string $schemaRef The reference of the schema
+     * @param string $endpoint  The endpoint
      *
      * @return ObjectEntity|null The zaaktype of the given source
      * @throws Exception
@@ -387,7 +385,7 @@ class WPZaakService
     /**
      * Gets the zaaktype from the given zaak
      *
-     * @param string       $zaaktypeUrl The url of the zaaktype.
+     * @param string $zaaktypeUrl The url of the zaaktype.
      *
      * @return ObjectEntity|null The zaaktype of the given source
      * @throws Exception
@@ -400,7 +398,7 @@ class WPZaakService
 
         // Get the uuid from the zaaktype url.
         $explodedUrl = explode('/', $zaaktypeUrl);
-        $zaaktypeId = null;
+        $zaaktypeId  = null;
         foreach ($explodedUrl as $item) {
             if (Uuid::isValid($item)) {
                 $zaaktypeId = $item;
@@ -563,7 +561,7 @@ class WPZaakService
      */
     public function getZaakFromSource(ObjectEntity $zaak): ?ObjectEntity
     {
-        $source = $this->resourceService->getSource($this->configuration['zrcSource'], 'common-gateway/waardepapieren-bundle');
+        $source   = $this->resourceService->getSource($this->configuration['zrcSource'], 'common-gateway/waardepapieren-bundle');
         $zaakSync = $zaak->getSynchronizations()->first();
 
         try {
@@ -591,7 +589,7 @@ class WPZaakService
      * Creates a certificate for a ZGW Zaak.
      * This action is triggered by a notification.
      *
-     * @param array $data Data from the handler where the xxllnc casetype is in.
+     * @param array $data          Data from the handler where the xxllnc casetype is in.
      * @param array $configuration Configuration for the Action.
      *
      * @return array $this->data Zaak which we updated with new data
@@ -612,7 +610,7 @@ class WPZaakService
         $zaakUrl = $this->data['body']['resourceUrl'];
         // Get the uuid from the zaaktype url.
         $explodedUrl = explode('/', $zaakUrl);
-        $zaakId = null;
+        $zaakId      = null;
         foreach ($explodedUrl as $item) {
             if (Uuid::isValid($item)) {
                 $zaakId = $item;
@@ -654,7 +652,7 @@ class WPZaakService
         // TODO: how do we know which we need to get?
         // Fill certificate with persons information and/or zaak.
         $message['message'] = 'Waardepapier aangemaakt voor zaak met id: '.$zaakObject->getId()->toString();
-        $certificate = $this->downloadService->downloadPdf($message);
+        $certificate        = $this->downloadService->downloadPdf($message);
 
         // Store waardepapier in DRC source.
         $this->saveWaardepapierInDRC($certificate, $zaakObject, $informatieobjecttypeUrl);
