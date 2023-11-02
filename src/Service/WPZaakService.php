@@ -105,14 +105,18 @@ class WPZaakService
      *
      * @return bool Whether the synchronization has passed.
      *
-     * @throws LoaderError
-     * @throws SyntaxError
+     * @throws Exception|LoaderError|SyntaxError
      */
     public function synchronizeUpstream(Synchronization $synchronization): bool
     {
         $data = $this->mappingService->mapping($synchronization->getMapping(), $synchronization->getObject()->toArray());
 
-        $response     = $this->callService->call($synchronization->getSource(), $synchronization->getEndpoint(), 'POST', ['json' => $data]);
+        try {
+            $response     = $this->callService->call($synchronization->getSource(), $synchronization->getEndpoint(), 'POST', ['json' => $data]);
+        } catch (Exception $exception) {
+            throw new Exception($exception->getMessage());
+        }
+
         $updateObject = $this->callService->decodeResponse($synchronization->getSource(), $response);
 
         $synchronization->getObject()->hydrate($updateObject);
@@ -143,13 +147,14 @@ class WPZaakService
     /**
      * Store information objects to an upstream source
      *
-     * @param ObjectEntity $informatieobject     The information object to store
+     * @param ObjectEntity $informatieobject The information object to store
      * @param ObjectEntity $zaakinformatieobject The case-information-object to store
-     * @param ObjectEntity $zaak                 The case the objects belong to
+     * @param ObjectEntity $zaak The case the objects belong to
      *
      * @return bool Whether the synchronization has passed.
+     * @throws Exception
      */
-    public function storeWaardepapierInSourceDRC(ObjectEntity $informatieobject, ObjectEntity $zaakinformatieobject, ObjectEntity $zaak): bool
+    public function storeWaardepapierInSourceDRC(ObjectEntity $informatieobject, ObjectEntity $zaakinformatieobject, ObjectEntity $gebruiksrecht, ObjectEntity $zaak): bool
     {
         if (count($zaak->getSynchronizations()) === 0) {
             return true;
@@ -176,6 +181,22 @@ class WPZaakService
             return false;
         }
 
+        $gebruiksrechtSync = new Synchronization();
+        $gebruiksrechtSync->setSource($drcSource);
+        $gebruiksrechtSync->setMapping($this->resourceService->getMapping('https://waardepapieren.commongateway.nl/mapping/drc.gebruiksrechtUpstream.mapping.json', 'common-gateway/waardepapieren-bundle'));
+        $gebruiksrechtSync->setEndpoint('/gebruiksrechten');
+        $gebruiksrechtSync->setObject($gebruiksrecht);
+
+        $this->entityManager->persist($gebruiksrechtSync);
+        $this->entityManager->flush();
+
+        $result = $this->synchronizeUpstream($gebruiksrechtSync);
+
+
+        if ($result === false) {
+            return false;
+        }
+
         $zioSync = new Synchronization();
         $zioSync->setSource($source);
         $zioSync->setMapping($this->resourceService->getMapping($this->configuration['zaakInfoMapping'], 'common-gateway/waardepapieren-bundle'));
@@ -195,11 +216,12 @@ class WPZaakService
     /**
      * Store information objects to an upstream source
      *
-     * @param string       $data
-     * @param ObjectEntity $zaakObject              The case as object.
-     * @param string       $informatieobjecttypeUrl The url of the information object type that is related to the case type.
+     * @param string $data
+     * @param ObjectEntity $zaakObject The case as object.
+     * @param string $informatieobjecttypeUrl The url of the information object type that is related to the case type.
      *
      * @return void Whether the synchronization has passed.
+     * @throws Exception
      */
     public function saveWaardepapierInDRC(string $data, ObjectEntity $zaakObject, string $informatieobjecttypeUrl): void
     {
@@ -215,7 +237,7 @@ class WPZaakService
             'auteur'                       => 'Common Gateway',
             'taal'                         => 'NLD',
             'bestandsnaam'                 => 'waardepapier.pdf',
-            'versie'                       => null,
+            'versie'                       => null
         ];
 
         $informationObjectSchema = $this->resourceService->getSchema('https://vng.opencatalogi.nl/schemas/drc.enkelvoudigInformatieObject.schema.json', 'common-gateway/waardepapieren-bundle');
@@ -227,6 +249,24 @@ class WPZaakService
 
         $informationObject->hydrate($informationArray);
         $this->entityManager->persist($informationObject);
+        $this->entityManager->flush();
+
+
+        $gebruiksrechtSchema = $this->resourceService->getSchema('https://vng.opencatalogi.nl/schemas/drc.gebruiksrecht.schema.json', 'common-gateway/waardepapieren-bundle');
+        if ($gebruiksrechtSchema === null) {
+            return;
+        }
+
+        $gebruiksrechtArray = [
+            'informatieobject'   => $informationObject,
+            'startdatum'         => $now->format('c'),
+            'omschrijvingVoorwaarden' => 'Voorwaarden',
+        ];
+
+        $gebruiksrecht = new ObjectEntity($gebruiksrechtSchema);
+
+        $gebruiksrecht->hydrate($gebruiksrechtArray);
+        $this->entityManager->persist($gebruiksrecht);
         $this->entityManager->flush();
 
         $caseInformationObjectSchema = $this->resourceService->getSchema('https://vng.opencatalogi.nl/schemas/zrc.zaakInformatieObject.schema.json', 'common-gateway/waardepapieren-bundle');
@@ -244,7 +284,7 @@ class WPZaakService
         $this->entityManager->persist($caseInformationObject);
         $this->entityManager->flush();
 
-        $this->storeWaardepapierInSourceDRC($informationObject, $caseInformationObject, $zaakObject);
+        $this->storeWaardepapierInSourceDRC($informationObject, $caseInformationObject, $gebruiksrecht, $zaakObject);
 
     }//end saveWaardepapierInDRC()
 
@@ -252,7 +292,6 @@ class WPZaakService
     /**
      * Gets the zaaktype from the given zaak
      *
-     * @param ObjectEntity $zaak      The zaak object.
      * @param string       $objectUrl The url of the zaaktype.
      * @param string       $schemaRef The reference of the schema
      * @param string       $endpoint  The endpoint
@@ -260,7 +299,7 @@ class WPZaakService
      * @return ObjectEntity|null The zaaktype of the given source
      * @throws Exception
      */
-    public function getZaaktypeSubObjects(ObjectEntity $zaak, string $objectUrl, string $schemaRef, string $endpoint): ?ObjectEntity
+    public function getZaaktypeSubObjects(string $objectUrl, string $schemaRef, string $endpoint): ?ObjectEntity
     {
         // Get zaaktype schema.
         $schema = $this->resourceService->getSchema($schemaRef, 'common-gateway/waardepapieren-bundle');
@@ -272,6 +311,10 @@ class WPZaakService
             if (Uuid::isValid($item)) {
                 $objectId = $item;
             }
+        }
+
+        if (isset($objectId) === false) {
+            return null;
         }
 
         // Check if we have a zaaktype with findSyncByObject.
@@ -304,35 +347,35 @@ class WPZaakService
     /**
      * Gets the zaaktype from the given zaak
      *
-     * @param array        $response The response of the call
-     * @param ObjectEntity $zaak     The zaak object
+     * @param array $response The response of the call
      *
      * @return array The zaaktype of the given source
+     * @throws Exception
      */
-    public function getSubobjects(array $response, ObjectEntity $zaak): array
+    public function getSubobjects(array $response): array
     {
         foreach ($response['informatieobjecttypen'] as $infoObjectType) {
-            $info = $this->getZaaktypeSubObjects($zaak, $infoObjectType, 'https://vng.opencatalogi.nl/schemas/ztc.informatieObjectType.schema.json', '/informatieobjecttypen');
+            $info = $this->getZaaktypeSubObjects($infoObjectType, 'https://vng.opencatalogi.nl/schemas/ztc.informatieObjectType.schema.json', '/informatieobjecttypen');
             $response['informatieobjecttypen'][] = $info;
         }
 
         foreach ($response['eigenschappen'] as $eigenschap) {
-            $eigenschapObject            = $this->getZaaktypeSubObjects($zaak, $eigenschap, 'https://vng.opencatalogi.nl/schemas/ztc.eigenschap.schema.json', '/eigenschappen');
+            $eigenschapObject            = $this->getZaaktypeSubObjects($eigenschap, 'https://vng.opencatalogi.nl/schemas/ztc.eigenschap.schema.json', '/eigenschappen');
             $response['eigenschappen'][] = $eigenschapObject;
         }
 
         foreach ($response['roltypen'] as $roltype) {
-            $roltypeObject          = $this->getZaaktypeSubObjects($zaak, $roltype, 'https://vng.opencatalogi.nl/schemas/ztc.rolType.schema.json', '/roltypen');
+            $roltypeObject          = $this->getZaaktypeSubObjects($roltype, 'https://vng.opencatalogi.nl/schemas/ztc.rolType.schema.json', '/roltypen');
             $response['roltypen'][] = $roltypeObject;
         }
 
         foreach ($response['statustypen'] as $statustype) {
-            $statustypeObject          = $this->getZaaktypeSubObjects($zaak, $statustype, 'https://vng.opencatalogi.nl/schemas/ztc.statusType.schema.json', '/statustypen');
+            $statustypeObject          = $this->getZaaktypeSubObjects($statustype, 'https://vng.opencatalogi.nl/schemas/ztc.statusType.schema.json', '/statustypen');
             $response['statustypen'][] = $statustypeObject;
         }
 
         foreach ($response['resultaattypen'] as $resultaattype) {
-            $resultaattypeObject          = $this->getZaaktypeSubObjects($zaak, $resultaattype, 'https://vng.opencatalogi.nl/schemas/ztc.resultaatType.schema.json', '/resultaattype');
+            $resultaattypeObject          = $this->getZaaktypeSubObjects($resultaattype, 'https://vng.opencatalogi.nl/schemas/ztc.resultaatType.schema.json', '/resultaattypen');
             $response['resultaattypen'][] = $resultaattypeObject;
         }
 
@@ -344,13 +387,12 @@ class WPZaakService
     /**
      * Gets the zaaktype from the given zaak
      *
-     * @param ObjectEntity $zaak        The zaak object.
      * @param string       $zaaktypeUrl The url of the zaaktype.
      *
      * @return ObjectEntity|null The zaaktype of the given source
      * @throws Exception
      */
-    public function getZaaktypeFromSource(ObjectEntity $zaak, string $zaaktypeUrl): ?ObjectEntity
+    public function getZaaktypeFromSource(string $zaaktypeUrl): ?ObjectEntity
     {
         // Get zaaktype schema.
         $schema = $this->resourceService->getSchema('https://vng.opencatalogi.nl/schemas/ztc.zaakType.schema.json', 'common-gateway/waardepapieren-bundle');
@@ -358,10 +400,15 @@ class WPZaakService
 
         // Get the uuid from the zaaktype url.
         $explodedUrl = explode('/', $zaaktypeUrl);
+        $zaaktypeId = null;
         foreach ($explodedUrl as $item) {
             if (Uuid::isValid($item)) {
                 $zaaktypeId = $item;
             }
+        }
+
+        if ($zaaktypeId === null) {
+            return null;
         }
 
         // Check if we have a zaaktype with findSyncByObject.
@@ -375,7 +422,7 @@ class WPZaakService
         }
 
         $response     = $this->callService->decodeResponse($source, $response);
-        $response     = $this->getSubobjects($response, $zaak);
+        $response     = $this->getSubobjects($response);
         $zaaktypeSync = $this->syncService->synchronize($zaaktypeSync, $response);
         $this->entityManager->flush();
 
@@ -426,9 +473,7 @@ class WPZaakService
         $this->entityManager->persist($statusSync);
         $this->entityManager->flush();
 
-        $result = $this->synchronizeUpstream($statusSync);
-
-        return $result;
+        return $this->synchronizeUpstream($statusSync);
 
     }//end storeInSourceZRC()
 
@@ -519,9 +564,10 @@ class WPZaakService
     public function getZaakFromSource(ObjectEntity $zaak): ?ObjectEntity
     {
         $source = $this->resourceService->getSource($this->configuration['zrcSource'], 'common-gateway/waardepapieren-bundle');
+        $zaakSync = $zaak->getSynchronizations()->first();
 
         try {
-            $response = $this->callService->call($source, '/zaken');
+            $response = $this->callService->call($source, '/zaken/'.$zaakSync->getSourceId());
         } catch (Exception $exception) {
             throw new Exception($exception->getMessage());
         }
@@ -545,10 +591,11 @@ class WPZaakService
      * Creates a certificate for a ZGW Zaak.
      * This action is triggered by a notification.
      *
-     * @param array $data          Data from the handler where the xxllnc casetype is in.
+     * @param array $data Data from the handler where the xxllnc casetype is in.
      * @param array $configuration Configuration for the Action.
      *
      * @return array $this->data Zaak which we updated with new data
+     * @throws Exception
      */
     public function wpZaakHandler(array $data, array $configuration): array
     {
@@ -565,10 +612,15 @@ class WPZaakService
         $zaakUrl = $this->data['body']['resourceUrl'];
         // Get the uuid from the zaaktype url.
         $explodedUrl = explode('/', $zaakUrl);
+        $zaakId = null;
         foreach ($explodedUrl as $item) {
             if (Uuid::isValid($item)) {
                 $zaakId = $item;
             }
+        }
+
+        if ($zaakId === null) {
+            return $this->data;
         }
 
         // Find the zaak object through the source and sourceId.
@@ -579,19 +631,30 @@ class WPZaakService
 
         $zaak = $zaakObject->toArray(['embedded' => true]);
 
-        // Get the zaaktype from the source with the url from the zaak.
-        $zaaktype     = $zaakObject->getValue('zaaktype');
-        $zaaktypeSync = $zaaktype->getSynchronizations()->first();
-        $zaaktypeUrl  = $zaaktypeSync->getSourceId();
+        if (is_string($zaak['zaaktype']) === true) {
+            $zaaktypeUrl = $zaak['zaaktype'];
+        }
 
-        $zaaktype = $this->getZaaktypeFromSource($zaakObject, $zaaktypeUrl);
+        if (is_string($zaak['zaaktype']) === false) {
+            // Get the zaaktype from the source with the url from the zaak.
+            $zaaktype     = $zaakObject->getValue('zaaktype');
+            $zaaktypeSync = $zaaktype->getSynchronizations()->first();
+            $zaaktypeUrl  = $zaaktypeSync->getSourceId();
+        }
+
+        if (isset($zaaktypeUrl) === false) {
+            return $this->data;
+        }
+
+        $zaaktype = $this->getZaaktypeFromSource($zaaktypeUrl);
 
         // Get the informatieobjecttypen of the zaaktype to set to the enkelvoudiginformatieobject.
         $informatieobjecttypen   = $zaaktype->getValue('informatieobjecttypen');
         $informatieobjecttypeUrl = $informatieobjecttypen[0]->getValue('url');
         // TODO: how do we know which we need to get?
         // Fill certificate with persons information and/or zaak.
-        $certificate = $this->downloadService->downloadPdf($zaak);
+        $message['message'] = 'Waardepapier aangemaakt voor zaak met id: '.$zaakObject->getId()->toString();
+        $certificate = $this->downloadService->downloadPdf($message);
 
         // Store waardepapier in DRC source.
         $this->saveWaardepapierInDRC($certificate, $zaakObject, $informatieobjecttypeUrl);
@@ -603,10 +666,8 @@ class WPZaakService
         $zaak = $this->getZaakFromSource($zaakObject);
 
         // Set the zaak as response in the dataArray response.
-        $dataArray['response'] = new Response(json_encode($zaak), 200);
+        $this->data['response'] = new Response(json_encode($zaak->toArray()), 200);
 
-        // Create a certificate for the case.
-        // $this->waardepapierService->waardepapierHandler($dataArray, $this->configuration);
         return $this->data;
 
     }//end wpZaakHandler()
