@@ -1,0 +1,12 @@
+{
+  "title": "Gebruiksrecht",
+  "$id": "https://waardepapieren.commongateway.nl/mapping/drc.gebruiksrechtUpstream.mapping.json",
+  "$schema": "https://docs.commongateway.nl/schemas/Mapping.schema.json",
+  "version": "0.0.1",
+  "passTrough": false,
+  "mapping": {
+    "informatieobject": "informatieobject._self.synchronizations.0.sourceId",
+    "startdatum": "startdatum",
+    "omschrijvingVoorwaarden": "omschrijvingVoorwaarden"
+  }
+}
