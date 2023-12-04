@@ -669,7 +669,7 @@ class WPZaakService
         $dataArray['zaak'] = $zaak;
 
         // Fill certificate with persons information and/or zaak.
-        $certificate        = $this->downloadService->downloadPdf($dataArray);
+        $certificate = $this->downloadService->downloadPdf($dataArray);
 
         // Store waardepapier in DRC source.
         $this->saveWaardepapierInDRC($certificate, $zaakObject, $informatieobjecttypeUrl);
