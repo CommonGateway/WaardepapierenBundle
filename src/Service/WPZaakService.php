@@ -662,17 +662,14 @@ class WPZaakService
 
         // Set the person to the dataArray.
         if ($bsn !== null) {
-            $dataArray['person'] = $this->waardepapierService->fetchPersoonsgegevens();
+            $dataArray['person'] = $this->waardepapierService->fetchPersoonsgegevens($bsn);
         }
 
         // Set the zaak to the dataArray.
         $dataArray['zaak'] = $zaak;
 
         // Fill certificate with persons information and/or zaak.
-        $certificate = $this->downloadService->downloadPdf($dataArray);
-
-        var_dump($certificate);
-        die();
+        $certificate        = $this->downloadService->downloadPdf($dataArray);
 
         // Store waardepapier in DRC source.
         $this->saveWaardepapierInDRC($certificate, $zaakObject, $informatieobjecttypeUrl);
