@@ -599,6 +599,7 @@ class WPZaakService
     {
         var_dump('test wpZaakHandler');
         $this->configuration = $configuration;
+        $this->waardepapierService->configuration = $configuration;
         $this->data          = $data;
 
         $source = $this->resourceService->getSource($this->configuration['zrcSource'], 'common-gateway/waardepapieren-bundle');
@@ -661,16 +662,21 @@ class WPZaakService
             }
         }
 
+        $bsn = '900198424';
         // Set the person to the dataArray.
         if ($bsn !== null) {
             $dataArray['person'] = $this->waardepapierService->fetchPersoonsgegevens($bsn);
         }
+        var_dump($dataArray['person']);
 
         // Set the zaak to the dataArray.
         $dataArray['zaak'] = $zaak;
 
+        // Set QR code
+        $dataArray['qr'] = $this->waardepapierService->createImage([]);
+
         // Fill certificate with persons information and/or zaak.
-        $certificate        = $this->downloadService->render($zaak, $this->configuration['templateRef'] ?? 'https://waardepapieren.commonground.nl/Template/certificate.template.json');
+        $certificate        = $this->downloadService->render($dataArray, $this->configuration['template'] ?? 'https://waardepapieren.commonground.nl/Template/certificate.template.json');
         var_dump($certificate);die;
 
         // Store waardepapier in DRC source.

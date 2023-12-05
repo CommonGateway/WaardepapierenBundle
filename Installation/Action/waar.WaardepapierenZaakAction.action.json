@@ -17,6 +17,7 @@
   "class": "CommonGateway\\WaardepapierenBundle\\ActionHandler\\WPZaakHandler",
   "configuration": {
     "source": "https://buren.nl/source/buren.brp.source.json",
+    "template": "https://waardepapieren.commonground.nl/Template/zaak.template.json",
     "zrcSource": "https://buren.nl/source/buren.zrc.source.json",
     "drcSource": "https://buren.nl/source/buren.drc.source.json",
     "ztcSource": "https://buren.nl/source/buren.ztc.source.json",

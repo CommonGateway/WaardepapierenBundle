@@ -296,6 +296,9 @@ class WaardepapierService
     public function fetchPersoonsgegevens(string $bsn): ?array
     {
         $source = $this->resourceService->getSource($this->configuration['source'], 'common-gateway/waardepapieren-bundle');
+        if ($source !== null || $source->getIsEnabled() === false) {
+            return [];
+        }
 
         if (key_exists('brpEndpoint', $this->configuration) === true) {
             $endpoint = $this->configuration['brpEndpoint'];
@@ -305,10 +308,15 @@ class WaardepapierService
             $endpoint = 'ingeschrevenpersonen';
         }
 
+        $endpoint = '/'.$endpoint.'/'.$bsn;
+        var_dump('$endpoint');
+        var_dump($endpoint);
+        var_dump('------');
+
         try {
             $response = $this->callService->call(
                 $source,
-                '/'.$endpoint.'/'.$bsn,
+                $endpoint,
                 'GET'
             );
         } catch (\Exception $exception) {
