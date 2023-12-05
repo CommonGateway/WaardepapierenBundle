@@ -597,6 +597,7 @@ class WPZaakService
      */
     public function wpZaakHandler(array $data, array $configuration): array
     {
+        var_dump('test wpZaakHandler');
         $this->configuration = $configuration;
         $this->data          = $data;
 
@@ -669,7 +670,8 @@ class WPZaakService
         $dataArray['zaak'] = $zaak;
 
         // Fill certificate with persons information and/or zaak.
-        $certificate = $this->downloadService->downloadPdf($dataArray);
+        $certificate        = $this->downloadService->render($zaak, $this->configuration['templateRef'] ?? 'https://waardepapieren.commonground.nl/Template/certificate.template.json');
+        var_dump($certificate);die;
 
         // Store waardepapier in DRC source.
         $this->saveWaardepapierInDRC($certificate, $zaakObject, $informatieobjecttypeUrl);
