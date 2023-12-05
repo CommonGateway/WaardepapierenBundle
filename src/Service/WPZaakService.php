@@ -647,12 +647,29 @@ class WPZaakService
         $zaaktype = $this->getZaaktypeFromSource($zaaktypeUrl);
 
         // Get the informatieobjecttypen of the zaaktype to set to the enkelvoudiginformatieobject.
+        // TODO: how do we know which we need to get?
         $informatieobjecttypen   = $zaaktype->getValue('informatieobjecttypen');
         $informatieobjecttypeUrl = $informatieobjecttypen[0]->getValue('url');
-        // TODO: how do we know which we need to get?
+
+        $bsn = null;
+        foreach ($zaak['eigenschappen'] as $eigenschap) {
+            if ($eigenschap['naam'] === 'BSN'
+                || $eigenschap['naam'] === 'bsn'
+            ) {
+                $bsn = $eigenschap['waarde'];
+            }
+        }
+
+        // Set the person to the dataArray.
+        if ($bsn !== null) {
+            $dataArray['person'] = $this->waardepapierService->fetchPersoonsgegevens($bsn);
+        }
+
+        // Set the zaak to the dataArray.
+        $dataArray['zaak'] = $zaak;
+
         // Fill certificate with persons information and/or zaak.
-        $message['message'] = 'Waardepapier aangemaakt voor zaak met id: '.$zaakObject->getId()->toString();
-        $certificate        = $this->downloadService->downloadPdf($message);
+        $certificate = $this->downloadService->downloadPdf($dataArray);
 
         // Store waardepapier in DRC source.
         $this->saveWaardepapierInDRC($certificate, $zaakObject, $informatieobjecttypeUrl);

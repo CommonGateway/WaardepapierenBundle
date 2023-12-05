@@ -297,10 +297,6 @@ class WaardepapierService
     {
         $source = $this->resourceService->getSource($this->configuration['source'], 'common-gateway/waardepapieren-bundle');
 
-        // if (key_exists('ssl_key', $source->getConfiguration()) === false) {
-        // The ssl key is not set.
-        // return null;
-        // }
         if (key_exists('brpEndpoint', $this->configuration) === true) {
             $endpoint = $this->configuration['brpEndpoint'];
         }
