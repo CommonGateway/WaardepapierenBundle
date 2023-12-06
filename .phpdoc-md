@@ -5,6 +5,6 @@ return (object)[
     'format' => 'github',
     'classes' => [
         '\CommonGateway\WaardepapierenBundle\Service\WaardepapierService',
-        '\CommonGateway\WaardepapierenBundle\Service\WPZaakService'
+        '\CommonGateway\WaardepapierenBundle\Service\ZaakNotificationService'
     ],
 ];

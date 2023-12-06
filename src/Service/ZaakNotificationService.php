@@ -23,14 +23,14 @@ use Twig\Error\LoaderError;
 use Twig\Error\SyntaxError;
 
 /**
- * WPZaakService makes a certificate with for a zaak
+ * ZaakNotificationService makes a certificate with for a zaak
  *
  * @author   Barry Brands barry@conduction.nl
  * @package  common-gateway/waardepapieren-bundle
  * @category Service
  * @access   public
  */
-class WPZaakService
+class ZaakNotificationService
 {
 
     /**
@@ -386,11 +386,12 @@ class WPZaakService
      * Gets the zaaktype from the given zaak
      *
      * @param string $zaaktypeUrl The url of the zaaktype.
+     * @param string $zaakTypeSourceId The sourceId of the zaaktype.
      *
      * @return ObjectEntity|null The zaaktype of the given source
      * @throws Exception
      */
-    public function getZaaktypeFromSource(string $zaaktypeUrl): ?ObjectEntity
+    public function getZaaktypeFromSource(string $zaaktypeUrl, ?string &$zaakTypeSourceId = null): ?ObjectEntity
     {
         // Get zaaktype schema.
         $schema = $this->resourceService->getSchema('https://vng.opencatalogi.nl/schemas/ztc.zaakType.schema.json', 'common-gateway/waardepapieren-bundle');
@@ -402,6 +403,7 @@ class WPZaakService
         foreach ($explodedUrl as $item) {
             if (Uuid::isValid($item)) {
                 $zaaktypeId = $item;
+                $zaakTypeSourceId = $item;
             }
         }
 
@@ -584,30 +586,8 @@ class WPZaakService
 
     }//end getZaakFromSource()
 
-
-    /**
-     * Creates a certificate for a ZGW Zaak.
-     * This action is triggered by a notification.
-     *
-     * @param array $data          Data from the handler where the xxllnc casetype is in.
-     * @param array $configuration Configuration for the Action.
-     *
-     * @return array $this->data Zaak which we updated with new data
-     * @throws Exception
-     */
-    public function wpZaakHandler(array $data, array $configuration): array
+    private function getZaak(Source $source, Schema $schema, ?ObjectEntity &$zaakObject = null): array
     {
-        var_dump('test wpZaakHandler');
-        $this->configuration = $configuration;
-        $this->waardepapierService->configuration = $configuration;
-        $this->data          = $data;
-
-        $source = $this->resourceService->getSource($this->configuration['zrcSource'], 'common-gateway/waardepapieren-bundle');
-        $schema = $this->resourceService->getSchema($this->configuration['zaakSchema'], 'common-gateway/waardepapieren-bundle');
-        if ($source instanceof Source === false || $schema instanceof Schema === false) {
-            return $this->data;
-        }
-
         // Get the zaak url from the body of the request.
         $zaakUrl = $this->data['body']['resourceUrl'];
         // Get the uuid from the zaaktype url.
@@ -629,8 +609,11 @@ class WPZaakService
             return $this->data;
         }
 
-        $zaak = $zaakObject->toArray(['embedded' => true]);
+        return $zaakObject->toArray(['embedded' => true]);
+    }
 
+    private function getZaakType(array $zaak, ObjectEntity $zaakObject, ?string &$zaakTypeSourceId = null): ObjectEntity
+    {
         if (is_string($zaak['zaaktype']) === true) {
             $zaaktypeUrl = $zaak['zaaktype'];
         }
@@ -646,44 +629,126 @@ class WPZaakService
             return $this->data;
         }
 
-        $zaaktype = $this->getZaaktypeFromSource($zaaktypeUrl);
+        return $this->getZaaktypeFromSource($zaaktypeUrl, $zaakTypeSourceId);
+    }
+
+    private function getBsnFromZaak(array $zaak): ?string {
+
+            // @TODO get bsn from role?
+            $bsn = null;
+            foreach ($zaak['eigenschappen'] as $eigenschap) {
+                if ($eigenschap['naam'] === 'BSN'
+                    || $eigenschap['naam'] === 'bsn'
+                ) {
+                    $bsn = $eigenschap['waarde'];
+                }
+            }
+
+            return $bsn;
+    }
+
+    private function getPersoonsgegevens(array $zaak, string $sourceRef): ?array
+    {
+        $bsn = $this->getBsnFromZaak($zaak);
+        if ($bsn === null) {
+            // @TODO throw error and log about no bsn found.
+            return $this->data;
+        }
+
+        // @TODO Remove when testing full working flow.
+        $bsn = 'test';
+
+        $this->waardepapierService->configuration['source'] = $sourceRef;
+        $persoonsGegevens = $this->waardepapierService->fetchPersoonsgegevens($bsn);
+        if (empty($persoonsGegevens) === true) {
+            // @TODO throw error and log about no persoonsgegevens could be fetched/found.
+            return [];
+        }
+    }
+
+
+    /**
+     * Creates a certificate for a ZGW Zaak.
+     * This action is triggered by a notification.
+     *
+     * @param array $data          Data from the handler where the xxllnc casetype is in.
+     * @param array $configuration Configuration for the Action.
+     *
+     * @return array $this->data Zaak which we updated with new data
+     * @throws Exception
+     */
+    public function zaakNotificationHandler(array $data, array $configuration): array
+    {
+        var_dump('test zaakNotificationHandler');
+        $this->configuration = $configuration;
+        $this->waardepapierService->configuration = $configuration;
+        $this->data          = $data;
+
+
+        $zrcSource = $this->resourceService->getSource($this->configuration['zrcSource'], 'common-gateway/waardepapieren-bundle');
+        $zaakSchema = $this->resourceService->getSchema($this->configuration['zaakSchema'], 'common-gateway/waardepapieren-bundle');
+
+        if ($zrcSource instanceof Source === false || $zaakSchema instanceof Schema === false) {
+            return $this->data;
+        }
+
+        // $zaakObject gets passed back here in getZaak function by the ampersand &.
+        $zaakObject = null;
+        $zaak = $this->getZaak($zrcSource, $zaakSchema, $zaakObject);
+        
+        // $zaakTypeSourceId gets passed back here in getZaakType function by the ampersand &.
+        $zaakTypeSourceId = null;
+        $zaakType = $this->getZaakType($zaak, $zaakObject, $zaakTypeSourceId);
+
+
+        // Check if we have config for this source id.
+        if (isset($this->configuration['zaakTypen'][$zaakTypeSourceId]) === false) {
+            // return base template or nothing
+            return $this->data;
+        }
+
+        $zaakTypeConfig = $this->configuration['zaakTypen'][$zaakTypeSourceId];
+
+        if (isset($zaakTypeConfig['certificate']['key']) === false) {
+            // @TODO error and log becuase no cert key
+            return $this->data;
+        }
+
+        $dataToMap = ['zaak' => $zaak];
+
+        foreach ($zaakTypeConfig['sources'] as $type => $reference) {
+            switch ($type) {
+                case 'brp':
+                    $dataToMap['persoonsgegevens'] = $this->getPersoonsgegevens($zaak, $reference);
+                    break;
+                default:
+                    break;
+            }
+
+        }
+
+        $claim = $this->waardepapierService->createClaim($dataToMap, $zaakTypeConfig['mapping']);
+        $jwt = $this->waardepapierService->createJWT($claim, $zaakTypeConfig['certificate']['key']);
 
         // Get the informatieobjecttypen of the zaaktype to set to the enkelvoudiginformatieobject.
         // TODO: how do we know which we need to get?
-        $informatieobjecttypen   = $zaaktype->getValue('informatieobjecttypen');
+        $informatieobjecttypen   = $zaakType->getValue('informatieobjecttypen');
         $informatieobjecttypeUrl = $informatieobjecttypen[0]->getValue('url');
 
-        $bsn = null;
-        foreach ($zaak['eigenschappen'] as $eigenschap) {
-            if ($eigenschap['naam'] === 'BSN'
-                || $eigenschap['naam'] === 'bsn'
-            ) {
-                $bsn = $eigenschap['waarde'];
-            }
-        }
-
-        $bsn = '900198424';
-        // Set the person to the dataArray.
-        if ($bsn !== null) {
-            $dataArray['person'] = $this->waardepapierService->fetchPersoonsgegevens($bsn);
-        }
-        var_dump($dataArray['person']);
-
-        // Set the zaak to the dataArray.
-        $dataArray['zaak'] = $zaak;
-
-        // Set QR code
-        $dataArray['qr'] = $this->waardepapierService->createImage([]);
+        $templateData = [
+            'claim'    => $claim,
+            'claimJwt' => $jwt
+        ];
 
         // Fill certificate with persons information and/or zaak.
-        $certificate        = $this->downloadService->render($dataArray, $this->configuration['template'] ?? 'https://waardepapieren.commonground.nl/Template/certificate.template.json');
+        $certificate        = $this->downloadService->render($templateData, $zaakTypeConfig['template']);
         var_dump($certificate);die;
 
         // Store waardepapier in DRC source.
         $this->saveWaardepapierInDRC($certificate, $zaakObject, $informatieobjecttypeUrl);
 
         // Store resultaat and status in ZRC source.
-        $this->saveInZRC($zaakObject, $zaaktype);
+        $this->saveInZRC($zaakObject, $zaakType);
 
         // Get the zaak from source with updated data.
         $zaak = $this->getZaakFromSource($zaakObject);
@@ -693,7 +758,7 @@ class WPZaakService
 
         return $this->data;
 
-    }//end wpZaakHandler()
+    }//end zaakNotificationHandler()
 
 
 }//end class

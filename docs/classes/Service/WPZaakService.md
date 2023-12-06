@@ -1,15 +1,15 @@
-# CommonGateway\WaardepapierenBundle\Service\WPZaakService
+# CommonGateway\WaardepapierenBundle\Service\ZaakNotificationService
 
-WPZaakService makes a certificate with for a zaak
+ZaakNotificationService makes a certificate with for a zaak
 
 ## Methods
 
 | Name | Description |
 |------|-------------|
 |[\_\_construct](#wpzaakservice__construct)|\_\_construct|
-|[wpZaakHandler](#wpzaakservicewpzaakhandler)|Creates a certificate for a ZGW Zaak.|
+|[zaakNotificationHandler](#wpzaakservicewpzaakhandler)|Creates a certificate for a ZGW Zaak.|
 
-### WPZaakService::\_\_construct
+### ZaakNotificationService::\_\_construct
 
 **Description**
 
@@ -29,12 +29,12 @@ public __construct (void)
 
 <hr />
 
-### WPZaakService::wpZaakHandler
+### ZaakNotificationService::zaakNotificationHandler
 
 **Description**
 
 ```php
-public wpZaakHandler (array $data, array $configuration)
+public zaakNotificationHandler (array $data, array $configuration)
 ```
 
 Creates a certificate for a ZGW Zaak.

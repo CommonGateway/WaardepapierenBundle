@@ -1,0 +1,22 @@
+{
+  "title": "Claim uittreksel basis registratie personen",
+  "$id": "https://waardepapieren.commongateway.nl/mapping/waar.uittrekselBasisRegsitratiePersonen.mapping.json",
+  "$schema": "https://docs.commongateway.nl/schemas/Mapping.schema.json",
+  "version": "0.0.1",
+  "passTrough": false,
+  "mapping": {
+    "@context": [
+      "https://www.w3.org/ns/credentials/v2",
+      "https://www.w3.org/ns/credentials/examples/v2"
+    ],
+    "id": "http://university.example/credentials/1872",
+    "type": ["VerifiableCredential", "ExampleAlumniCredential"],
+    "issuer": "https://university.example/issuers/565049",
+    "validFrom": "2010-01-01T19:23:24Z",
+    "credentialSubject": {
+        "keyForValueAlsoUsedInTempalte": "valueOfThatKeyInTempalte"
+    }
+  },
+  "cast": {},
+  "unset": {}
+}
