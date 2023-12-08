@@ -7,6 +7,7 @@ use App\Entity\Entity as Schema;
 use App\Entity\ObjectEntity;
 use App\Entity\Synchronization;
 use App\Service\SynchronizationService;
+use App\Service\ApplicationService;
 use Brick\Reflection\Tests\S;
 use CommonGateway\CoreBundle\Service\CallService;
 use CommonGateway\CoreBundle\Service\DownloadService;
@@ -73,6 +74,11 @@ class ZaakNotificationService
      */
     private MappingService $mappingService;
 
+    /**
+     * @var ApplicationService The Mapping service from the Core bundle.
+     */
+    private ApplicationService $applicationService;
+
 
     /**
      * __construct
@@ -84,7 +90,8 @@ class ZaakNotificationService
         GatewayResourceService $resourceService,
         CallService $callService,
         MappingService $mappingService,
-        SynchronizationService $syncService
+        SynchronizationService $syncService,
+        ApplicationService $applicationService
     ) {
         $this->entityManager       = $entityManager;
         $this->waardepapierService = $waardepapierService;
@@ -93,6 +100,7 @@ class ZaakNotificationService
         $this->callService         = $callService;
         $this->mappingService      = $mappingService;
         $this->syncService         = $syncService;
+        $this->applicationService         = $applicationService;
 
     }//end __construct()
 
@@ -632,19 +640,21 @@ class ZaakNotificationService
         return $this->getZaaktypeFromSource($zaaktypeUrl, $zaakTypeSourceId);
     }
 
-    private function getBsnFromZaak(array $zaak): ?string {
+    private function getBsnFromZaak(array $zaak): ?string 
+    {
+        if (isset($zaak['embedded']['rollen'][0]['betrokkeneIdentificatie']['inpBsn'])) {
+            return $zaak['embedded']['rollen'][0]['betrokkeneIdentificatie']['inpBsn'];
+        }
 
-            // @TODO get bsn from role?
-            $bsn = null;
-            foreach ($zaak['eigenschappen'] as $eigenschap) {
-                if ($eigenschap['naam'] === 'BSN'
-                    || $eigenschap['naam'] === 'bsn'
-                ) {
-                    $bsn = $eigenschap['waarde'];
-                }
+        foreach ($zaak['embedded']['eigenschappen'] as $eigenschap) {
+            if ($eigenschap['naam'] === 'BSN'
+                || $eigenschap['naam'] === 'bsn'
+            ) {
+                return $eigenschap['waarde'];
             }
+        }
 
-            return $bsn;
+        return null;
     }
 
     private function getPersoonsgegevens(array $zaak, string $sourceRef): ?array
@@ -655,15 +665,8 @@ class ZaakNotificationService
             return $this->data;
         }
 
-        // @TODO Remove when testing full working flow.
-        $bsn = 'test';
-
         $this->waardepapierService->configuration['source'] = $sourceRef;
-        $persoonsGegevens = $this->waardepapierService->fetchPersoonsgegevens($bsn);
-        if (empty($persoonsGegevens) === true) {
-            // @TODO throw error and log about no persoonsgegevens could be fetched/found.
-            return [];
-        }
+        return $this->waardepapierService->fetchPersoonsgegevens($bsn);
     }
 
 
@@ -679,10 +682,15 @@ class ZaakNotificationService
      */
     public function zaakNotificationHandler(array $data, array $configuration): array
     {
-        var_dump('test zaakNotificationHandler');
         $this->configuration = $configuration;
         $this->waardepapierService->configuration = $configuration;
         $this->data          = $data;
+
+        $application = $this->applicationService->getApplication();
+        if ($application === null || $application->getPrivateKey() === null || empty($application->getDomains()) === true) {
+            // @TODO log error
+            return $this->data;
+        } 
 
 
         $zrcSource = $this->resourceService->getSource($this->configuration['zrcSource'], 'common-gateway/waardepapieren-bundle');
@@ -709,12 +717,10 @@ class ZaakNotificationService
 
         $zaakTypeConfig = $this->configuration['zaakTypen'][$zaakTypeSourceId];
 
-        if (isset($zaakTypeConfig['certificate']['key']) === false) {
-            // @TODO error and log becuase no cert key
-            return $this->data;
-        }
-
-        $dataToMap = ['zaak' => $zaak];
+        $dataToMap = [
+            'zaak'              => $zaak,
+            'applicationDomain' => $application->getDomains()[0],
+        ];
 
         foreach ($zaakTypeConfig['sources'] as $type => $reference) {
             switch ($type) {
@@ -724,11 +730,11 @@ class ZaakNotificationService
                 default:
                     break;
             }
-
         }
 
         $claim = $this->waardepapierService->createClaim($dataToMap, $zaakTypeConfig['mapping']);
-        $jwt = $this->waardepapierService->createJWT($claim, $zaakTypeConfig['certificate']['key']);
+        $jwt = $this->waardepapierService->createJWT($claim, $application->getPrivateKey());
+        $qrImage = $this->waardepapierService->createQRImage($jwt);
 
         // Get the informatieobjecttypen of the zaaktype to set to the enkelvoudiginformatieobject.
         // TODO: how do we know which we need to get?
@@ -737,7 +743,7 @@ class ZaakNotificationService
 
         $templateData = [
             'claim'    => $claim,
-            'claimJwt' => $jwt
+            'qrImage' => $qrImage
         ];
 
         // Fill certificate with persons information and/or zaak.

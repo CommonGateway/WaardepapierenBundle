@@ -202,13 +202,11 @@ class WaardepapierService
      *
      * @return string The image as a string
      */
-    public function createImage(array $certificate): string
+    public function createQRImage(string $claimJwt): string
     {
         // Then we need to render the QR code
         $qrCode = $this->qrCode->create(
-        // $certificate['jwt'], //@todo some ssl certs dont work
-            "QR code with text",
-            // @todo remove if above line works
+            $claimJwt, 
             [
                 'size'   => 1000,
                 'margin' => 1,
@@ -218,8 +216,7 @@ class WaardepapierService
 
         // And finnaly we need to set the result on the certificate resource
         return 'data:image/png;base64,'.base64_encode($qrCode->writeString());
-
-    }//end createImage()
+    }//end createQRImage()
 
 
     /**
@@ -263,64 +260,6 @@ class WaardepapierService
     {
         $payload = $claim;
 
-
-        // @TODO when ready for testing with certificates from action config
-        $certificateKey = "-----BEGIN ENCRYPTED PRIVATE KEY-----
-        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
-        y6FTcXjXxaM7Mvyv0yE5ZA==
-        -----END ENCRYPTED PRIVATE KEY-----
-        ";
-
         $jwk = JWKFactory::createFromKey($certificateKey);
 
         $jwsBuilder = new \Jose\Component\Signature\JWSBuilder(new AlgorithmManager([new RS512()]));
@@ -348,7 +287,7 @@ class WaardepapierService
     {
         $mapping = $this->resourceService->getMapping($mappingRef, 'common-gateway/waardepapieren-bundle');
 
-        return $this->mappingService->mapping($data, $mapping);
+        return $this->mappingService->mapping($mapping, $data);
     }//end createClaim()
 
 
@@ -364,7 +303,8 @@ class WaardepapierService
     public function fetchPersoonsgegevens(string $bsn): ?array
     {
         $source = $this->resourceService->getSource($this->configuration['source'], 'common-gateway/waardepapieren-bundle');
-        if ($source !== null || $source->getIsEnabled() === false) {
+        if ($source === null || $source->getIsEnabled() === false) {
+            // @TODO log
             return [];
         }
 
@@ -399,6 +339,8 @@ class WaardepapierService
 
     /**
      * Creates or updates a Certificate.
+     * 
+     * @todo This method wont work rn after some refactor. The functions used in this method do work but not in this implementation, see ZaakNotificationService.
      *
      * @param array $data          Data from the handler where the xxllnc casetype is in.
      * @param array $configuration Configuration for the Action.
@@ -431,7 +373,7 @@ class WaardepapierService
         }
 
         // 3. Create the image for the certificate.
-        $image = $this->createImage($certificate);
+        $image = $this->createQRImage($certificate);
 
         // 4. Make a data array to map from.
         $data = [
