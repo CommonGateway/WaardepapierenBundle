@@ -46,7 +46,7 @@ class WPZaakCommand extends Command
     public function __construct(ZaakNotificationService $zaakNotificationService, EntityManagerInterface $entityManager)
     {
         $this->zaakNotificationService = $zaakNotificationService;
-        $this->entityManager           = $entityManager;
+        $this->entityManager = $entityManager;
         parent::__construct();
 
     }//end __construct()

@@ -206,7 +206,7 @@ class WaardepapierService
     {
         // Then we need to render the QR code
         $qrCode = $this->qrCode->create(
-            $claimJwt,
+            $claimJwt, 
             [
                 'size'   => 1000,
                 'margin' => 1,
@@ -216,7 +216,6 @@ class WaardepapierService
 
         // And finnaly we need to set the result on the certificate resource
         return 'data:image/png;base64,'.base64_encode($qrCode->writeString());
-
     }//end createQRImage()
 
 
@@ -252,7 +251,7 @@ class WaardepapierService
     /**
      * This function generates a jwt token using the claim that's available from the certificate object.
      *
-     * @param array  $claim          The certificate object.
+     * @param array $claim           The certificate object.
      * @param string $certificateKey Certificate to sign the jws with.
      *
      * @return string The generated jwt token.
@@ -279,7 +278,7 @@ class WaardepapierService
     /**
      * This function simply maps data with a mapping to a claim.
      *
-     * @param array  $data       Data to map to a claim.
+     * @param array  $data Data to map to a claim.
      * @param string $mappingRef Reference to mapping to use.
      *
      * @return array The claim.
@@ -289,7 +288,6 @@ class WaardepapierService
         $mapping = $this->resourceService->getMapping($mappingRef, 'common-gateway/waardepapieren-bundle');
 
         return $this->mappingService->mapping($mapping, $data);
-
     }//end createClaim()
 
 
@@ -341,8 +339,8 @@ class WaardepapierService
 
     /**
      * Creates or updates a Certificate.
-     *
-     * @todo This method wont work rn after some refactor. The functions used in this method do work but not in this implementation, see ZaakNotificationService.
+     * 
+     * @todo Outdated and unused (probably) function.
      *
      * @param array $data          Data from the handler where the xxllnc casetype is in.
      * @param array $configuration Configuration for the Action.

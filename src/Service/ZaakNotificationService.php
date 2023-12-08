@@ -8,13 +8,11 @@ use App\Entity\ObjectEntity;
 use App\Entity\Synchronization;
 use App\Service\SynchronizationService;
 use App\Service\ApplicationService;
-use Brick\Reflection\Tests\S;
 use CommonGateway\CoreBundle\Service\CallService;
 use CommonGateway\CoreBundle\Service\DownloadService;
 use CommonGateway\CoreBundle\Service\GatewayResourceService;
 use CommonGateway\CoreBundle\Service\MappingService;
 use CommonGateway\WaardepapierenBundle\Service\WaardepapierService;
-use CommonGateway\ZGWBundle\Service\DRCService;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Ramsey\Uuid\Uuid;
@@ -100,7 +98,7 @@ class ZaakNotificationService
         $this->callService         = $callService;
         $this->mappingService      = $mappingService;
         $this->syncService         = $syncService;
-        $this->applicationService  = $applicationService;
+        $this->applicationService         = $applicationService;
 
     }//end __construct()
 
@@ -393,13 +391,13 @@ class ZaakNotificationService
     /**
      * Gets the zaaktype from the given zaak
      *
-     * @param string $zaaktypeUrl      The url of the zaaktype.
+     * @param string $zaaktypeUrl The url of the zaaktype.
      * @param string $zaakTypeSourceId The sourceId of the zaaktype.
      *
      * @return ObjectEntity|null The zaaktype of the given source
      * @throws Exception
      */
-    public function getZaaktypeFromSource(string $zaaktypeUrl, ?string &$zaakTypeSourceId=null): ?ObjectEntity
+    public function getZaaktypeFromSource(string $zaaktypeUrl, ?string &$zaakTypeSourceId = null): ?ObjectEntity
     {
         // Get zaaktype schema.
         $schema = $this->resourceService->getSchema('https://vng.opencatalogi.nl/schemas/ztc.zaakType.schema.json', 'common-gateway/waardepapieren-bundle');
@@ -410,7 +408,7 @@ class ZaakNotificationService
         $zaaktypeId  = null;
         foreach ($explodedUrl as $item) {
             if (Uuid::isValid($item)) {
-                $zaaktypeId       = $item;
+                $zaaktypeId = $item;
                 $zaakTypeSourceId = $item;
             }
         }
@@ -594,8 +592,16 @@ class ZaakNotificationService
 
     }//end getZaakFromSource()
 
-
-    private function getZaak(Source $source, Schema $schema, ?ObjectEntity &$zaakObject=null): array
+    /**
+     * Gets Zaak from its source with id.
+     * 
+     * @param Source $source     ZRC source.
+     * @param Schema $schema     Zaak Schema object.
+     * @param ObjectEntity|null  $zaakObject Can be null and gets passed back to parent function.
+     * 
+     * @return array BSN if found from zaak.
+     */
+    private function getZaak(Source $source, Schema $schema, ?ObjectEntity &$zaakObject = null): array
     {
         // Get the zaak url from the body of the request.
         $zaakUrl = $this->data['body']['resourceUrl'];
@@ -619,11 +625,19 @@ class ZaakNotificationService
         }
 
         return $zaakObject->toArray(['embedded' => true]);
-
     }//end getZaak()
 
 
-    private function getZaakType(array $zaak, ObjectEntity $zaakObject, ?string &$zaakTypeSourceId=null): ObjectEntity
+    /**
+     * Gets ZaakType through synchronization in gateway.
+     * 
+     * @param array        $zaak             Zaak array object.
+     * @param ObjectEntity $zazaakObject     Zaak Zaak ObjectEntity.
+     * @param string|null  $zaakTypeSourceId ZaakType id from its source.
+     * 
+     * @return string|null BSN if found from zaak.
+     */
+    private function getZaakType(array $zaak, ObjectEntity $zaakObject, ?string &$zaakTypeSourceId = null): ObjectEntity
     {
         if (is_string($zaak['zaaktype']) === true) {
             $zaaktypeUrl = $zaak['zaaktype'];
@@ -641,11 +655,16 @@ class ZaakNotificationService
         }
 
         return $this->getZaaktypeFromSource($zaaktypeUrl, $zaakTypeSourceId);
-
     }//end getZaakType()
 
-
-    private function getBsnFromZaak(array $zaak): ?string
+    /**
+     * Gets BSN from zaak.
+     * 
+     * @param array $zaak Zaak array object.
+     * 
+     * @return string|null BSN if found from zaak.
+     */
+    private function getBsnFromZaak(array $zaak): ?string 
     {
         if (isset($zaak['embedded']['rollen'][0]['betrokkeneIdentificatie']['inpBsn'])) {
             return $zaak['embedded']['rollen'][0]['betrokkeneIdentificatie']['inpBsn'];
@@ -660,10 +679,16 @@ class ZaakNotificationService
         }
 
         return null;
-
     }//end getBsnFromZaak()
 
-
+    /**
+     * Gets BSN from Zaak and fetches BRP persoonsgegevens with waardepapierService.
+     * 
+     * @param array $zaak       Zaak array object.
+     * @param string $sourceRef Reference for Source object (brp).
+     * 
+     * @return array Persoonsgegevens.
+     */
     private function getPersoonsgegevens(array $zaak, string $sourceRef): ?array
     {
         $bsn = $this->getBsnFromZaak($zaak);
@@ -674,7 +699,6 @@ class ZaakNotificationService
 
         $this->waardepapierService->configuration['source'] = $sourceRef;
         return $this->waardepapierService->fetchPersoonsgegevens($bsn);
-
     }//end getPersoonsgegevens()
 
 
@@ -692,15 +716,16 @@ class ZaakNotificationService
     {
         $this->configuration = $configuration;
         $this->waardepapierService->configuration = $configuration;
-        $this->data = $data;
+        $this->data          = $data;
 
         $application = $this->applicationService->getApplication();
         if ($application === null || $application->getPrivateKey() === null || empty($application->getDomains()) === true) {
             // @TODO log error
             return $this->data;
-        }
+        } 
 
-        $zrcSource  = $this->resourceService->getSource($this->configuration['zrcSource'], 'common-gateway/waardepapieren-bundle');
+
+        $zrcSource = $this->resourceService->getSource($this->configuration['zrcSource'], 'common-gateway/waardepapieren-bundle');
         $zaakSchema = $this->resourceService->getSchema($this->configuration['zaakSchema'], 'common-gateway/waardepapieren-bundle');
 
         if ($zrcSource instanceof Source === false || $zaakSchema instanceof Schema === false) {
@@ -709,11 +734,12 @@ class ZaakNotificationService
 
         // $zaakObject gets passed back here in getZaak function by the ampersand &.
         $zaakObject = null;
-        $zaak       = $this->getZaak($zrcSource, $zaakSchema, $zaakObject);
-
+        $zaak = $this->getZaak($zrcSource, $zaakSchema, $zaakObject);
+        
         // $zaakTypeSourceId gets passed back here in getZaakType function by the ampersand &.
         $zaakTypeSourceId = null;
-        $zaakType         = $this->getZaakType($zaak, $zaakObject, $zaakTypeSourceId);
+        $zaakType = $this->getZaakType($zaak, $zaakObject, $zaakTypeSourceId);
+
 
         // Check if we have config for this source id.
         if (isset($this->configuration['zaakTypen'][$zaakTypeSourceId]) === false) {
@@ -730,16 +756,16 @@ class ZaakNotificationService
 
         foreach ($zaakTypeConfig['sources'] as $type => $reference) {
             switch ($type) {
-            case 'brp':
-                $dataToMap['persoonsgegevens'] = $this->getPersoonsgegevens($zaak, $reference);
-                break;
-            default:
-                break;
+                case 'brp':
+                    $dataToMap['persoonsgegevens'] = $this->getPersoonsgegevens($zaak, $reference);
+                    break;
+                default:
+                    break;
             }
         }
 
-        $claim   = $this->waardepapierService->createClaim($dataToMap, $zaakTypeConfig['mapping']);
-        $jwt     = $this->waardepapierService->createJWT($claim, $application->getPrivateKey());
+        $claim = $this->waardepapierService->createClaim($dataToMap, $zaakTypeConfig['mapping']);
+        $jwt = $this->waardepapierService->createJWT($claim, $application->getPrivateKey());
         $qrImage = $this->waardepapierService->createQRImage($jwt);
 
         // Get the informatieobjecttypen of the zaaktype to set to the enkelvoudiginformatieobject.
@@ -748,15 +774,12 @@ class ZaakNotificationService
         $informatieobjecttypeUrl = $informatieobjecttypen[0]->getValue('url');
 
         $templateData = [
-            'claim'   => $claim,
-            'qrImage' => $qrImage,
+            'claim'    => $claim,
+            'qrImage' => $qrImage
         ];
 
         // Fill certificate with persons information and/or zaak.
-        $certificate = $this->downloadService->render($templateData, $zaakTypeConfig['template']);
-        var_dump($certificate);
-        die;
-
+        $certificate        = $this->downloadService->downloadPdf($templateData, $zaakTypeConfig['template']);
         // Store waardepapier in DRC source.
         $this->saveWaardepapierInDRC($certificate, $zaakObject, $informatieobjecttypeUrl);
 
