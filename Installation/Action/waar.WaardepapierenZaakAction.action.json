@@ -23,9 +23,6 @@
             "mapping": "https://waardepapieren.commongateway.nl/mapping/waar.uittrekselBasisRegsitratiePersonen.mapping.json",
             "sources": {
                 "brp": "https://buren.nl/source/buren.brp.source.json"
-            },
-            "certificate": {
-                "key": "key"
             }
         }
     },
