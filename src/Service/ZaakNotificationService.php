@@ -106,7 +106,7 @@ class ZaakNotificationService
         $this->mappingService      = $mappingService;
         $this->syncService         = $syncService;
         $this->applicationService  = $applicationService;
-        $this->logger              = $logger;
+        $this->logger = $logger;
 
     }//end __construct()
 
