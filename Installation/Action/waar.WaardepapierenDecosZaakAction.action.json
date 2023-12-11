@@ -14,7 +14,7 @@
       "https://zgw-ztc-api-acc.decosasp.com/api/zaaktypen/52a3da26-6f91-47d7-8f19-df98b05ae184"
     ]
   },
-  "class": "CommonGateway\\WaardepapierenBundle\\ActionHandler\\WPZaakHandler",
+  "class": "CommonGateway\\WaardepapierenBundle\\ActionHandler\\ZaakNotificationHandler",
   "configuration": {
     "zrcSource": "https://waardepapieren.commonground.nl/source/waar.decos.zrc.source.json",
     "drcSource": "https://waardepapieren.commonground.nl/source/waar.decos.drc.source.json",

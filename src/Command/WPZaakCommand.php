@@ -2,7 +2,7 @@
 
 namespace CommonGateway\WaardepapierenBundle\Command;
 
-use CommonGateway\WaardepapierenBundle\Service\WPZaakService;
+use CommonGateway\WaardepapierenBundle\Service\ZaakNotificationService;
 use Doctrine\ORM\EntityManagerInterface;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\Console\Command\Command;
@@ -14,7 +14,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 /**
  * This class handles the command for the creation of a certificate for a ZGW Zaak.
  *
- * This Command executes the WPZaakService->wpZaakHandler.
+ * This Command executes the ZaakNotificationService->zaakNotificationHandler.
  *
  * @author Barry Brands <barry@conduction.nl>
  *
@@ -35,18 +35,18 @@ class WPZaakCommand extends Command
     private EntityManagerInterface $entityManager;
 
     /**
-     * @var WPZaakService
+     * @var ZaakNotificationService
      */
-    private WPZaakService $wpZaakService;
+    private ZaakNotificationService $zaakNotificationService;
 
 
     /**
      * __construct
      */
-    public function __construct(WPZaakService $wpZaakService, EntityManagerInterface $entityManager)
+    public function __construct(ZaakNotificationService $zaakNotificationService, EntityManagerInterface $entityManager)
     {
-        $this->wpZaakService = $wpZaakService;
-        $this->entityManager = $entityManager;
+        $this->zaakNotificationService = $zaakNotificationService;
+        $this->entityManager           = $entityManager;
         parent::__construct();
 
     }//end __construct()
@@ -60,8 +60,8 @@ class WPZaakCommand extends Command
     protected function configure(): void
     {
         $this
-            ->setDescription('This command triggers WPZaakService')
-            ->setHelp('This command triggers WPZaakService')
+            ->setDescription('This command triggers ZaakNotificationService')
+            ->setHelp('This command triggers ZaakNotificationService')
             ->addArgument('id', InputArgument::REQUIRED, 'Zaak ID');
 
     }//end configure()
@@ -98,8 +98,8 @@ class WPZaakCommand extends Command
             return Command::FAILURE;
         }
 
-        $style->info('Creating certificate with WPZaakService..');
-        if (is_array($this->wpZaakService->wpZaakHandler(['response' => $zaakObject->toArray()], $wpZaakAction->getConfiguration())) === true) {
+        $style->info('Creating certificate with ZaakNotificationService..');
+        if (is_array($this->zaakNotificationService->zaakNotificationHandler(['response' => $zaakObject->toArray()], $wpZaakAction->getConfiguration())) === true) {
             $style->success('Succesfully created certificate for zaak: '.$zaakId);
             return Command::SUCCESS;
         }//end if

@@ -202,13 +202,11 @@ class WaardepapierService
      *
      * @return string The image as a string
      */
-    public function createImage(array $certificate): string
+    public function createQRImage(string $claimJwt): string
     {
         // Then we need to render the QR code
         $qrCode = $this->qrCode->create(
-        // $certificate['jwt'], //@todo some ssl certs dont work
-            "QR code with text",
-            // @todo remove if above line works
+            $claimJwt,
             [
                 'size'   => 1000,
                 'margin' => 1,
@@ -219,7 +217,7 @@ class WaardepapierService
         // And finnaly we need to set the result on the certificate resource
         return 'data:image/png;base64,'.base64_encode($qrCode->writeString());
 
-    }//end createImage()
+    }//end createQRImage()
 
 
     /**
@@ -254,22 +252,16 @@ class WaardepapierService
     /**
      * This function generates a jwt token using the claim that's available from the certificate object.
      *
-     * @param array $certificate The certificate object
+     * @param array  $claim          The certificate object.
+     * @param string $certificateKey Certificate to sign the jws with.
      *
-     * @return string The generated jwt token
+     * @return string The generated jwt token.
      */
-    public function createJWT(array $certificate): ?string
+    public function createJWT(array $claim, string $certificateKey): ?string
     {
-        $source = $this->resourceService->getSource($this->configuration['source'], 'common-gateway/waardepapieren-bundle');
+        $payload = $claim;
 
-        // Create a payload
-        $payload = $certificate['claim'];
-
-        if (key_exists('ssl_key', $source->getConfiguration()) === false) {
-            return null;
-        }
-
-        $jwk = JWKFactory::createFromKey($source->getConfiguration()['ssl_key'][0]);
+        $jwk = JWKFactory::createFromKey($certificateKey);
 
         $jwsBuilder = new \Jose\Component\Signature\JWSBuilder(new AlgorithmManager([new RS512()]));
         $jws        = $jwsBuilder
@@ -285,6 +277,23 @@ class WaardepapierService
 
 
     /**
+     * This function simply maps data with a mapping to a claim.
+     *
+     * @param array  $data       Data to map to a claim.
+     * @param string $mappingRef Reference to mapping to use.
+     *
+     * @return array The claim.
+     */
+    public function createClaim(array $data, string $mappingRef): ?array
+    {
+        $mapping = $this->resourceService->getMapping($mappingRef, 'common-gateway/waardepapieren-bundle');
+
+        return $this->mappingService->mapping($mapping, $data);
+
+    }//end createClaim()
+
+
+    /**
      * This function fetches a haalcentraal persoon with the callService.
      *
      * @param string $bsn The bsn of the person.
@@ -296,11 +305,11 @@ class WaardepapierService
     public function fetchPersoonsgegevens(string $bsn): ?array
     {
         $source = $this->resourceService->getSource($this->configuration['source'], 'common-gateway/waardepapieren-bundle');
+        if ($source === null || $source->getIsEnabled() === false) {
+            // @TODO log
+            return [];
+        }
 
-        // if (key_exists('ssl_key', $source->getConfiguration()) === false) {
-        // The ssl key is not set.
-        // return null;
-        // }
         if (key_exists('brpEndpoint', $this->configuration) === true) {
             $endpoint = $this->configuration['brpEndpoint'];
         }
@@ -309,10 +318,12 @@ class WaardepapierService
             $endpoint = 'ingeschrevenpersonen';
         }
 
+        $endpoint = '/'.$endpoint.'/'.$bsn;
+
         try {
             $response = $this->callService->call(
                 $source,
-                '/'.$endpoint.'/'.$bsn,
+                $endpoint,
                 'GET'
             );
         } catch (\Exception $exception) {
@@ -330,6 +341,8 @@ class WaardepapierService
 
     /**
      * Creates or updates a Certificate.
+     *
+     * @todo Outdated and unused (probably) function.
      *
      * @param array $data          Data from the handler where the xxllnc casetype is in.
      * @param array $configuration Configuration for the Action.
@@ -362,7 +375,7 @@ class WaardepapierService
         }
 
         // 3. Create the image for the certificate.
-        $image = $this->createImage($certificate);
+        $image = $this->createQRImage($certificate);
 
         // 4. Make a data array to map from.
         $data = [

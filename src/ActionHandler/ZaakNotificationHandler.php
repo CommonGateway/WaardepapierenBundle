@@ -3,25 +3,25 @@
 namespace CommonGateway\WaardepapierenBundle\ActionHandler;
 
 use CommonGateway\CoreBundle\ActionHandler\ActionHandlerInterface;
-use CommonGateway\WaardepapierenBundle\Service\WPZaakService;
+use CommonGateway\WaardepapierenBundle\Service\ZaakNotificationService;
 
 /**
- * WPZaakHandler
+ * ZaakNotificationHandler
  *
  * @author   Barry Brands barry@conduction.nl
  * @package  common-gateway/waardepapieren-bundle
  * @category ActionHandler
  * @access   public
  */
-class WPZaakHandler implements ActionHandlerInterface
+class ZaakNotificationHandler implements ActionHandlerInterface
 {
 
-    private WPZaakService $wpZaakService;
+    private ZaakNotificationService $zaakNotificationService;
 
 
-    public function __construct(WPZaakService $wpZaakService)
+    public function __construct(ZaakNotificationService $zaakNotificationService)
     {
-        $this->wpZaakService = $wpZaakService;
+        $this->zaakNotificationService = $zaakNotificationService;
 
     }//end __construct()
 
@@ -60,7 +60,7 @@ class WPZaakHandler implements ActionHandlerInterface
      */
     public function run(array $data, array $configuration): array
     {
-        return $this->wpZaakService->wpZaakHandler($data, $configuration);
+        return $this->zaakNotificationService->zaakNotificationHandler($data, $configuration);
 
     }//end run()
 
