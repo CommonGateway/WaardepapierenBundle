@@ -561,7 +561,7 @@ class ZaakNotificationService
         }
 
         if ($statustype === null) {
-            $this->logger->error("statustype is null"), ['plugin' => 'common-gateway/waardepapieren-bundle'];
+            $this->logger->error("statustype is null", ['plugin' => 'common-gateway/waardepapieren-bundle']);
             return;
         }
 
