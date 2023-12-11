@@ -2,17 +2,12 @@
 
 namespace CommonGateway\WaardepapierenBundle\Service;
 
-use App\Entity\Entity;
-use App\Entity\Gateway;
 use App\Entity\ObjectEntity;
 use CommonGateway\CoreBundle\Service\CallService;
 use CommonGateway\CoreBundle\Service\DownloadService;
 use CommonGateway\CoreBundle\Service\GatewayResourceService;
-use CommonGateway\CoreBundle\Service\FileService;
 use CommonGateway\CoreBundle\Service\MappingService;
-use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
-use Dompdf\Dompdf;
 use Endroid\QrCode\Factory\QrCodeFactoryInterface;
 use Exception;
 use Jose\Component\Core\AlgorithmManager;
@@ -20,7 +15,7 @@ use Jose\Component\KeyManagement\JWKFactory;
 use Jose\Component\Signature\Algorithm\RS512;
 use Jose\Component\Signature\Serializer\CompactSerializer;
 use Symfony\Component\HttpFoundation\Response;
-use Twig\Environment as Twig;
+use Psr\Log\LoggerInterface;
 
 /**
  * WaardepapierService creates certificates
@@ -65,6 +60,10 @@ class WaardepapierService
     private MappingService $mappingService;
 
     /**
+     * @var LoggerInterface LoggerInterface.
+     */
+    private LoggerInterface $logger;
+    /**
      * @var array $configuration of the current action.
      */
     public array $configuration;
@@ -82,6 +81,7 @@ class WaardepapierService
      * @param GatewayResourceService $resourceService
      * @param DownloadService        $downloadService
      * @param MappingService         $mappingService
+     * @param LoggerInterface        $logger
      */
     public function __construct(
         EntityManagerInterface $entityManager,
@@ -89,7 +89,8 @@ class WaardepapierService
         CallService $callService,
         GatewayResourceService $resourceService,
         DownloadService $downloadService,
-        MappingService $mappingService
+        MappingService $mappingService,
+        LoggerInterface $logger
     ) {
         $this->entityManager   = $entityManager;
         $this->qrCode          = $qrCode;
@@ -97,84 +98,9 @@ class WaardepapierService
         $this->resourceService = $resourceService;
         $this->downloadService = $downloadService;
         $this->mappingService  = $mappingService;
+        $this->logger  = $logger;
 
     }//end __construct()
-
-
-    // private function sendEnkelvoudigInformatieObject($enkelvoudigInformatieObject)
-    // {
-    // try {
-    // $response = $this->callService->call(
-    // $this->openZaakSource,
-    // '/enkelvoudiginformatieobjecten',
-    // 'POST',
-    // ['body' => $enkelvoudigInformatieObject]
-    // );
-    // } catch (\Exception $exception) {
-    // throw new Exception($exception->getMessage());
-    // }
-    //
-    // return $this->callService->decodeResponse($this->openZaakSource, $response);
-    //
-    // }//end sendEnkelvoudigInformatieObject()
-    //
-    //
-    // private function sendObjectInformatieObject($objectInformatieObject)
-    // {
-    // try {
-    // $response = $this->callService->call(
-    // $this->openZaakSource,
-    // '/objectinformatieobjecten',
-    // 'POST',
-    // ['body' => $objectInformatieObject]
-    // );
-    // } catch (\Exception $exception) {
-    // throw new Exception($exception->getMessage());
-    // }
-    //
-    // return $this->callService->decodeResponse($this->openZaakSource, $response);
-    //
-    // }//end sendObjectInformatieObject()
-    //
-    //
-    // private function createInformatieObject()
-    // {
-    // $today = new DateTime();
-    // $enkelvoudigInformatieObject = [
-    // 'bronorganisatie'              => 'bsn buren',
-    // 'creatiedatum'                 => $today->format('Y-m-d'),
-    // 'titel'                        => 'Waardepapier'.$this->certificate['type'],
-    // 'vertrouwelijkheidsaanduiding' => 'vertrouwelijk',
-    // 'auteur'                       => 'bsn buren',
-    // 'status'                       => 'gearchiveerd',
-    // 'formaat'                      => 'application/pdf',
-    // 'taal'                         => 'nld',
-    // 'versie'                       => 1,
-    // 'beginRegistratie'             => $today->format('Y-m-d'),
-    // 'bestandsnaam'                 => 'todo',
-    // 'inhoud'                       => ($this->certificate['pdf'] ?? 'todo'),
-    // 'beschrijving'                 => 'Waardepapier '.$this->certificate['type'],
-    // 'ontvangstdatum'               => $today->format('Y-m-d'),
-    // 'verzenddatum'                 => $today->format('Y-m-d'),
-    // 'informatieobjecttype'         => '?',
-    // ];
-    //
-    // $enkelvoudigInformatieObjectResult = $this->sendEnkelvoudigInformatieObject($enkelvoudigInformatieObject);
-    //
-    // Check is valid
-    // if ($enkelvoudigInformatieObject) {
-    // }
-    //
-    // $objectInformatieObject = [
-    // 'informatieobject' => $enkelvoudigInformatieObjectResult['id or uri'],
-    // 'object'           => $this->userData['zaakId or uri'],
-    // 'objectType'       => 'zaak',
-    // ];
-    //
-    // $this->sendObjectInformatieObject($objectInformatieObject);
-    //
-    // }//end createInformatieObject()
-
 
     /**
      * Creates or updates a dynamic Certificate.
@@ -261,6 +187,7 @@ class WaardepapierService
     {
         $payload = $claim;
 
+        try {
         $jwk = JWKFactory::createFromKey($certificateKey);
 
         $jwsBuilder = new \Jose\Component\Signature\JWSBuilder(new AlgorithmManager([new RS512()]));
@@ -270,6 +197,9 @@ class WaardepapierService
             ->addSignature($jwk, ['alg' => 'RS512'])
             ->build();
         $serializer = new CompactSerializer();
+        } catch (\Exception $exception) {
+            $this->logger->error("Something wen't wrong trying to create a jwt claim token: {$exception->getMessage()}", ['plugin' => 'common-gateway/waardepapieren-bundle']);
+        }
 
         return $serializer->serialize($jws, 0);
 
@@ -306,7 +236,7 @@ class WaardepapierService
     {
         $source = $this->resourceService->getSource($this->configuration['source'], 'common-gateway/waardepapieren-bundle');
         if ($source === null || $source->getIsEnabled() === false) {
-            // @TODO log
+            $this->logger->error("Source is not found or enabled to fetch BRP data from: {$this->configuration['source']}", ['plugin' => 'common-gateway/waardepapieren-bundle']);
             return [];
         }
 
@@ -327,7 +257,7 @@ class WaardepapierService
                 'GET'
             );
         } catch (\Exception $exception) {
-            // Todo set error log
+            $this->logger->error("Failed to fetch data from BRP. Error: {$exception->getMessage()}", ['plugin' => 'common-gateway/waardepapieren-bundle']);
             throw new Exception($exception->getMessage());
         }//end try
 
