@@ -81,7 +81,7 @@ class ZaakNotificationService
     /**
      * @var LoggerInterface LoggerInterface.
      */
-    private LoggerInterface $loggerInterface;
+    private LoggerInterface $logger;
 
 
     /**
@@ -96,7 +96,7 @@ class ZaakNotificationService
         MappingService $mappingService,
         SynchronizationService $syncService,
         ApplicationService $applicationService,
-        LoggerInterface $loggerInterface
+        LoggerInterface $logger
     ) {
         $this->entityManager       = $entityManager;
         $this->waardepapierService = $waardepapierService;
@@ -106,7 +106,7 @@ class ZaakNotificationService
         $this->mappingService      = $mappingService;
         $this->syncService         = $syncService;
         $this->applicationService  = $applicationService;
-        $this->logger = $loggerInterface;
+        $this->logger              = $logger;
 
     }//end __construct()
 
