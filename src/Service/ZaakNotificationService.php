@@ -691,11 +691,13 @@ class ZaakNotificationService
             return $zaak['embedded']['rollen'][0]['betrokkeneIdentificatie']['inpBsn'];
         }
 
-        foreach ($zaak['embedded']['eigenschappen'] as $eigenschap) {
-            if ($eigenschap['naam'] === 'BSN'
-                || $eigenschap['naam'] === 'bsn'
-            ) {
-                return $eigenschap['waarde'];
+        if (isset($zaak['embedded']['eigenschappen']) === true) {
+            foreach ($zaak['embedded']['eigenschappen'] as $eigenschap) {
+                if ($eigenschap['naam'] === 'BSN'
+                    || $eigenschap['naam'] === 'bsn'
+                ) {
+                    return $eigenschap['waarde'];
+                }
             }
         }
 
@@ -707,17 +709,27 @@ class ZaakNotificationService
     /**
      * Gets BSN from Zaak and fetches BRP persoonsgegevens with waardepapierService.
      *
-     * @param array  $zaak      Zaak array object.
-     * @param string $sourceRef Reference for Source object (brp).
+     * @param array                        $zaak      Zaak array object.
+     * @param string                       $sourceRef Reference for Source object (brp).
+     * @param Source zrcSource  ZRC source.
      *
      * @return array Persoonsgegevens.
      */
-    private function getPersoonsgegevens(array $zaak, string $sourceRef): ?array
+    private function getPersoonsgegevens(array $zaak, string $sourceRef, Source $zrcSource): ?array
     {
         $bsn = $this->getBsnFromZaak($zaak);
         if ($bsn === null) {
-            $this->logger->error("BSN not found in Zaak", ['plugin' => 'common-gateway/waardepapieren-bundle']);
-            return $this->data;
+            $this->logger->error("BSN not found in Zaak, trying to fetch rollen of a Zaak.", ['plugin' => 'common-gateway/waardepapieren-bundle']);
+
+            // Fetch rollen from Zaak and check for a BSN.
+            $response = $this->callService->call($zrcSource, "/rollen?zaak={$this->data['body']['resourceUrl']}");
+            $response = $this->callService->decodeResponse($zrcSource, $response);
+            foreach ($response['results'] as $rol) {
+                if (isset($rol['betrokkeneIdentificatie']['inpBsn']) === true) {
+                    $bsn = $rol['betrokkeneIdentificatie']['inpBsn'];
+                    break;
+                }
+            }
         }
 
         $this->waardepapierService->configuration['source'] = $sourceRef;
@@ -783,7 +795,7 @@ class ZaakNotificationService
         foreach ($zaakTypeConfig['sources'] as $type => $reference) {
             switch ($type) {
             case 'brp':
-                $dataToMap['persoonsgegevens'] = $this->getPersoonsgegevens($zaak, $reference);
+                $dataToMap['persoonsgegevens'] = $this->getPersoonsgegevens($zaak, $reference, $zrcSource);
                 break;
             default:
                 break;
