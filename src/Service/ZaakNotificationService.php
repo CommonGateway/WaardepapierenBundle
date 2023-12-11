@@ -270,6 +270,7 @@ class ZaakNotificationService
 
         $gebruiksrechtSchema = $this->resourceService->getSchema('https://vng.opencatalogi.nl/schemas/drc.gebruiksrecht.schema.json', 'common-gateway/waardepapieren-bundle');
         if ($gebruiksrechtSchema === null) {
+            $this->logger->error('gebruiksrechtSchema is null', ['plugin' => 'common-gateway/waardepapieren-bundle']);
             return;
         }
 
@@ -287,6 +288,7 @@ class ZaakNotificationService
 
         $caseInformationObjectSchema = $this->resourceService->getSchema('https://vng.opencatalogi.nl/schemas/zrc.zaakInformatieObject.schema.json', 'common-gateway/waardepapieren-bundle');
         if ($caseInformationObjectSchema === null) {
+            $this->logger->error('caseInformationObjectSchema is null', ['plugin' => 'common-gateway/waardepapieren-bundle']);
             return;
         }
 
