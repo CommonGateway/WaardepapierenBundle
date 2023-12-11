@@ -13,6 +13,7 @@ use CommonGateway\CoreBundle\Service\DownloadService;
 use CommonGateway\CoreBundle\Service\GatewayResourceService;
 use CommonGateway\CoreBundle\Service\MappingService;
 use CommonGateway\WaardepapierenBundle\Service\WaardepapierService;
+use Psr\Log\LoggerInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Ramsey\Uuid\Uuid;
@@ -77,6 +78,11 @@ class ZaakNotificationService
      */
     private ApplicationService $applicationService;
 
+    /**
+     * @var LoggerInterface LoggerInterface.
+     */
+    private LoggerInterface $logger;
+
 
     /**
      * __construct
@@ -89,7 +95,8 @@ class ZaakNotificationService
         CallService $callService,
         MappingService $mappingService,
         SynchronizationService $syncService,
-        ApplicationService $applicationService
+        ApplicationService $applicationService,
+        LoggerInterface $logger
     ) {
         $this->entityManager       = $entityManager;
         $this->waardepapierService = $waardepapierService;
@@ -99,6 +106,7 @@ class ZaakNotificationService
         $this->mappingService      = $mappingService;
         $this->syncService         = $syncService;
         $this->applicationService  = $applicationService;
+        $this->logger = $logger;
 
     }//end __construct()
 
@@ -120,6 +128,7 @@ class ZaakNotificationService
         try {
             $response = $this->callService->call($synchronization->getSource(), $synchronization->getEndpoint(), 'POST', ['json' => $data]);
         } catch (Exception $exception) {
+            $this->logger->error($exception->getMessage());
             throw new Exception($exception->getMessage());
         }
 
@@ -163,6 +172,7 @@ class ZaakNotificationService
     public function storeWaardepapierInSourceDRC(ObjectEntity $informatieobject, ObjectEntity $zaakinformatieobject, ObjectEntity $gebruiksrecht, ObjectEntity $zaak): bool
     {
         if (count($zaak->getSynchronizations()) === 0) {
+            $this->logger->warning('Can\'t store waardepapier in drc, zaak has no synchronziaitons in source.');
             return true;
         }
 
@@ -184,6 +194,7 @@ class ZaakNotificationService
         $result = $this->synchronizeUpstream($eioSync);
 
         if ($result === false) {
+            $this->logger->error('Could not synchronize waardepapier to DRC source', ['plugin' => 'common-gateway/waardepapieren-bundle']);
             return false;
         }
 
@@ -199,6 +210,7 @@ class ZaakNotificationService
         $result = $this->synchronizeUpstream($gebruiksrechtSync);
 
         if ($result === false) {
+            $this->logger->error('Could not synchronize gebruiksrecht to DRC source', ['plugin' => 'common-gateway/waardepapieren-bundle']);
             return false;
         }
 
@@ -258,6 +270,7 @@ class ZaakNotificationService
 
         $gebruiksrechtSchema = $this->resourceService->getSchema('https://vng.opencatalogi.nl/schemas/drc.gebruiksrecht.schema.json', 'common-gateway/waardepapieren-bundle');
         if ($gebruiksrechtSchema === null) {
+            $this->logger->error('gebruiksrechtSchema is null', ['plugin' => 'common-gateway/waardepapieren-bundle']);
             return;
         }
 
@@ -275,6 +288,7 @@ class ZaakNotificationService
 
         $caseInformationObjectSchema = $this->resourceService->getSchema('https://vng.opencatalogi.nl/schemas/zrc.zaakInformatieObject.schema.json', 'common-gateway/waardepapieren-bundle');
         if ($caseInformationObjectSchema === null) {
+            $this->logger->error('caseInformationObjectSchema is null', ['plugin' => 'common-gateway/waardepapieren-bundle']);
             return;
         }
 
@@ -318,6 +332,7 @@ class ZaakNotificationService
         }
 
         if (isset($objectId) === false) {
+            $this->logger->error("No object id found ZaakType subobject type $schemaRef its url", ['plugin' => 'common-gateway/waardepapieren-bundle']);
             return null;
         }
 
@@ -329,6 +344,7 @@ class ZaakNotificationService
             try {
                 $response = $this->callService->call($source, $endpoint.'/'.$objectId);
             } catch (Exception $exception) {
+                $this->logger->error("Failed to fetch zaaktype subobject: {$exception->getMessage()}", ['plugin' => 'common-gateway/waardepapieren-bundle']);
                 throw new Exception($exception->getMessage());
             }
 
@@ -414,6 +430,7 @@ class ZaakNotificationService
         }
 
         if ($zaaktypeId === null) {
+            $this->logger->error("Could not get a ID on the ZaakType url $zaaktypeUrl", ['plugin' => 'common-gateway/waardepapieren-bundle']);
             return null;
         }
 
@@ -424,6 +441,7 @@ class ZaakNotificationService
         try {
             $response = $this->callService->call($source, '/zaaktypen/'.$zaaktypeId);
         } catch (Exception $exception) {
+            $this->logger->error("Failed to fetch ZaakType from source: {$exception->getMessage()}", ['plugin' => 'common-gateway/waardepapieren-bundle']);
             throw new Exception($exception->getMessage());
         }
 
@@ -467,6 +485,7 @@ class ZaakNotificationService
         $result = $this->synchronizeUpstream($resultaatSync);
 
         if ($result === false) {
+            $this->logger->error("ResultaatType is null", ['plugin' => 'common-gateway/waardepapieren-bundle']);
             return false;
         }
 
@@ -505,6 +524,7 @@ class ZaakNotificationService
         }
 
         if ($resultaattype === null) {
+            $this->logger->error("ResultaatType is null", ['plugin' => 'common-gateway/waardepapieren-bundle']);
             return;
         }
 
@@ -515,6 +535,7 @@ class ZaakNotificationService
 
         $resultaatSchema = $this->resourceService->getSchema('https://vng.opencatalogi.nl/schemas/zrc.resultaat.schema.json', 'common-gateway/waardepapieren-bundle');
         if ($resultaatSchema === null) {
+            $this->logger->error("resultaatSchema is null", ['plugin' => 'common-gateway/waardepapieren-bundle']);
             return;
         }
 
@@ -526,6 +547,7 @@ class ZaakNotificationService
 
         $statusSchema = $this->resourceService->getSchema("https://vng.opencatalogi.nl/schemas/zrc.status.schema.json", 'common-gateway/waardepapieren-bundle');
         if ($statusSchema === null) {
+            $this->logger->error("statusSchema is null", ['plugin' => 'common-gateway/waardepapieren-bundle']);
             return;
         }
 
@@ -539,6 +561,7 @@ class ZaakNotificationService
         }
 
         if ($statustype === null) {
+            $this->logger->error("statustype is null"), ['plugin' => 'common-gateway/waardepapieren-bundle'];
             return;
         }
 
@@ -575,6 +598,7 @@ class ZaakNotificationService
         try {
             $response = $this->callService->call($source, '/zaken/'.$zaakSync->getSourceId());
         } catch (Exception $exception) {
+            $this->logger->error("Failed to fetch zaak from source. Error: {$exception->getMessage()}", ['plugin' => 'common-gateway/waardepapieren-bundle']);
             throw new Exception($exception->getMessage());
         }
 
@@ -616,12 +640,14 @@ class ZaakNotificationService
         }
 
         if ($zaakId === null) {
+            $this->logger->error("Could not get a ID from the zaak url: $zaakUrl", ['plugin' => 'common-gateway/waardepapieren-bundle']);
             return $this->data;
         }
 
         // Find the zaak object through the source and sourceId.
         $zaakSync = $this->syncService->findSyncBySource($source, $schema, $zaakId);
         if (($zaakObject = $zaakSync->getObject()) === null) {
+            $this->logger->error("Failed to fetch zaak from source. Error: {$exception->getMessage()}", ['plugin' => 'common-gateway/waardepapieren-bundle']);
             return $this->data;
         }
 
@@ -653,6 +679,7 @@ class ZaakNotificationService
         }
 
         if (isset($zaaktypeUrl) === false) {
+            $this->logger->error("ZaakType url is not set", ['plugin' => 'common-gateway/waardepapieren-bundle']);
             return $this->data;
         }
 
@@ -699,7 +726,7 @@ class ZaakNotificationService
     {
         $bsn = $this->getBsnFromZaak($zaak);
         if ($bsn === null) {
-            // @TODO throw error and log about no bsn found.
+            $this->logger->error("BSN not found in Zaak", ['plugin' => 'common-gateway/waardepapieren-bundle']);
             return $this->data;
         }
 
@@ -725,9 +752,11 @@ class ZaakNotificationService
         $this->waardepapierService->configuration = $configuration;
         $this->data = $data;
 
+        $this->logger->debug("WaardepapierenBundle -> ZaakNotificationService -> zaakNotificationHandler()", ['plugin' => 'common-gateway/waardepapieren-bundle']);
+
         $application = $this->applicationService->getApplication();
         if ($application === null || $application->getPrivateKey() === null || empty($application->getDomains()) === true) {
-            // @TODO log error
+            $this->logger->error("Application is null, has no private key or has no domains", ['plugin' => 'common-gateway/waardepapieren-bundle']);
             return $this->data;
         }
 
@@ -735,6 +764,7 @@ class ZaakNotificationService
         $zaakSchema = $this->resourceService->getSchema($this->configuration['zaakSchema'], 'common-gateway/waardepapieren-bundle');
 
         if ($zrcSource instanceof Source === false || $zaakSchema instanceof Schema === false) {
+            $this->logger->error("zrcSource instanceof Source is false or zaakSchema instanceof Schema is false", ['plugin' => 'common-gateway/waardepapieren-bundle']);
             return $this->data;
         }
 
@@ -748,7 +778,8 @@ class ZaakNotificationService
 
         // Check if we have config for this source id.
         if (isset($this->configuration['zaakTypen'][$zaakTypeSourceId]) === false) {
-            // return base template or nothing
+            $this->logger->error("No action config found for ZaakType ID: $zaakTypeSourceId", ['plugin' => 'common-gateway/waardepapieren-bundle']);
+
             return $this->data;
         }
 
@@ -796,6 +827,9 @@ class ZaakNotificationService
 
         // Set the zaak as response in the dataArray response.
         $this->data['response'] = new Response(json_encode($zaak->toArray()), 200);
+
+        $this->logger->warning("Succesfully added waardepapier to Zaak and synced the Zaak and its subobjects back to its source.", ['plugin' => 'common-gateway/waardepapieren-bundle']);
+        $this->logger->notice("Succesfully added waardepapier to Zaak and synced the Zaak and its subobjects back to its source.", ['plugin' => 'common-gateway/waardepapieren-bundle']);
 
         return $this->data;
 
