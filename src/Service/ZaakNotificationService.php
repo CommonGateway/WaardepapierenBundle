@@ -709,8 +709,8 @@ class ZaakNotificationService
     /**
      * Gets BSN from Zaak and fetches BRP persoonsgegevens with waardepapierService.
      *
-     * @param array  $zaak      Zaak array object.
-     * @param string $sourceRef Reference for Source object (brp).
+     * @param array                        $zaak      Zaak array object.
+     * @param string                       $sourceRef Reference for Source object (brp).
      * @param Source zrcSource  ZRC source.
      *
      * @return array Persoonsgegevens.
@@ -720,7 +720,7 @@ class ZaakNotificationService
         $bsn = $this->getBsnFromZaak($zaak);
         if ($bsn === null) {
             $this->logger->error("BSN not found in Zaak, trying to fetch rollen of a Zaak.", ['plugin' => 'common-gateway/waardepapieren-bundle']);
-            
+
             // Fetch rollen from Zaak and check for a BSN.
             $response = $this->callService->call($zrcSource, "/rollen?zaak={$this->data['body']['resourceUrl']}");
             $response = $this->callService->decodeResponse($zrcSource, $response);
