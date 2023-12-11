@@ -106,7 +106,7 @@ class ZaakNotificationService
         $this->mappingService      = $mappingService;
         $this->syncService         = $syncService;
         $this->applicationService  = $applicationService;
-        $this->logger              = $loggerInterface;
+        $this->logger = $loggerInterface;
 
     }//end __construct()
 
@@ -354,7 +354,7 @@ class ZaakNotificationService
         if ($objectSync->getObject() !== null) {
             return $objectSync->getObject();
         }
-                
+
         return null;
 
     }//end getZaaktypeSubObjects()
