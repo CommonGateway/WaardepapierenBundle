@@ -136,8 +136,7 @@ class ZaakNotificationService
 
         $synchronization->getObject()->hydrate($updateObject);
         $this->entityManager->persist($synchronization->getObject());
-        $this->entityManager->flush();
-
+        // $this->entityManager->flush();
         if (key_exists('uuid', $updateObject) === true) {
             $sourceId = $updateObject['uuid'];
         }
@@ -189,8 +188,7 @@ class ZaakNotificationService
         $eioSync->setObject($informatieobject);
 
         $this->entityManager->persist($eioSync);
-        $this->entityManager->flush();
-
+        // $this->entityManager->flush();
         $result = $this->synchronizeUpstream($eioSync);
 
         if ($result === false) {
@@ -205,8 +203,7 @@ class ZaakNotificationService
         $gebruiksrechtSync->setObject($gebruiksrecht);
 
         $this->entityManager->persist($gebruiksrechtSync);
-        $this->entityManager->flush();
-
+        // $this->entityManager->flush();
         $result = $this->synchronizeUpstream($gebruiksrechtSync);
 
         if ($result === false) {
@@ -221,8 +218,7 @@ class ZaakNotificationService
         $zioSync->setObject($zaakinformatieobject);
 
         $this->entityManager->persist($zioSync);
-        $this->entityManager->flush();
-
+        // $this->entityManager->flush();
         $result = $this->synchronizeUpstream($zioSync);
 
         return $result;
@@ -266,8 +262,7 @@ class ZaakNotificationService
 
         $informationObject->hydrate($informationArray);
         $this->entityManager->persist($informationObject);
-        $this->entityManager->flush();
-
+        // $this->entityManager->flush();
         $gebruiksrechtSchema = $this->resourceService->getSchema('https://vng.opencatalogi.nl/schemas/drc.gebruiksrecht.schema.json', 'common-gateway/waardepapieren-bundle');
         if ($gebruiksrechtSchema === null) {
             $this->logger->error('gebruiksrechtSchema is null', ['plugin' => 'common-gateway/waardepapieren-bundle']);
@@ -284,8 +279,7 @@ class ZaakNotificationService
 
         $gebruiksrecht->hydrate($gebruiksrechtArray);
         $this->entityManager->persist($gebruiksrecht);
-        $this->entityManager->flush();
-
+        // $this->entityManager->flush();
         $caseInformationObjectSchema = $this->resourceService->getSchema('https://vng.opencatalogi.nl/schemas/zrc.zaakInformatieObject.schema.json', 'common-gateway/waardepapieren-bundle');
         if ($caseInformationObjectSchema === null) {
             $this->logger->error('caseInformationObjectSchema is null', ['plugin' => 'common-gateway/waardepapieren-bundle']);
@@ -300,8 +294,7 @@ class ZaakNotificationService
 
         $caseInformationObject->hydrate($caseInformationArray);
         $this->entityManager->persist($caseInformationObject);
-        $this->entityManager->flush();
-
+        // $this->entityManager->flush();
         $this->storeWaardepapierInSourceDRC($informationObject, $caseInformationObject, $gebruiksrecht, $zaakObject);
 
     }//end saveWaardepapierInDRC()
@@ -480,8 +473,7 @@ class ZaakNotificationService
         $resultaatSync->setObject($resultaat);
 
         $this->entityManager->persist($resultaatSync);
-        $this->entityManager->flush();
-
+        // $this->entityManager->flush();
         $result = $this->synchronizeUpstream($resultaatSync);
 
         if ($result === false) {
@@ -543,8 +535,7 @@ class ZaakNotificationService
 
         $resultaatObject->hydrate($resultaatArray);
         $this->entityManager->persist($resultaatObject);
-        $this->entityManager->flush();
-
+        // $this->entityManager->flush();
         $statusSchema = $this->resourceService->getSchema("https://vng.opencatalogi.nl/schemas/zrc.status.schema.json", 'common-gateway/waardepapieren-bundle');
         if ($statusSchema === null) {
             $this->logger->error("statusSchema is null", ['plugin' => 'common-gateway/waardepapieren-bundle']);
@@ -575,8 +566,7 @@ class ZaakNotificationService
 
         $statusObject->hydrate($statusArray);
         $this->entityManager->persist($statusObject);
-        $this->entityManager->flush();
-
+        // $this->entityManager->flush();
         $this->storeInSourceZRC($resultaatObject, $statusObject, $zaakObject);
 
     }//end saveInZRC()
