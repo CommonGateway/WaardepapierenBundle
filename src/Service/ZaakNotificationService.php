@@ -779,7 +779,7 @@ class ZaakNotificationService
         // Check if we have config for this source id.
         if (isset($this->configuration['zaakTypen'][$zaakTypeSourceId]) === false) {
             $this->logger->error("No action config found for ZaakType ID: $zaakTypeSourceId", ['plugin' => 'common-gateway/waardepapieren-bundle']);
-            
+
             return $this->data;
         }
 

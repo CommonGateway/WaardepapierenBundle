@@ -63,6 +63,7 @@ class WaardepapierService
      * @var LoggerInterface LoggerInterface.
      */
     private LoggerInterface $logger;
+
     /**
      * @var array $configuration of the current action.
      */
@@ -98,9 +99,10 @@ class WaardepapierService
         $this->resourceService = $resourceService;
         $this->downloadService = $downloadService;
         $this->mappingService  = $mappingService;
-        $this->logger  = $logger;
+        $this->logger          = $logger;
 
     }//end __construct()
+
 
     /**
      * Creates or updates a dynamic Certificate.
@@ -188,15 +190,15 @@ class WaardepapierService
         $payload = $claim;
 
         try {
-        $jwk = JWKFactory::createFromKey($certificateKey);
+            $jwk = JWKFactory::createFromKey($certificateKey);
 
-        $jwsBuilder = new \Jose\Component\Signature\JWSBuilder(new AlgorithmManager([new RS512()]));
-        $jws        = $jwsBuilder
-            ->create()
-            ->withPayload(json_encode($payload))
-            ->addSignature($jwk, ['alg' => 'RS512'])
-            ->build();
-        $serializer = new CompactSerializer();
+            $jwsBuilder = new \Jose\Component\Signature\JWSBuilder(new AlgorithmManager([new RS512()]));
+            $jws        = $jwsBuilder
+                ->create()
+                ->withPayload(json_encode($payload))
+                ->addSignature($jwk, ['alg' => 'RS512'])
+                ->build();
+            $serializer = new CompactSerializer();
         } catch (\Exception $exception) {
             $this->logger->error("Something wen't wrong trying to create a jwt claim token: {$exception->getMessage()}", ['plugin' => 'common-gateway/waardepapieren-bundle']);
         }
