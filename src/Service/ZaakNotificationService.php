@@ -251,6 +251,7 @@ class ZaakNotificationService
             'taal'                         => 'NLD',
             'bestandsnaam'                 => 'waardepapier.pdf',
             'versie'                       => null,
+            'status'                       => 'definitief'
         ];
 
         $informationObjectSchema = $this->resourceService->getSchema('https://vng.opencatalogi.nl/schemas/drc.enkelvoudigInformatieObject.schema.json', 'common-gateway/waardepapieren-bundle');
