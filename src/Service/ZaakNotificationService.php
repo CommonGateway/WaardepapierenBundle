@@ -644,14 +644,14 @@ class ZaakNotificationService
         return $zaakObject->toArray(['embedded' => true]);
 
     }//end getZaak()
-    
-    
+
+
     /**
      * Gets ZaakType through synchronization in gateway.
      *
-     * @param array $zaak Zaak array object.
+     * @param array        $zaak             Zaak array object.
      * @param ObjectEntity $zaakObject
-     * @param string|null $zaakTypeSourceId ZaakType id from its source.
+     * @param string|null  $zaakTypeSourceId ZaakType id from its source.
      *
      * @return ObjectEntity|null BSN if found from zaak.
      * @throws Exception
@@ -664,11 +664,11 @@ class ZaakNotificationService
 
         if (is_string($zaak['zaaktype']) === false) {
             // Get the zaaktype from the source with the url from the zaak.
-            $zaaktype     = $zaakObject->getValue('zaaktype');
+            $zaaktype = $zaakObject->getValue('zaaktype');
             if ($zaaktype instanceof ObjectEntity === false) {
                 return null;
             }
-            
+
             $zaaktypeSync = $zaaktype->getSynchronizations()->first();
             $zaaktypeUrl  = $zaaktypeSync->getSourceId();
         }
