@@ -644,18 +644,19 @@ class ZaakNotificationService
         return $zaakObject->toArray(['embedded' => true]);
 
     }//end getZaak()
-
-
+    
+    
     /**
      * Gets ZaakType through synchronization in gateway.
      *
-     * @param array        $zaak             Zaak array object.
-     * @param ObjectEntity $zazaakObject     Zaak Zaak ObjectEntity.
-     * @param string|null  $zaakTypeSourceId ZaakType id from its source.
+     * @param array $zaak Zaak array object.
+     * @param ObjectEntity $zaakObject
+     * @param string|null $zaakTypeSourceId ZaakType id from its source.
      *
-     * @return string|null BSN if found from zaak.
+     * @return ObjectEntity|null BSN if found from zaak.
+     * @throws Exception
      */
-    private function getZaakType(array $zaak, ObjectEntity $zaakObject, ?string &$zaakTypeSourceId=null): ObjectEntity
+    private function getZaakType(array $zaak, ObjectEntity $zaakObject, ?string &$zaakTypeSourceId=null): ?ObjectEntity
     {
         if (is_string($zaak['zaaktype']) === true) {
             $zaaktypeUrl = $zaak['zaaktype'];
@@ -664,6 +665,10 @@ class ZaakNotificationService
         if (is_string($zaak['zaaktype']) === false) {
             // Get the zaaktype from the source with the url from the zaak.
             $zaaktype     = $zaakObject->getValue('zaaktype');
+            if ($zaaktype instanceof ObjectEntity === false) {
+                return null;
+            }
+            
             $zaaktypeSync = $zaaktype->getSynchronizations()->first();
             $zaaktypeUrl  = $zaaktypeSync->getSourceId();
         }
@@ -777,6 +782,9 @@ class ZaakNotificationService
         // $zaakTypeSourceId gets passed back here in getZaakType function by the ampersand &.
         $zaakTypeSourceId = null;
         $zaakType         = $this->getZaakType($zaak, $zaakObject, $zaakTypeSourceId);
+        if ($zaakType === null) {
+            return $this->data;
+        }
 
         // Check if we have config for this source id.
         if (isset($this->configuration['zaakTypen'][$zaakTypeSourceId]) === false) {
