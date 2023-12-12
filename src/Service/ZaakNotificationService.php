@@ -822,7 +822,10 @@ class ZaakNotificationService
         $this->saveWaardepapierInDRC($certificate, $zaakObject, $informatieobjecttypeUrl);
 
         // Store resultaat and status in ZRC source.
-        $this->saveInZRC($zaakObject, $zaakType);
+        // Only create a new resultaat and status if there is not one yet (1 max per zaak).
+        if (isset($zaak['resultaat']) === false) {
+            $this->saveInZRC($zaakObject, $zaakType);
+        }
 
         // Get the zaak from source with updated data.
         $zaak = $this->getZaakFromSource($zaakObject);
