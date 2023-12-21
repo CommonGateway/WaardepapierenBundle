@@ -18,23 +18,25 @@ softwareType: softwareAddon
 description:
   en:
     localisedName: null
-    genericName: Symfony bundle for certificate functionality.
-    shortDescription: WaardepapierenBundle
-    longDescription: Symfony bundle for certificate functionality.
+    genericName: null
+    shortDescription: "Symfony bundle for certificate functionality."
+    longDescription: "Symfony bundle for certificate functionality."
     documentation: https://www.waardepapieren.app
     apiDocumentation: null
-    features: []
+    features:
+      - Common Ground Gateway Plugin
     screenshots: []
     videos: []
     awards: []
   nl:
     localisedName: null
-    genericName: Symfony bundle voor waardepapieren functionaliteit.
-    shortDescription: WaardepapierenBundle
-    longDescription: Symfony bundle voor waardepapieren functionaliteit.
+    genericName: null
+    shortDescription: "Symfony bundle voor waardepapieren functionaliteit."
+    longDescription: "Symfony bundle voor waardepapieren functionaliteit."
     documentation: https://www.waardepapieren.app
     apiDocumentation: null
-    features: []
+    features:
+      - Common Ground Gateway Plugin
     screenshots: []
     videos: []
     awards: []
@@ -78,6 +80,14 @@ dependsOn:
       versionMin: 1.2
       versionMax: 1.3
       version: 1.2.47
+      optional: false
+    - name: ZGWBundle
+      versionMin: 1.0
+      version: 1.0.49
+      optional: false
+    - name: KissBundle
+      versionMin: 0.1
+      version: 0.1.38
       optional: false
 roadmap: null
 inputTypes:
