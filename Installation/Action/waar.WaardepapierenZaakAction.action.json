@@ -22,7 +22,7 @@
             "template": "https://waardepapieren.commonground.nl/Template/buren.uittrekselBasisRegsitratiePersonen.template.json",
             "mapping": "https://waardepapieren.commongateway.nl/mapping/waar.uittrekselBasisRegsitratiePersonen.mapping.json",
             "sources": {
-                "brp": "https://waardepapieren.commonground.nl/source/waardepapieren.brp.source.json"
+                "brp": "https://buren.nl/source/buren.brp.source.json"
             }
         }
     },

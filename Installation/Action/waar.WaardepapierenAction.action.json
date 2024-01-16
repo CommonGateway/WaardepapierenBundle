@@ -14,7 +14,7 @@
   "class": "CommonGateway\\WaardepapierenBundle\\ActionHandler\\WaardepapierenHandler",
   "configuration": {
     "schema": "https://waardepapieren.commonground.nl/certificate.schema.json",
-    "source": "https://waardepapieren.commonground.nl/source/waardepapieren.brp.source.json",
+    "source": "https://buren.nl/source/buren.brp.source.json",
     "mapping": "https://waardepapieren.commongateway.nl/mapping/waardepapieren.certificate.mapping.json",
     "brpEndpoint": "ingeschrevenpersonen"
   }
