@@ -2,7 +2,7 @@
   "title": "WaardepapierenZaakAction",
   "$id": "https://waardepapieren.commonground.nl/action/waar.WaardepapierenZaakAction.action.json",
   "$schema": "https://docs.commongateway.nl/schemas/Action.schema.json",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "listens": ["kiss.notification"],
   "description": "This is a action to update a zaak with certificate.",
   "throws": ["send.bericht"],
@@ -22,7 +22,7 @@
             "template": "https://waardepapieren.commonground.nl/Template/buren.uittrekselBasisRegsitratiePersonen.template.json",
             "mapping": "https://waardepapieren.commongateway.nl/mapping/waar.uittrekselBasisRegsitratiePersonen.mapping.json",
             "sources": {
-                "brp": "https://waardepapieren.commonground.nl/source/waardepapieren.brp.source.json"
+                "brp": "https://buren.nl/source/buren.brp.source.json"
             }
         }
     },
