@@ -1,0 +1,31 @@
+{
+  "title": "WaardepapierenDecosZaakAction",
+  "$id": "https://waardepapieren.commonground.nl/action/waar.WaardepapierenDecosZaakAction.action.json",
+  "$schema": "https://docs.commongateway.nl/schemas/Action.schema.json",
+  "version": "0.0.2",
+  "listens": ["kiss.notification"],
+  "description": "This is a action to update a zaak with certificate.",
+  "throws": [],
+  "conditions": {
+    "==": [
+      {
+        "var": "body.kenmerken.zaaktype"
+      },
+      "https://zgw-ztc-api-acc.decosasp.com/api/zaaktypen/52a3da26-6f91-47d7-8f19-df98b05ae184"
+    ]
+  },
+  "class": "CommonGateway\\WaardepapierenBundle\\ActionHandler\\ZaakNotificationHandler",
+  "configuration": {
+    "zrcSource": "https://waardepapieren.commonground.nl/source/waar.decos.zrc.source.json",
+    "drcSource": "https://waardepapieren.commonground.nl/source/waar.decos.drc.source.json",
+    "ztcSource": "https://waardepapieren.commonground.nl/source/waar.decos.ztc.source.json",
+    "enkelvoudigInfoMapping": "https://waardepapieren.commongateway.nl/mapping/drc.enkelvoudigInformatieObjectUpstream.mapping.json",
+    "zaakInfoMapping": "https://waardepapieren.commongateway.nl/mapping/zrc.zaakInformatieObjectUpstream.mapping.json",
+    "resultaatMapping": "https://waardepapieren.commongateway.nl/mapping/zrc.resultaatUpstream.mapping.json",
+    "statusMapping": "https://waardepapieren.commongateway.nl/mapping/zrc.statusUpstream.mapping.json",
+    "zaakSchema": "https://vng.opencatalogi.nl/schemas/zrc.zaak.schema.json",
+    "resultaatSchema": "https://vng.opencatalogi.nl/schemas/zrc.resultaat.schema.json",
+    "statusSchema": "https://vng.opencatalogi.nl/schemas/zrc.status.schema.json",
+    "zaaktypeSchema": "https://vng.opencatalogi.nl/schemas/ztc.zaakType.schema.json"
+  }
+}

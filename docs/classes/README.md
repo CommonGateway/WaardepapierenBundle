@@ -1,4 +1,4 @@
 # CommonGateway\WaardepapierenBundle
 
 * [Service\WaardepapierService](Service/WaardepapierService.md)
-* [Service\WPZaakService](Service/WPZaakService.md)
+* [Service\ZaakNotificationService](Service/ZaakNotificationService.md)

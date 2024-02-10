@@ -1,0 +1,18 @@
+{
+  "title": "EnkelvoudigInformatieobject",
+  "$id": "https://waardepapieren.commongateway.nl/mapping/drc.enkelvoudigInformatieObjectUpstream.mapping.json",
+  "$schema": "https://docs.commongateway.nl/schemas/Mapping.schema.json",
+  "version": "0.0.2",
+  "passTrough": false,
+  "mapping": {
+    "bronorganisatie": "bronorganisatie",
+    "creatiedatum": "creatiedatum",
+    "titel": "titel",
+    "auteur": "auteur",
+    "taal": "taal",
+    "bestandsnaam": "bestandsnaam",
+    "inhoud": "inhoud",
+    "informatieobjecttype": "informatieobjecttype",
+    "status": "status"
+  }
+}

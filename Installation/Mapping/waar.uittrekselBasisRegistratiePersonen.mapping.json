@@ -1,0 +1,26 @@
+{
+  "title": "Claim uittreksel basis registratie personen",
+  "$id": "https://waardepapieren.commongateway.nl/mapping/waar.uittrekselBasisRegsitratiePersonen.mapping.json",
+  "$schema": "https://docs.commongateway.nl/schemas/Mapping.schema.json",
+  "version": "0.0.1",
+  "passTrough": false,
+  "mapping": {
+    "@context": "[\"https://www.w3.org/ns/credentials/v\", \"https://www.w3.org/ns/credentials/examples/v2\"]",
+    "id": "",
+    "type": "[\"VerifiableCredential\", \"ExampleAlumniCredential\"]",
+    "issuer": "applicationDomain",
+    "validFrom": "2010-01-01T19:23:24Z",
+    "credentialSubject.naam": "persoonsgegevens.naam.aanschrijfwijze",
+    "credentialSubject.voornamen": "persoonsgegevens.naam.voornamen",
+    "credentialSubject.geboortedatum": "persoonsgegevens.geboorte.datum.datum",
+    "credentialSubject.geboorteplaats": "{% if persoonsgegevens.geboorte.plaats.omschrijving|default %}{{ persoonsgegevens.geboorte.plaats.omschrijving }}{% endif %}",
+    "credentialSubject.wonendeTe": "{% if persoonsgegevens.verblijfplaats.woonplaats|default %}{{ persoonsgegevens.verblijfplaats.woonplaats }}{% endif %}",
+    "credentialSubject.gemeente": "{% if persoonsgegevens.verblijfplaats.woonplaats|default %}{{ persoonsgegevens.verblijfplaats.woonplaats }}{% endif %}",
+    "credentialSubject.burgelijkeStaat": "{% if persoonsgegevens.partners[0].soortVerbintenis|default %}{{ persoonsgegevens.partners[0].soortVerbintenis }}{% else %}{{ 'Alleenstaand' }}{% endif %}",
+    "credentialSubject.bsn": "persoonsgegevens.burgerservicenummer"
+  },
+  "cast": {
+    "@context": "jsonToArray"
+  },
+  "unset": {}
+}

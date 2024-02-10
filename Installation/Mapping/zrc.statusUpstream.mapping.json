@@ -1,0 +1,12 @@
+{
+  "title": "Status",
+  "$id": "https://waardepapieren.commongateway.nl/mapping/zrc.statusUpstream.mapping.json",
+  "$schema": "https://docs.commongateway.nl/schemas/Mapping.schema.json",
+  "version": "0.0.1",
+  "passTrough": false,
+  "mapping": {
+    "zaak": "zaak.url",
+    "statustype": "statustype",
+    "datumStatusGezet": "datumStatusGezet"
+  }
+}
