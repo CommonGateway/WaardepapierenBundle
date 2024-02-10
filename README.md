@@ -1,6 +1,5 @@
 # Waardepapieren
 
-
 ## Over Waardepapieren
 
 Soms moet je aantonen dat je in een gemeente woont. Bijvoorbeeld als een woningcorporatie daarom vraagt. Je gaat dan naar de gemeente om een uittreksel aan te vragen. De gemeentemedewerker zoekt jouw gegevens op in het burgerzakensysteem. Print een uittreksel. En zet daar een stempel op. Een uittreksel kan vaak ook online aangevraagd worden. Het duurt dan een aantal dagen voordat je het uittreksel thuis hebt. In beide gevallen is het proces arbeidsintensief, en klantonvriendelijk. Ook zijn de kosten voor zowel de gemeente als inwoner hoog. NB: Deze website is in aanbouw.
@@ -11,7 +10,7 @@ De dienstverlening aan inwoners en bedrijven moet verbeterd worden. Het liefst i
 
 ## Verviable credentials als kern
 
-Waardepapieren bouwt verder op het [verviable credentials project](https://ec.europa.eu/digital-building-blocks/wikis/pages/viewpage.action?pageId=555222155) van de europese unnie. Het creërt claims en ondertekende deze met een certificaat (in NL context een PKIo). 
+Waardepapieren bouwt verder op het [verviable credentials project](https://ec.europa.eu/digital-building-blocks/wikis/pages/viewpage.action?pageId=555222155) van de europese unnie. Het creërt claims en ondertekende deze met een certificaat (in NL context een PKIo).
 
 Een claim kan een data set zijn (zo als een volledig uittreksel) en een enkel feit (zo als een diploma), bij het teken van een claim wordt het signatuur van de data verweven met het certificaat van de uitgever. Zo kan een controllerende partij die een claim voor zich ziet twee belangrijke digitale controlles uitvoeren
 
@@ -20,13 +19,11 @@ Een claim kan een data set zijn (zo als een volledig uittreksel) en een enkel fe
 
 ## Aktes
 
-We zien claims als een aanvulling op de huidige papieren aktes die overheden reeds uitgeven. Door de claim als QR code op de akte af te drukken zijn aktes 
-
+We zien claims als een aanvulling op de huidige papieren aktes die overheden reeds uitgeven. Door de claim als QR code op de akte af te drukken zijn aktes
 
 ## Veiliger
 
-Het simpel toevoegen van qr codes en aktes daarmee controleerbaar maken voegt een extra dimensie van veiligheid toe aan aktes die niet met hologrammen of watermerken te bereiken zijn. 
-
+Het simpel toevoegen van qr codes en aktes daarmee controleerbaar maken voegt een extra dimensie van veiligheid toe aan aktes die niet met hologrammen of watermerken te bereiken zijn.
 
 ## Inzet buiten aktes
 

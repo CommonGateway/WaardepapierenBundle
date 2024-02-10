@@ -21,13 +21,13 @@ Deze variant is specifiek ontworpen om te integreren met ZGW-gebaseerde zaaksyst
 **Referenties**
 
 * [ZGW API's](https://www.vngrealisatie.nl/producten/api-standaarden-zaakgericht-werken)
-* 
+*
+
 ### Direct gebruik
 
-Naast de waardenpapieren service laten mee luisteren op een zaaksysteem is het ook mogenlijk om applicaties direct via de services een waardepapier te laten creëren (bijvoorbeeld omdat je een waardepapier nodig hebt los van een zaak). In dat geval kan de onderliggende applicatie een JSON bericht aan de waardepapiersn service sturen 
+Naast de waardenpapieren service laten mee luisteren op een zaaksysteem is het ook mogenlijk om applicaties direct via de services een waardepapier te laten creëren (bijvoorbeeld omdat je een waardepapier nodig hebt los van een zaak). In dat geval kan de onderliggende applicatie een JSON bericht aan de waardepapiersn service sturen
 
 ![Direct Architecture](https://raw.githubusercontent.com/CommonGateway/WaardepapierenBundle/main/docs/direct_waardepapier.svg)
-
 
 ### Mijn Omgeving
 
