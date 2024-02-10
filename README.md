@@ -1,11 +1,5 @@
 # Waardepapieren
 
-## Over Waardepapieren
-
-Soms moet je aantonen dat je in een gemeente woont. Bijvoorbeeld als een woningcorporatie daarom vraagt. Je gaat dan naar de gemeente om een uittreksel aan te vragen. De gemeentemedewerker zoekt jouw gegevens op in het burgerzakensysteem. Print een uittreksel. En zet daar een stempel op. Een uittreksel kan vaak ook online aangevraagd worden. Het duurt dan een aantal dagen voordat je het uittreksel thuis hebt. In beide gevallen is het proces arbeidsintensief, en klantonvriendelijk. Ook zijn de kosten voor zowel de gemeente als inwoner hoog. NB Deze website is in aanbouw.
-
-Over het innovatieproject Waardepapieren
-De dienstverlening aan inwoners en bedrijven moet verbeterd worden. Het liefst in combinatie met het bereiken van een efficiëntere bedrijfsvoering. Dit streven leidde bij de gemeente Haarlem tot de ontwikkeling van een Proof of Concept (PoC) voor het verstrekken van digitale waardepapieren. Een uittreksel uit de Basisregistratie Personen bijvoorbeeld. De klantreis voor uittreksels is in kaart gebracht om de behoefte aan deze oplossing bij zowel de gemeente als de inwoner te analyseren. Acht gemeenten hebben het prototype uitgewerkt tot een veilig product dat gemeenten nu zelf kunnen implementeren.
 
 ## Over Waardepapieren
 
@@ -14,6 +8,29 @@ Soms moet je aantonen dat je in een gemeente woont. Bijvoorbeeld als een woningc
 ## Over het innovatieproject Waardepapieren
 
 De dienstverlening aan inwoners en bedrijven moet verbeterd worden. Het liefst in combinatie met het bereiken van een efficiëntere bedrijfsvoering. Dit streven leidde bij de gemeente Haarlem tot de ontwikkeling van een Proof of Concept (PoC) voor het verstrekken van digitale waardepapieren. Een uittreksel uit de Basisregistratie Personen bijvoorbeeld. De klantreis voor uittreksels is in kaart gebracht om de behoefte aan deze oplossing bij zowel de gemeente als de inwoner te analyseren. Acht gemeenten hebben het prototype uitgewerkt tot een veilig product dat gemeenten nu zelf kunnen implementeren.
+
+## Verviable credentials als kern
+
+Waardepapieren bouwt verder op het [verviable credentials project](https://ec.europa.eu/digital-building-blocks/wikis/pages/viewpage.action?pageId=555222155) van de europese unnie. Het creërt claims en ondertekende deze met een certificaat (in NL context een PKIo). 
+
+Een claim kan een data set zijn (zo als een volledig uittreksel) en een enkel feit (zo als een diploma), bij het teken van een claim wordt het signatuur van de data verweven met het certificaat van de uitgever. Zo kan een controllerende partij die een claim voor zich ziet twee belangrijke digitale controlles uitvoeren
+
+1. De data in de claim is niet aangepast
+2. De claim is verstrekt door een specifieke organisaties
+
+## Aktes
+
+We zien claims als een aanvulling op de huidige papieren aktes die overheden reeds uitgeven. Door de claim als QR code op de akte af te drukken zijn aktes 
+
+
+## Veiliger
+
+Het simpel toevoegen van qr codes en aktes daarmee controleerbaar maken voegt een extra dimensie van veiligheid toe aan aktes die niet met hologrammen of watermerken te bereiken zijn. 
+
+
+## Inzet buiten aktes
+
+De QR codes op claims kunnen ook buiten aktes worden gebruikt, bijvoorbeeld op een taxi-pass of toegangs bewijs.
 
 ## Met wie we samenwerken
 
