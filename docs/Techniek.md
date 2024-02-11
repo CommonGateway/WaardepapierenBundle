@@ -19,19 +19,22 @@ Waardepapieren zijn digitale documenten die claims bevatten. Deze claims kunnen 
 5. **Interoperabiliteit**: Kan worden geïntegreerd met verschillende systemen en standaarden.
 
 ## Voorbeelden van waardepapieren
-- Akten (uitreksel burgelijke stand, bewijs van in leven zijn)
-- Abbonementen (Bibliotheek)
-- Rechten (parkeer ontheffing)
+
+* Akten (uitreksel burgelijke stand, bewijs van in leven zijn)
+* Abbonementen (Bibliotheek)
+* Rechten (parkeer ontheffing)
 
 ## Intrekken van waardepapieren
+
 Een intressante optie van digitaal getekende waardepapieren is dat ze (in tegenstelling tot papieren waardepapieren) op afstand kunnen worden ingetrokken. Dit betekend dat de papieren een hogere  waarde vertegenwoordigen, ze waren niet alleen juist op het moment van afgeven maar zijn ook juist op het moment van controlleren. Dit voorkomt misbruik van reeds afgegeven papieren.
 
-- Bewijs van inschrijving (intrekken als persoon niet langer is ingeschreven)
-- KvK uitreksel (intrekken als bedrijf wordt uitgeschreven)
-- Bewijs van in leven zijn (als persoon overleid)
-- Verklaring van Goed gedrag (als persoon wordt veroordeeld)
+* Bewijs van inschrijving (intrekken als persoon niet langer is ingeschreven)
+* KvK uitreksel (intrekken als bedrijf wordt uitgeschreven)
+* Bewijs van in leven zijn (als persoon overleid)
+* Verklaring van Goed gedrag (als persoon wordt veroordeeld)
 
 ## Tijdenlijk maken van waardepapieren
+
 Als van te voren bekend is dat een waardepapier een beperkte geldigheid heeft (bijvoorbeeld een parkeerkaart voor invalide) kan in de QR code een eindmoment worden meegegeven.
 
 ## Referenties naar Europese en Nederlandse identiteitsprojecten
