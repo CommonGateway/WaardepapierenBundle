@@ -13,6 +13,7 @@ Onderstaande treft u de bij ons bekende kosten per component die leveranciers in
 Wilt u leverancue worden en onderstaande componenten zelf ook aanbieden aan uw klanten? Neem dan contact op met Conduction en mail ons op <info@conduction.nl>. We voegen u graag toe!
 
 ## Componenten
+
 Voor waardepapieren app heeft u de volgende componenten nodig
 
 ### Waardepapieren Service
@@ -42,4 +43,4 @@ Naast de algemeen beschickbare scan app bestaat de mogenlijkheid om een specifie
 |-----------|-------------|----------|-------------|
 | ScanApp   | Conduction  | € 3000,-  | € 250.-    |
 
-> [!IMPORTANT] Uw organisatie dient zichzelf hiervoor te registreren als app leverancier bij Apple en Google.
+> \[!IMPORTANT] Uw organisatie dient zichzelf hiervoor te registreren als app leverancier bij Apple en Google.
