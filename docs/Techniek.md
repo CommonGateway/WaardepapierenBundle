@@ -38,6 +38,7 @@ Een intressante optie van digitaal getekende waardepapieren is dat ze (in tegens
 Als van te voren bekend is dat een waardepapier een beperkte geldigheid heeft (bijvoorbeeld een parkeerkaart voor invalide) kan in de QR code een eindmoment worden meegegeven.
 
 ## Referenties naar Europese en Nederlandse identiteitsprojecten
+
 * [IRMA (I Reveal My Attributes)](https://irma.app/)
 * [eIDAS](https://ec.europa.eu/info/law/law-topic/data-protection/eu-data-protection-rules/eidas-regulation_en)
 
