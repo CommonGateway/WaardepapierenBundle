@@ -9,14 +9,16 @@ De Waardepapieren Service is in 2023 getransformeerd van een standalone applicat
 * [Microservices Architectuur](https://www.noraonline.nl/wiki/Microservices)
 
 ## Componenten
+
 De Waardenpapieren.app bestaat uit de volgende componenten
 
-1. **Scan app:** De (MVP) scan app voor het controlen van de QR code op een waardepapier. 
+1. **Scan app:** De (MVP) scan app voor het controlen van de QR code op een waardepapier.
 2. **Waardepapieren Service:** De Service die verantwoordenlijk is voor het daadwerkenlijk creëren van het waardepapier
 3. **Waardepapieren Register (optioneel):** Indien waardepapieren intrekbaar zijn moeten deze worden opgeslagen in een register zodat zij daadwerkenlijk vernietigd kunnen worden.
 
 ## Intrekken van waardepapieren
-Het intrekken van waardepapieren vergt het installeren van een controlleregister (waardepapieren register), dat publiek toegankenlijk is en een kopie van de atributen bevat (zodat er atribuut specifiek vernietigd kan worden). Tijdens iedere controlle van een claim wordt dit register bevraagd aan de hand van een unieke hash. De server kan echter maar drie antwoorden geven (geldig, ongeldig, onbereibkaar) een waardepapier dat niet in het register kan worden gevonden word aangeduid als ongeldig. Hoe er rekening meer dat in deze casus bij het verhuisen of beindigen van een waardepapieren register alle daarin ogenomen waardepapieren niet langer te valideren zijn. 
+
+Het intrekken van waardepapieren vergt het installeren van een controlleregister (waardepapieren register), dat publiek toegankenlijk is en een kopie van de atributen bevat (zodat er atribuut specifiek vernietigd kan worden). Tijdens iedere controlle van een claim wordt dit register bevraagd aan de hand van een unieke hash. De server kan echter maar drie antwoorden geven (geldig, ongeldig, onbereibkaar) een waardepapier dat niet in het register kan worden gevonden word aangeduid als ongeldig. Hoe er rekening meer dat in deze casus bij het verhuisen of beindigen van een waardepapieren register alle daarin ogenomen waardepapieren niet langer te valideren zijn.
 
 ![Waardepapier Intrekken](https://raw.githubusercontent.com/CommonGateway/WaardepapierenBundle/main/docs/waardepapier_intrekken.svg)
 
@@ -26,20 +28,20 @@ Afhankelijk van de opzet van het zaaksysteem binnen de organisatie die waardepap
 
 ### ZGW / Zaakgericht Werken
 
-Deze variant is specifiek ontworpen om te integreren met ZGW-gebaseerde zaaksystemen. Het maakt gebruik van de ZGW API's voor een naadloze interactie Het is tevens de **Basis variant** we gaan er namenlijk vanuit dat de gemeente zaakgericht werkt, dat betekend automatisch dat de afhandeling (en dus ook document creatie) plaatsvind op het zaaksysteem. Het is vanuit die visie dan ook onwensenlijk dat een formulieren applicatie of mijn omgeving zelf waardepapieren creert (als dan niet via de service). Hiermee zou immers de scheiding van functionele componenten worden gebroken.  
+Deze variant is specifiek ontworpen om te integreren met ZGW-gebaseerde zaaksystemen. Het maakt gebruik van de ZGW API's voor een naadloze interactie Het is tevens de **Basis variant** we gaan er namenlijk vanuit dat de gemeente zaakgericht werkt, dat betekend automatisch dat de afhandeling (en dus ook document creatie) plaatsvind op het zaaksysteem. Het is vanuit die visie dan ook onwensenlijk dat een formulieren applicatie of mijn omgeving zelf waardepapieren creert (als dan niet via de service). Hiermee zou immers de scheiding van functionele componenten worden gebroken.
 
 ![ZGW Architecture](https://raw.githubusercontent.com/CommonGateway/WaardepapierenBundle/main/docs/zgw_waardepapier_klein.svg)
 
 **Referenties**
 
 * [ZGW API's](https://www.vngrealisatie.nl/producten/api-standaarden-zaakgericht-werken)
-* 
+*
+
 ### Direct gebruik
 
-Naast de waardenpapieren service laten mee luisteren op een zaaksysteem is het ook mogenlijk om applicaties direct via de services een waardepapier te laten creëren (bijvoorbeeld omdat je een waardepapier nodig hebt los van een zaak). In dat geval kan de onderliggende applicatie een JSON bericht aan de waardepapieren service sturen de service creert vervolgens een waardepapier en geeft dit terug. Deze service dient alleen te worden gebruikt door componenten die een functionele taak hebben voor het creeren van waardepapieren (bijvoorbeeld een burgerzaken applicatie) en niet door formulieren en mijn omgevingen (zie ook ZGW / Zaakgericht werken) 
+Naast de waardenpapieren service laten mee luisteren op een zaaksysteem is het ook mogenlijk om applicaties direct via de services een waardepapier te laten creëren (bijvoorbeeld omdat je een waardepapier nodig hebt los van een zaak). In dat geval kan de onderliggende applicatie een JSON bericht aan de waardepapieren service sturen de service creert vervolgens een waardepapier en geeft dit terug. Deze service dient alleen te worden gebruikt door componenten die een functionele taak hebben voor het creeren van waardepapieren (bijvoorbeeld een burgerzaken applicatie) en niet door formulieren en mijn omgevingen (zie ook ZGW / Zaakgericht werken)
 
 ![Direct Architecture](https://raw.githubusercontent.com/CommonGateway/WaardepapierenBundle/main/docs/direct_waardepapier.svg)
-
 
 ### Mijn Omgeving
 
@@ -84,5 +86,3 @@ Deze variant is bedoeld voor organisaties die gebruik maken van de ZDS-standaard
 **Referenties**
 
 * [ZDS](https://www.gemmaonline.nl/index.php/Zaak-_en_Documentservices)
-
-
