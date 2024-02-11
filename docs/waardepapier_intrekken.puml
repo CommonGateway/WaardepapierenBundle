@@ -11,9 +11,15 @@ database "Waardepapieren Register" as WPR #fa4494
 WPS -> WPR: Schrijft bij aanmaken een kopie weg
 ScanApp -> WPR: Vraagt geldigheid hash op
 WPR -> WPR: Kijkt of waardepapier aan de hand van hash gevonden kan worden
+
 alt hash gevonden
-WPR -> ScanApp: Waardepapier geldig
+
+    WPR -> ScanApp: Waardepapier geldig
+
 else hash niet gevonden
-WPR -> ScanApp: Waardepapier ongeldig
+
+    WPR -> ScanApp: Waardepapier ongeldig
+
+end
 
 @enduml
