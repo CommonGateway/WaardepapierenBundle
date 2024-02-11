@@ -1,36 +1,48 @@
 # Waardepapieren
 
+## Waarom waardepapieren?
 
-## Over Waardepapieren
+Soms moet je aantonen dat je in een gemeente woont. Bijvoorbeeld als een woningcorporatie daarom vraagt. Je gaat dan naar de gemeente om een uittreksel aan te vragen. De gemeentemedewerker zoekt jouw gegevens op in het burgerzakensysteem. Print een uittreksel. En zet daar een stempel op. Een uittreksel kan vaak ook online aangevraagd worden. Het duurt dan een aantal dagen voordat je het uittreksel thuis hebt. In beide gevallen is het proces arbeidsintensief, en klantonvriendelijk. Ook zijn de kosten voor zowel de gemeente als inwoner hoog.
 
-Soms moet je aantonen dat je in een gemeente woont. Bijvoorbeeld als een woningcorporatie daarom vraagt. Je gaat dan naar de gemeente om een uittreksel aan te vragen. De gemeentemedewerker zoekt jouw gegevens op in het burgerzakensysteem. Print een uittreksel. En zet daar een stempel op. Een uittreksel kan vaak ook online aangevraagd worden. Het duurt dan een aantal dagen voordat je het uittreksel thuis hebt. In beide gevallen is het proces arbeidsintensief, en klantonvriendelijk. Ook zijn de kosten voor zowel de gemeente als inwoner hoog. NB: Deze website is in aanbouw.
+Deze dienstverlening aan inwoners en bedrijven moet verbeterd worden. Het liefst in combinatie met het bereiken van een efficiëntere bedrijfsvoering. Dit streven leidde bij de gemeente Haarlem tot de ontwikkeling van een Proof of Concept (PoC) voor het verstrekken van digitale waardepapieren. Een uittreksel uit de Basisregistratie Personen bijvoorbeeld. De klantreis voor uittreksels is in kaart gebracht om de behoefte aan deze oplossing bij zowel de gemeente als de inwoner te analyseren. Acht gemeenten hebben het prototype uitgewerkt tot een veilig product dat gemeenten nu zelf kunnen implementeren.
 
-## Over het innovatieproject Waardepapieren
+## Wat is nu eigenlijk een waardepapier?
 
-De dienstverlening aan inwoners en bedrijven moet verbeterd worden. Het liefst in combinatie met het bereiken van een efficiëntere bedrijfsvoering. Dit streven leidde bij de gemeente Haarlem tot de ontwikkeling van een Proof of Concept (PoC) voor het verstrekken van digitale waardepapieren. Een uittreksel uit de Basisregistratie Personen bijvoorbeeld. De klantreis voor uittreksels is in kaart gebracht om de behoefte aan deze oplossing bij zowel de gemeente als de inwoner te analyseren. Acht gemeenten hebben het prototype uitgewerkt tot een veilig product dat gemeenten nu zelf kunnen implementeren.
+In de technische zin is een waardepapier een claim die kan worden gecontroleerd, of in vakjargon [verifiable credentials](https://www.w3.org/TR/vc-data-model/) een [europese standaard](https://ec.europa.eu/digital-building-blocks/wikis/pages/viewpage.action?pageId=555222155) . Internationaal (en binnen de EU identywallet) gebruiken we als techniek daarvoor doorgaans [JSON WEB Tokens](https://en.wikipedia.org/wiki/JSON_Web_Token) maar in Nederland gebruiken we vaak [irma](https://irma.app/docs/schemes/#updating-and-signing-schemes-with-irma). De waardepapieren service ondersteund in princiepe bijde.
 
-## Verviable credentials als kern
+Een claim kan een data set zijn (zo als een volledig uittreksel) en een enkel feit (zo als een diploma), laten we die laatste eens als voorbeeld nemen
 
-Waardepapieren bouwt verder op het [verviable credentials project](https://ec.europa.eu/digital-building-blocks/wikis/pages/viewpage.action?pageId=555222155) van de europese unnie. Het creërt claims en ondertekende deze met een certificaat (in NL context een PKIo). 
+```json
+{
+  "@context": [
+    "https://www.w3.org/2018/credentials/v1",
+    "https://www.w3.org/2018/credentials/examples/v1"
+  ],
+  "id": "http://example.edu/credentials/3732",
+  "type": ["VerifiableCredential", "UniversityDegreeCredential"],
+  "issuer": "https://example.edu/issuers/565049",
+  "issuanceDate": "2010-01-01T00:00:00Z",
+  "credentialSubject": {
+    "degree": {
+      "type": "BachelorDegree",
+      "name": "Bachelor of Science and Arts"
+    }
+  }
+}
+```
 
-Een claim kan een data set zijn (zo als een volledig uittreksel) en een enkel feit (zo als een diploma), bij het teken van een claim wordt het signatuur van de data verweven met het certificaat van de uitgever. Zo kan een controllerende partij die een claim voor zich ziet twee belangrijke digitale controlles uitvoeren
+Het is met andere woorden niet veel meer dan een JSON object dat een aantal eigenschappen bevat, deze eigenschappen zouden overeen moeten komen met de eigenschappen van het document waarop de QR code gedrukt gaat worden.
 
-1. De data in de claim is niet aangepast
-2. De claim is verstrekt door een specifieke organisaties
+Vervolgens onderteken we de credential met een certificaat zodat aan de hand van de public key kan worden gecontrolleerd of de credential
 
-## Aktes
+* Daadwerkenlijk afgegeven is door de partij die er op staat als issuer
+* Niet is aangepast
+* Niet is verlopen (optioneel)
+* Niet is ingetrokken (optioneel)
 
-We zien claims als een aanvulling op de huidige papieren aktes die overheden reeds uitgeven. Door de claim als QR code op de akte af te drukken zijn aktes 
+En geeft de scan app de credential subject informatie terug te controlle (het papier waar de code op staat zou immers kunnen zijn aanepast).
 
-
-## Veiliger
-
-Het simpel toevoegen van qr codes en aktes daarmee controleerbaar maken voegt een extra dimensie van veiligheid toe aan aktes die niet met hologrammen of watermerken te bereiken zijn. 
-
-
-## Inzet buiten aktes
-
-De QR codes op claims kunnen ook buiten aktes worden gebruikt, bijvoorbeeld op een taxi-pass of toegangs bewijs.
+Zo creëren we een waterdicht systeem waarbij een afnemende partij in één oogopslag kan zien dat de gegevens nu nog juist zijn.
 
 ## Met wie we samenwerken
 
