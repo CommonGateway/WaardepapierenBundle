@@ -1,0 +1,21 @@
+@startuml
+title: Waardepapier Intrekken
+footer: Waardepapieren.app
+header: Waardepapieren.app
+
+
+actor ScanApp #fa4494
+entity "Waardepapieren Service" as WPS #fa4494
+entity "Waardepapieren Register" as WPR #fa4494
+database "Haalcentraal BRP" as BRP #26b8e6
+
+
+WPS -> WPR: Schrijft bij aanmaken een kopie weg
+ScanApp -> WPR: Vraagt geldigheid hash op
+WPR -> WPR: Kijkt of waardepapier aan de hand van hash gevonden kan worden
+alt hash gevonden
+WPR -> ScanApp: Waardepapier geldig
+else hash niet gevonden
+WPR -> ScanApp: Waardepapier ongeldig
+
+@enduml
