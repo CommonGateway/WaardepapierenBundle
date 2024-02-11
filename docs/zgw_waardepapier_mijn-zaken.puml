@@ -19,7 +19,7 @@ WP -> BRP: Haalt Persoonsgegevens op
 WP -> WP: Creerd waardepapier
 WP -> DRC: Plaats waardepapier
 WP -> ZRC: Zet status
-ZRC -> Citizen: Burger bekijkt zaak via Mijn Zaken
-DRC -> Citizen: Burger bekijkt waardepapier via Mijn Zaken
+ZRC -> Citizen: Inwoner bekijkt zaak via Mijn Zaken
+DRC -> Citizen: Inwoner bekijkt waardepapier via Mijn Zaken
 
 @enduml

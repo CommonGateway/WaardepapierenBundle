@@ -24,8 +24,8 @@ ZRC -> NC: Notificeerd
 NC -> Notify: Notificeerd
 Notify -> ZRC: Haalt klant gegevens
 Notify -> Citizen: Email of SMS
-ZRC -> Citizen: Burger bekijkt zaak via Mijn Zaken
-DRC -> Citizen: Burger bekijkt waardepapier via Mijn Zaken
+ZRC -> Citizen: Inwoner bekijkt zaak via Mijn Zaken
+DRC -> Citizen: Inwoner bekijkt waardepapier via Mijn Zaken
 
 
 @enduml
