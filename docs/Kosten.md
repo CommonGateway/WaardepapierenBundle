@@ -23,7 +23,7 @@ Het creëren van waardepapieren gebeurt in de waardepapieren service, u kunt ond
 |------------------------|-------------|----------|-------------|
 | Waardepapieren Service | Conduction  | € 3000,-  | € 250.-      |
 
-> [!IMPORTANT] De waardepapieren service maar gebruik van het [openservices.online]() framework, uw organisatie dient hierover te beschikken. Indien u dit nog niet heeft kunnen er aanvullende installatie kosten in rekening worden gebracht.
+> [!IMPORTANT] De waardepapieren service maar gebruik van het [openservices.online](http://openservices.online/) framework, uw organisatie dient hierover te beschikken. Indien u dit nog niet heeft kunnen er aanvullende installatie kosten in rekening worden gebracht.
 
 ### Waardepapieren Register (optioneel)
 
@@ -33,10 +33,10 @@ Indien u gebruik wilt maken van de mogenlijkheid tot het intrekken van waardepap
 |------------------------|-------------|----------|-------------|
 | Waardepapieren Register | Conduction  | € 1000,- | € 250.-      |
 
-> [!IMPORTANT] De waardepapieren service maar gebruik van het [openregisters.app]() framework, uw organisatie dient hierover te beschikken. Indien u dit nog niet heeft kunnen er aanvullende installatie kosten in rekening worden gebracht.
+> [!IMPORTANT] De waardepapieren service maar gebruik van het [openregisters.app](http://openregisters.app/) framework, uw organisatie dient hierover te beschikken. Indien u dit nog niet heeft kunnen er aanvullende installatie kosten in rekening worden gebracht.
 
 ### ScanApp (optioneel)
-Naast de algemeen beschickbare scan app bestaat de mogenlijkheid om een specifieke scanpp voor uw organisatie te ontwikkelen in uw huisstijl. Dit is een smaak keuze, het is voor het gebruik van waardepapieren.app niet nodig.
+Naast de algemeen beschickbare scan app bestaat de mogenlijkheid om een specifieke scanapp voor uw organisatie te ontwikkelen in uw huisstijl. Dit is een smaak keuze, het is voor het gebruik van waardepapieren.app niet nodig.
 
 | Component | Leverancier | Eenmalig | Maandelijks |
 |-----------|-------------|----------|-------------|
