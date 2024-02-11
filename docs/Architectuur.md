@@ -35,7 +35,6 @@ Deze variant is specifiek ontworpen om te integreren met ZGW-gebaseerde zaaksyst
 **Referenties**
 
 * [ZGW API's](https://www.vngrealisatie.nl/producten/api-standaarden-zaakgericht-werken)
-*
 
 ### Direct gebruik
 
