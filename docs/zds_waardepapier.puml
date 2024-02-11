@@ -1,11 +1,12 @@
 @startuml
 title: ZDS Waardepapier
-footer: Common Gateway | ZDS Waardepapier
-header: Common Gateway
+footer: Waardepapieren.app
+header: Waardepapieren.app
+skinparam backgroundColor transparent
 
-database "Zaak Systeem" as ZS
-entity "ZDS/ZGW Adapter" as Adapter
-entity "Waardepapieren Service" as WP
+database "Zaak Systeem" as ZS #00377a
+entity "ZDS/ZGW Adapter" as Adapter #00377a
+entity "Waardepapieren Service" as WP #fa4494
 
 ZS -> Adapter: ZDS Brug
 Adapter -> WP: ZGW

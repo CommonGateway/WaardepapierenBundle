@@ -1,10 +1,11 @@
 @startuml
 title: Waardepapier Direct bevragen
-footer: Common Gateway | Waardepapier Direct bevragen
-header: Common Gateway
+footer: Waardepapieren.app
+header: Waardepapieren.app
+skinparam backgroundColor transparent
 
-entity "Applicatie" as app
-entity "Waardepapieren Service" as WP
+entity "Applicatie" as app #00377a
+entity "Waardepapieren Service" as WP #fa4494
 
 app -> WP: POST waardepapier (inc gegeven)
 WP -> WP: Creërd waardepapier

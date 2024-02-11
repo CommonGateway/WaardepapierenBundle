@@ -1,13 +1,14 @@
 @startuml
 title: ZGW Waardepapier
-footer: Common Gateway | ZGW Waardepapier
-header: Common Gateway
+footer: Waardepapieren.app
+header: Waardepapieren.app
 
-database "Zaak registratie component" as ZRC
-database "Document registratie component" as DRC
-entity "Notificatie Component" as NC
-entity "Waardepapieren Service" as WP
-database "Haalcentraal BRP" as BRP
+
+database "Zaak registratie component" as ZRC #00377a
+database "Document registratie component" as DRC #00377a
+entity "Notificatie Component" as NC #00377a
+entity "Waardepapieren Service" as WP #fa4494
+database "Haalcentraal BRP" as BRP #26b8e6
 
 ZRC -> NC: Notificeerd
 NC -> WP: Notificeerd

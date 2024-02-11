@@ -1,14 +1,15 @@
 @startuml
 title: ZGW Waardepapier
-footer: Common Gateway | ZGW Waardepapier
-header: Common Gateway
+footer: Waardepapieren.app
+header: Waardepapieren.app
+skinparam backgroundColor transparent
 
-actor Citizen
-database "Zaak registratie component" as ZRC
-database "Document registratie component" as DRC
-entity "Notificatie Component" as NC
-entity "Waardepapieren Service" as WP
-database "Haalcentraal BRP" as BRP
+actor Inwoner as Citizen #00377a
+database "Zaak registratie component" as ZRC #00377a
+database "Document registratie component" as DRC #00377a
+entity "Notificatie Component" as NC #00377a
+entity "Waardepapieren Service" as WP #fa4494
+database "Haalcentraal BRP" as BRP #26b8e6
 
 Citizen -> ZRC : Maakt Zaak aan (e.g. via web formulier)
 ZRC -> NC: Notificeerd
@@ -20,6 +21,5 @@ WP -> DRC: Plaats waardepapier
 WP -> ZRC: Zet status
 ZRC -> Citizen: Burger bekijkt zaak via Mijn Zaken
 DRC -> Citizen: Burger bekijkt waardepapier via Mijn Zaken
-
 
 @enduml
