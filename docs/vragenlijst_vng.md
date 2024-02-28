@@ -38,54 +38,15 @@ De Waardepapieren-microservice biedt een uitgelezen kans voor overheden om hun d
 
 ## 8 Aangesloten gemeenten bij de realisatie
 
-Haarlem
-Bloemendaal/Heemstede
-DUO+ (Diemen, Uithoorn, Ouder-Amstel)
-Hoorn
-Schiedam
-Rotterdam (Via OpenCatalogi)
-Gouda (Via OpenCatalogi)
-Noordwijk (Via OpenWoo.app)
-Tubbergen (Via OpenWoo.app)
-Epe (Via OpenWoo.app)
-Dinkelland (Via OpenWoo.app)
-Leiden (Via OpenCatalogi)
-Roermond (Via OpenWoo.app)
-Assen (Via OpenWoo.app)
-Hilversum (Via OpenWoo.app)
-Haarlemermeer (Via OpenWoo.app)
-Enschede (Via OpenWoo.app)
-Eindhoven (Via OpenWoo.app)
+Buren, Hoorn, Hilversum, Haarlem
 
 ## 9 Gebruikende gemeenten
 
-Haarlem
-Bloemendaal/Heemstede
-DUO+ (Diemen, Uithoorn, Ouder-Amstel)
-Hoorn
-Schiedam
-Rotterdam (Via OpenCatalogi)
-Gouda (Via OpenCatalogi)
-Noordwijk (Via OpenWoo.app)
-Tubbergen (Via OpenWoo.app)
-Epe (Via OpenWoo.app)
-Dinkelland (Via OpenWoo.app)
-Leiden (Via OpenCatalogi)
-Roermond (Via OpenWoo.app)
-Assen (Via OpenWoo.app)
-Hilversum (Via OpenWoo.app)
-Haarlemermeer (Via OpenWoo.app)
-Enschede (Via OpenWoo.app)
-Eindhoven (Via OpenWoo.app)
+Buren
 
 ## 10 Betrokken leveranciers
 
-ICTU (als opdrachtnemer)
-Conduction B.V (Via OpenWoo.app en  OpenCatalogi)
-Yard (Via OpenWoo.app)
-Acato (Via OpenWoo.app)
-Sim Groep (Via OpenWoo.app en  OpenCatalogi)
-Xxllnc (Via OpenWoo.app en Open Registers | Klanten)
+Conduction B.V.
 
 ## 11 Startdatum initiatief
 
