@@ -6,15 +6,15 @@ Waardepapierenservice
 
 ## 2 Type product
 
-- Toepassing (bruikbare oplossing)
+* Toepassing (bruikbare oplossing)
 
 ## 3 Componenten in de toepassing
 
-- Open Services Framework
-- Verifiable Credentials Technologie (JSON WEB Tokens, IRMA)
-- Symfony
-- API Platform
-- Database (MySQL/PostgreSQL/MsSQL)
+* Open Services Framework
+* Verifiable Credentials Technologie (JSON WEB Tokens, IRMA)
+* Symfony
+* API Platform
+* Database (MySQL/PostgreSQL/MsSQL)
 
 ## 4 Parallel gebruik naast bestaande software
 
@@ -26,15 +26,15 @@ De Waardepapieren-microservice biedt een uitgelezen kans voor overheden om hun d
 
 ## 6 Domein
 
-- Overkoepelend/ randvoorwaardelijk voor CG
-- Specifiek voor dienstverlening en documentverificatie binnen gemeenten
+* Overkoepelend/ randvoorwaardelijk voor CG
+* Specifiek voor dienstverlening en documentverificatie binnen gemeenten
 
 ## 7 Betrokken organisatietypes
 
-- Gemeenten
-- Leveranciers
-- Kennisinstellingen (zoals ICTU)
-- Ketenpartners
+* Gemeenten
+* Leveranciers
+* Kennisinstellingen (zoals ICTU)
+* Ketenpartners
 
 ## 8 Aangesloten gemeenten bij de realisatie
 
@@ -109,7 +109,7 @@ Ruben van der Linde
 
 ## 16 Op welke website kunnen we meer info over het product vinden?
 
-[https://waardepapieren.openservices.online/](https://waardepapieren.openservices.online/)
+<https://waardepapieren.openservices.online/>
 
 ## 17 Korte omschrijving van het product
 
@@ -117,7 +117,7 @@ Het veilig, vertrouwd en snel verstrekken van digitale uittreksels en bewijsstuk
 
 ## 18 Bijdrage aan wendbaarheid van gemeenten
 
-- 4
+* 4
 
 ## 19 Toelichting op wendbaarheid
 
@@ -125,7 +125,7 @@ De service maakt snelle aanpassing aan nieuwe technologieën en dienstverlenings
 
 ## 20 Bijdrage aan betere dienstverlening
 
-- 4
+* 4
 
 ## 21 Toelichting op betere dienstverlening
 
@@ -133,7 +133,7 @@ Verbetering van de klantreis door snellere en directe verstrekking van digitale 
 
 ## 22 Bijdrage aan regie op gegevens voor inwoners
 
-- 4
+* 4
 
 ## 23 Toelichting op regie op gegevens
 
@@ -145,7 +145,7 @@ Biedt inwoners meer controle en overzicht over hun persoonlijke gegevens en de a
 
 ## 25 Lagen van het initiatief
 
-- Laag 4 (Dienstenlaag)
+* Laag 4 (Dienstenlaag)
 
 ## 26 Toegepaste API-standaarden
 
@@ -159,7 +159,7 @@ NL-GOV profiel voor cloud events
 
 ## 27 Fase van het initiatief
 
-- Doorontwikkeling en beheer
+* Doorontwikkeling en beheer
 
 ## 28 Uitdagingen
 
