@@ -6,7 +6,6 @@ Maar als u wel beheer en ondersteuning wenst dient u die in te kopen. De kosten 
 
 Onderstaande treft u de bij ons bekende kosten per component die leveranciers in rekening brengen voor een SLA of SAAS. Als u een beter beeld wilt krijgen bij welke componenten uw organisatie wil toepassen kunt u kijken bij [architectuur](/docs/Architectuur.md).
 
-
 ## Contactgegevens (bekende) leveranciers
 
 | Leverancier                                    | Contactpersoon                                                                       |
