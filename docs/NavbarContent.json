@@ -1,0 +1,71 @@
+[
+    {
+      "label": "Home",
+      "type": "internal",
+  
+      "current": {
+        "pathname": "/"
+      },
+      "handleClick": {
+        "link": "/"
+      }
+    },
+    {
+      "label": "Dimpact",
+      "type": "external",
+      "current": {
+        "pathname": "/registers"
+      },
+      "handleClick": {
+        "link":  "https://dimpact.nl/"
+        }
+    },
+    {
+      "label": "Informatie",
+      "current": {
+        "pathname": "/docs"
+      },
+      "subItems": [
+        {
+          "label": "Architectuur",
+          "type": "internalMarkdown",
+          "current": {
+            "pathname": "/docs/Architectuur"
+          },
+          "handleClick": {
+            "internalMarkdown": {
+              "directoryName": "docs",
+              "fileName": "Architectuur"
+            }
+          }
+        },
+        {
+          "label": "Kosten",
+          "type": "internalMarkdown",
+          "current": {
+            "pathname": "/docs/features"
+          },
+          "handleClick": {
+            "internalMarkdown": {
+              "directoryName": "docs",
+              "fileName": "Kosten"
+            }
+          }
+        },
+        {
+          "label": "Techniek",
+          "type": "internalMarkdown",
+          "current": {
+            "pathname": "/docs/features"
+          },
+          "handleClick": {
+            "internalMarkdown": {
+              "directoryName": "docs",
+              "fileName": "Techniek"
+            }
+          }
+        }
+      ]
+    }
+  ]
+  

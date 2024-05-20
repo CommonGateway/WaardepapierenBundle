@@ -1,0 +1,19 @@
+[
+  {
+    "title": "Links",
+    "items": [
+      {
+        "ariaLabel": "Home",
+        "value": "Home",
+        "link": "/",
+        "icon": { "prefix": "fas", "icon": "home", "placement": "left" }
+      },
+      {
+        "value": "Github",
+        "ariaLabel": "Github",
+        "link": "https://github.com/CommonGateway/WaardepapierenBundle",
+        "icon": { "prefix": "fab", "icon": "github", "placement": "left" }
+      }
+    ]
+  }
+]
