@@ -1,8 +1,11 @@
 # Kosten
 
-Waardepapieren.app bestaat uit een collectie van Common Ground componenten waarbij u als organisatie zelf de keuze heeft welke componenten toepast (gaat u bijvoorbeeld integereren in uw huidige eDiensten of losse formulieren opstarten). De kosten hangen daarmee sterk af van uw wensen en keuzes. Niet te min proberen we de kosten vooraf zo goed en open mogelijk in beeld te brengen.
+Waardepapieren.app bestaat uit een collectie van Common Ground componenten waarbij u als organisatie zelf de keuze heeft welke componenten toepast (gaat u bijvoorbeeld integereren in uw huidige eDiensten of losse formulieren opstarten). Uiteraard kunt u de applicatie open source zelf in eigen beheer draaien.
+
+Maar als u wel beheer en ondersteuning wenst dient u die in te kopen. De kosten hangen daarmee sterk af van uw wensen en keuzes. Niet te min proberen we de kosten vooraf zo goed en open mogelijk in beeld te brengen.
 
 Onderstaande treft u de bij ons bekende kosten per component die leveranciers in rekening brengen voor een SLA of SAAS. Als u een beter beeld wilt krijgen bij welke componenten uw organisatie wil toepassen kunt u kijken bij [architectuur](/docs/Architectuur.md).
+
 
 ## Contactgegevens (bekende) leveranciers
 
