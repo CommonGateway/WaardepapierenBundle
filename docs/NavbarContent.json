@@ -30,7 +30,7 @@
           "label": "Architectuur",
           "type": "internalMarkdown",
           "current": {
-            "pathname": "/docs/Architectuur"
+            "pathname": "/docs/architectuur"
           },
           "handleClick": {
             "internalMarkdown": {
@@ -43,7 +43,7 @@
           "label": "Kosten",
           "type": "internalMarkdown",
           "current": {
-            "pathname": "/docs/features"
+            "pathname": "/docs/kosten"
           },
           "handleClick": {
             "internalMarkdown": {
@@ -56,7 +56,7 @@
           "label": "Techniek",
           "type": "internalMarkdown",
           "current": {
-            "pathname": "/docs/features"
+            "pathname": "/docs/techniek"
           },
           "handleClick": {
             "internalMarkdown": {
